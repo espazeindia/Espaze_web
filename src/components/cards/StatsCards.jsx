@@ -17,6 +17,7 @@ export default function StatCard({ title, value, change, icon, iconBgClass }) {
           {icon}
         </div>
       </div>
+
       <div className="flex items-center justify-between mt-4">
           <span className={`${theme ? "text-zinc-700":"text-gray-300"} text-sm mr-2`}>{change.label}</span>
             <span
@@ -30,6 +31,7 @@ export default function StatCard({ title, value, change, icon, iconBgClass }) {
               ) : (
                 <ArrowDropDown className="text-2xl" />
               )}
+              
               
             </span>
             
