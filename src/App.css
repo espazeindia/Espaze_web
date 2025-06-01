@@ -1,0 +1,10 @@
+@import "tailwindcss";
+
+.sideBarNone::-webkit-scrollbar {
+  display: none;
+}
+
+
+.darkMode input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1); /* Inverts colors to make it dark */
+}
