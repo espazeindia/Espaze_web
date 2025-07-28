@@ -4,7 +4,7 @@ import { FormControl, Input } from "@mui/joy";
 import Logo from "../assets/img/logo2.png";
 import Logo2 from "../assets/img/logo.png";
 import { Link } from "react-router-dom";
-import AdminServices from "../services/AdminServices";
+import LoginServices from "../services/LoginServices";
 import { notifyError, notifySuccess } from "../utils/toast";
 import { useNavigate } from "react-router-dom";
 import { DarkMode, LightMode } from "@mui/icons-material";
@@ -21,19 +21,17 @@ function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const cookieTimeOut = 0.5;
-      const res = await AdminServices.loginAdmin({ ...formData });
-      if (res) {
-        notifySuccess("Login Success!");
-        Cookies.set("adminInfo", JSON.stringify(res), {
-          expires: cookieTimeOut,
-          sameSite: "None",
-          secure: true,
-        });
+      const res = await LoginServices.LoginOperationalGuy({email:formData.email,password:formData.password});
+      console.log("result",res)
+      if (res.success) {
+        notifySuccess(res.message);
+        Cookies.set("EspazeCookie",res.token);
         navigate("/");
+      }else{
+        notifyError(res.message)
       }
     } catch (err) {
-      notifyError(err?.response?.data?.message || err?.message);
+      notifyError(err.message);
     }
   };
 

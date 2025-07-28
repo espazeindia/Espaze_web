@@ -18,10 +18,9 @@ const Layout = () => {
 
   useEffect(() => {
     const checkAuth = async () => {
-      const cookie = Cookies.get("adminInfo");
+      const cookie = Cookies.get("EspazeCookie");
       if (cookie) {
-        const parsedCookie = JSON.parse(cookie);
-        const isValid = await validate(parsedCookie.token);
+        const isValid = await validate(cookie);
         const filterRoutes = routes.filter((route) =>
           route.access.includes(isValid.role)
         );

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Button, FormControl, Input, Select, Option } from "@mui/joy";
 import LoginImage from "../assets/img/login-office.jpeg";
 import { Link } from "react-router-dom";
-import AdminServices from "../services/AdminServices";
+import LoginServices from "../services/LoginServices";
 import { notifyError, notifySuccess } from "../utils/toast";
 import { useNavigate } from "react-router-dom";
 import { useMode } from "../contexts/themeModeContext";
@@ -20,7 +20,7 @@ function SignUp() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await AdminServices.registerAdmin({
+      const res = await LoginServices.registerAdmin({
         ...formData,
       });
       if (res) {

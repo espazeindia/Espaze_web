@@ -24,10 +24,10 @@ function App() {
   
     useEffect(() => {
       const checkAuth = async () => {
-        const cookie = Cookies.get("adminInfo");
+        const cookie = Cookies.get("EspazeCookie");
+        console.log("cookie",cookie)
         if (cookie) {
-          const parsedCookie = JSON.parse(cookie);
-          const isValid = await validate(parsedCookie.token);
+          const isValid = await validate(cookie);
           const filterRoutes = routes.filter(
             (route)=>route.access.includes(isValid.role)
           )
@@ -50,11 +50,11 @@ function App() {
   
     useEffect(() => {
       const checkAuth = async () => {
-        const cookie = Cookies.get("adminInfo");
+        const cookie = Cookies.get("EspazeCookie");
+        console.log("cookie2",cookie)
         if (cookie) {
-          const parsedCookie = JSON.parse(cookie);
-          const isValid = await validate(parsedCookie.token);
-          setIsAuthenticated(isValid);
+          const isValid = await validate(cookie);
+          setIsAuthenticated(true);
         } else {
           setIsAuthenticated(false);
         }
@@ -63,9 +63,9 @@ function App() {
       checkAuth();
     }, []);
   
-    if (isAuthenticated === null) return <div>Loading...</div>;
-    return isAuthenticated ? children : <Navigate to="/login" replace />;
-  }
+  //   if (isAuthenticated === null) return <div>Loading...</div>;
+  //   return isAuthenticated ? children : <Navigate to="/login" replace />;
+   }
   return (
     <>
       <ToastContainer />

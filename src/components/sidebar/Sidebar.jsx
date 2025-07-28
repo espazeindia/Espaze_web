@@ -19,7 +19,7 @@ function Sidebar() {
   const { theme } = useMode();
 
   const handleLogOut = () => {
-    Cookies.remove("adminInfo", { sameSite: "None", secure: true });
+    Cookies.remove("EspazeCookie", { sameSite: "None", secure: true });
     navigate("/login");
   };
 
@@ -28,28 +28,22 @@ function Sidebar() {
 
   useEffect(() => {
     const checkAuth = async () => {
-      const cookie = Cookies.get("adminInfo");
+      const cookie = Cookies.get("EspazeCookie");
       if (cookie) {
-        const parsedCookie = JSON.parse(cookie);
-        const isValid = await validate(parsedCookie.token);
+        const isValid = await validate(cookie);
         const filterRoutes = sidebarRoutes.filter((route) =>
-        route.access.includes(isValid.role)
+          route.access.includes(isValid.role)
         );
         setFilteredRoutes(filterRoutes);
-      } 
+      }
       setLoading(false); // Mark as loaded after checking auth
     };
 
     checkAuth();
   }, []);
 
-
-  if(loading){
-    return(
-      <div>
-        Loading...
-      </div>
-    )
+  if (loading) {
+    return <div>Loading...</div>;
   }
 
   //[#5f63e8]
@@ -58,7 +52,9 @@ function Sidebar() {
   return (
     <div
       className={`${
-        theme ? "bg-white border-zinc-200 border-r" : "bg-neutral-950 border-zinc-800 border-r"
+        theme
+          ? "bg-white border-zinc-200 border-r"
+          : "bg-neutral-950 border-zinc-800 border-r"
       } sticky top-0 min-h-screen py-3 flex flex-col justify-between text-white transition-transform duration-150 ${
         sidebarOpen ? "w-[13vw]" : "w-[4vw]"
       }`}
@@ -97,7 +93,9 @@ function Sidebar() {
             >
               <route.icon className="text-lg" />
               <span
-                className={`ml-3 transition-all duration-150 ${sidebarOpen ? " inline" : "hidden"}`}
+                className={`ml-3 transition-all duration-150 ${
+                  sidebarOpen ? " inline" : "hidden"
+                }`}
               >
                 {route.name}
               </span>
@@ -124,13 +122,17 @@ function Sidebar() {
           <Link
             to="/settings"
             className={`${
-              theme ? "text-zinc-600 hover:text-black" : "text-zinc-400 hover:text-white"
+              theme
+                ? "text-zinc-600 hover:text-black"
+                : "text-zinc-400 hover:text-white"
             } flex items-center px-4
              py-1 rounded-md ${sidebarOpen ? "" : "justify-center"} `}
           >
             <SettingsIcon />
             <span
-              className={`ml-3 transition-all duration-150  ${sidebarOpen ? "indline" : "hidden"} `}
+              className={`ml-3 transition-all duration-150  ${
+                sidebarOpen ? "indline" : "hidden"
+              } `}
             >
               Settings
             </span>
@@ -140,7 +142,9 @@ function Sidebar() {
         <button
           onClick={handleLogOut}
           className={`flex items-center w-full px-4
-          py-3 text-red-500 rounded-lg duration-1000  ${sidebarOpen ? "" : "justify-center "}
+          py-3 text-red-500 rounded-lg duration-1000  ${
+            sidebarOpen ? "" : "justify-center "
+          }
            hover:bg-red-500 hover:text-white hover:cursor-pointer transition-colors`}
         >
           <LogoutOutlinedIcon />

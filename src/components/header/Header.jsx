@@ -16,17 +16,19 @@ function Header() {
 
   useEffect(() => {
     const fetchUser = async () => {
-      const cookieInfo = JSON.parse(Cookies.get("adminInfo"));
-      const payload = await validate(cookieInfo.token);
+      const cookie = Cookies.get("EspazeCookie");
+      const payload = await validate(cookie);
+      console.log("nameuser",payload)
       if (payload) {
         setUser(payload.name);
+        
       }
     };
     fetchUser();
   }, []);
 
   const handleLogOut = () => {
-    Cookies.remove("adminInfo", { sameSite: "None", secure: true });
+    Cookies.remove("EspazeCookie", { sameSite: "None", secure: true });
     navigate("/login");
   };
 
