@@ -1,9 +1,11 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useMode } from "../contexts/themeModeContext";
 import AddMetaData from "../components/modal/AddMetaData";
 import ProductOnboardingTable from "../components/table/ProductOnboardingTable";
 
 function ProductOnboarding() {
+  const [page,setPage]=useState(0)
+  const [limit,setLimit]=useState(10)
   const [openAddMetaData, setOpenAddMetaData] = useState(false);
 
   const handleOpenAddMetaDataModal = () => {
@@ -35,7 +37,6 @@ function ProductOnboarding() {
   ]);
 
 
-  const [filterData, setFilterData] = useState([]);
 
   const [searchData, setSearchData] = useState("");
 
@@ -43,14 +44,6 @@ function ProductOnboarding() {
     setSearchData(e.target.value);
   };
 
-  useEffect(() => {
-    let filter = onboardingData.filter((data) =>
-      [data.productName, data.code, data.category, data.subCategory].some(
-        (column) => column.toLowerCase().includes(searchData.toLowerCase())
-      )
-    );
-    setFilterData(filter);
-  }, [searchData,onboardingData]);
 
   return (
     <div
@@ -68,7 +61,7 @@ function ProductOnboarding() {
               ? "bg-white text-zinc-700 shadow-zinc-300"
               : "bg-zinc-800 text-zinc-200 shadow-zinc-700"
           }`}
-          placeholder="Search MetaData"
+          placeholder="Search By MetaData Name"
         />
         <div className="flex gap-2">
           <div
@@ -94,7 +87,7 @@ function ProductOnboarding() {
           </button>
         </div>
       </div>
-      <ProductOnboardingTable onboardingData={filterData} setOnboardingData={setOnboardingData}/>
+      <ProductOnboardingTable onboardingData={onboardingData} setOnboardingData={setOnboardingData} setPage={setPage} page={page} limit={limit} setLimit={setLimit}/>
       <AddMetaData
         isOpen={openAddMetaData}
         onClose={() => {
