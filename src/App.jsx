@@ -51,7 +51,6 @@ function App() {
     useEffect(() => {
       const checkAuth = async () => {
         const cookie = Cookies.get("EspazeCookie");
-        console.log("cookie2",cookie)
         if (cookie) {
           const isValid = await validate(cookie);
           setIsAuthenticated(true);
