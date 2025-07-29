@@ -13,40 +13,71 @@ import {
   Textarea,
 } from "@mui/joy";
 import { useMode } from "../../contexts/themeModeContext";
+import { notifyError } from "../../utils/toast";
+import ProductOnboardingServices from "../../services/ProductOnboardingServices";
+import { Description } from "@mui/icons-material";
 
 function AddMetaData({ isOpen, onClose, setOnboardingData }) {
   const { theme } = useMode();
 
-  const[saveData,setSaveData] = useState(
-    {
-      productName : "",
-      productDescription : "",
-      category :"",
-      subCategory :"",
-      code :"",
-      mrp : 0,
-      image : "",
-    }
-  )
+  const [saveData, setSaveData] = useState({
+    productName: "",
+    productDescription: "",
+    category: "",
+    subCategory: "",
+    code: "",
+    mrp: 0,
+    image: "",
+  });
 
   const handleChange = (e) => {
-    const {name,value} = e.target
-    setSaveData((prevData)=>{
-      return({
-        ...prevData,[name]:value 
-      })
-    }) 
-    
-  }
+    const { name, value } = e.target;
+    setSaveData((prevData) => {
+      return {
+        ...prevData,
+        [name]: value,
+      };
+    });
+  };
 
-  const handleSubmit=(e)=>{
-    e.preventDefault()
-    setOnboardingData((prevData) =>[
-      ...prevData,{...saveData,id:prevData.length}
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const body = {
+        name: saveData.productName,
+        description: saveData.productDescription,
+        image: saveData.image,
+        category_id: saveData.category,
+        subcategory_id: saveData.subCategory,
+        mrp: parseFloat(saveData.mrp),
+        hsn_code : saveData.code
+      };
+      const res = await ProductOnboardingServices.CreateMetaData(body);
+      const result = {
+      productName : res.data.metadata_name,
+      productDescription: res.data.metadata_description,
+      category: res.data.metadata_category_id,
+      subCategory: res.data.metadata_subcategory_id,
+      code: res.data.hsn_code,
+      mrp: res.data.metadata_mrp,
+      image: res.data.metadata_image,
+      id : res.data.metadata_id
+      }
+      if(res.success === true )setOnboardingData((prevData) =>[
+      ...prevData,result
     ]
     )
-    onClose()
-  }
+      
+
+    } catch (err) {
+      if (err === "cookie error") {
+        notifyError("Cookie error, please relogin and try again");
+      } else {
+        notifyError(err.message);
+      }
+    }
+    onClose();
+  };
   return (
     <Modal open={isOpen} onClose={onClose}>
       <ModalDialog
@@ -64,16 +95,20 @@ function AddMetaData({ isOpen, onClose, setOnboardingData }) {
           Add Meta Data
         </DialogTitle>
         <DialogContent className="h-[50vh] w-[70vw] overflow-scroll sideBarNone">
-          <form
-          onSubmit={handleSubmit}
-          >
-          <div className="grid grid-cols-2 gap-5">
-          <FormControl size="lg" className="space-y-1">
-                <label className={theme ? "text-zinc-800" : "text-zinc-300"}>Product Name</label>
+          <form onSubmit={handleSubmit}>
+            <div className="grid grid-cols-2 gap-5">
+              <FormControl size="lg" className="space-y-1">
+                <label className={theme ? "text-zinc-800" : "text-zinc-300"}>
+                  Product Name
+                </label>
                 <Input
                   sx={
                     theme
-                      ? { backgroundColor: "#f4f4f5", color: "#27272a", border: "none" }
+                      ? {
+                          backgroundColor: "#f4f4f5",
+                          color: "#27272a",
+                          border: "none",
+                        }
                       : {
                           backgroundColor: "#27272a",
                           color: "#ffffff",
@@ -89,13 +124,19 @@ function AddMetaData({ isOpen, onClose, setOnboardingData }) {
                 />
               </FormControl>
               <FormControl size="lg" className="space-y-1 row-span-2">
-                <label className={theme ? "text-zinc-800" : "text-zinc-300"}>Product Description</label>
+                <label className={theme ? "text-zinc-800" : "text-zinc-300"}>
+                  Product Description
+                </label>
                 <Textarea
-                className = "h-full p-2"
-                maxRows={4}
+                  className="h-full p-2"
+                  maxRows={4}
                   sx={
                     theme
-                      ? { backgroundColor: "#f4f4f5", color: "#27272a", border: "none" }
+                      ? {
+                          backgroundColor: "#f4f4f5",
+                          color: "#27272a",
+                          border: "none",
+                        }
                       : {
                           backgroundColor: "#27272a",
                           color: "#ffffff",
@@ -110,11 +151,17 @@ function AddMetaData({ isOpen, onClose, setOnboardingData }) {
                 />
               </FormControl>
               <FormControl size="lg" className="space-y-1">
-                <label className={theme ? "text-zinc-800" : "text-zinc-300"}>Category</label>
+                <label className={theme ? "text-zinc-800" : "text-zinc-300"}>
+                  Category
+                </label>
                 <Input
                   sx={
                     theme
-                      ? { backgroundColor: "#f4f4f5", color: "#27272a", border: "none" }
+                      ? {
+                          backgroundColor: "#f4f4f5",
+                          color: "#27272a",
+                          border: "none",
+                        }
                       : {
                           backgroundColor: "#27272a",
                           color: "#ffffff",
@@ -130,11 +177,17 @@ function AddMetaData({ isOpen, onClose, setOnboardingData }) {
                 />
               </FormControl>
               <FormControl size="lg" className="space-y-1">
-                <label className={theme ? "text-zinc-800" : "text-zinc-300"}>Sub Category</label>
+                <label className={theme ? "text-zinc-800" : "text-zinc-300"}>
+                  Sub Category
+                </label>
                 <Input
                   sx={
                     theme
-                      ? { backgroundColor: "#f4f4f5", color: "#27272a", border: "none" }
+                      ? {
+                          backgroundColor: "#f4f4f5",
+                          color: "#27272a",
+                          border: "none",
+                        }
                       : {
                           backgroundColor: "#27272a",
                           color: "#ffffff",
@@ -150,11 +203,17 @@ function AddMetaData({ isOpen, onClose, setOnboardingData }) {
                 />
               </FormControl>
               <FormControl size="lg" className="space-y-1">
-                <label className={theme ? "text-zinc-800" : "text-zinc-300"}>Code</label>
+                <label className={theme ? "text-zinc-800" : "text-zinc-300"}>
+                  Code
+                </label>
                 <Input
                   sx={
                     theme
-                      ? { backgroundColor: "#f4f4f5", color: "#27272a", border: "none" }
+                      ? {
+                          backgroundColor: "#f4f4f5",
+                          color: "#27272a",
+                          border: "none",
+                        }
                       : {
                           backgroundColor: "#27272a",
                           color: "#ffffff",
@@ -170,11 +229,17 @@ function AddMetaData({ isOpen, onClose, setOnboardingData }) {
                 />
               </FormControl>
               <FormControl size="lg" className="space-y-1">
-                <label className={theme ? "text-zinc-800" : "text-zinc-300"}>MRP</label>
+                <label className={theme ? "text-zinc-800" : "text-zinc-300"}>
+                  MRP
+                </label>
                 <Input
                   sx={
                     theme
-                      ? { backgroundColor: "#f4f4f5", color: "#27272a", border: "none" }
+                      ? {
+                          backgroundColor: "#f4f4f5",
+                          color: "#27272a",
+                          border: "none",
+                        }
                       : {
                           backgroundColor: "#27272a",
                           color: "#ffffff",
@@ -192,11 +257,17 @@ function AddMetaData({ isOpen, onClose, setOnboardingData }) {
                 />
               </FormControl>
               <FormControl size="lg" className="space-y-1">
-                <label className={theme ? "text-zinc-800" : "text-zinc-300"}>Image</label>
+                <label className={theme ? "text-zinc-800" : "text-zinc-300"}>
+                  Image
+                </label>
                 <Input
                   sx={
                     theme
-                      ? { backgroundColor: "#f4f4f5", color: "#27272a", border: "none" }
+                      ? {
+                          backgroundColor: "#f4f4f5",
+                          color: "#27272a",
+                          border: "none",
+                        }
                       : {
                           backgroundColor: "#27272a",
                           color: "#ffffff",
@@ -204,22 +275,27 @@ function AddMetaData({ isOpen, onClose, setOnboardingData }) {
                         }
                   }
                   name="image"
-                  type = "file"
-                  accept ="images/*"
+                  type="file"
+                  accept="images/*"
                   // value={formData.productName}
                   // onChange={handleChange}
                   size="lg"
                   placeholder="select Image"
                 />
-              </FormControl>    
-          </div>
-          <div className="flex justify-end">
-          <button className={`p-2 font-medium rounded-lg w-20 mt-8 
-                ${theme ? "border border-green-600 text-green-600 hover:bg-green-600 hover:text-white"
-                :"border border-green-500 hover:bg-green-600 hover:text-white text-green-500"}`}>
+              </FormControl>
+            </div>
+            <div className="flex justify-end">
+              <button
+                className={`p-2 font-medium rounded-lg w-20 mt-8 
+                ${
+                  theme
+                    ? "border border-green-600 text-green-600 hover:bg-green-600 hover:text-white"
+                    : "border border-green-500 hover:bg-green-600 hover:text-white text-green-500"
+                }`}
+              >
                 Add
               </button>
-          </div>
+            </div>
           </form>
         </DialogContent>
       </ModalDialog>

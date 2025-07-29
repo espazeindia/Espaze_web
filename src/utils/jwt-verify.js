@@ -8,6 +8,6 @@ export async function validate(token) {
         return payload;
     } catch (err) {
         console.error('Token verification failed: ', err);
-        return;
+        return null;
     }
 }

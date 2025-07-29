@@ -19,7 +19,7 @@ const requests = {
   get: (url, body, headers) =>
     instance.get(url, body, headers).then(responseBody),
 
-  post: (url, body) => instance.post(url, body).then(responseBody),
+  post: (url, body, headers) => instance.post(url, body, headers).then(responseBody),
 
   put: (url, body, headers) =>
     instance.put(url, body, headers).then(responseBody),

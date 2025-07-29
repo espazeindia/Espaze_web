@@ -63,8 +63,8 @@ function App() {
       checkAuth();
     }, []);
   
-  //   if (isAuthenticated === null) return <div>Loading...</div>;
-  //   return isAuthenticated ? children : <Navigate to="/login" replace />;
+    if (isAuthenticated === null) return <div>Loading...</div>;
+    return isAuthenticated ? children : <Navigate to="/login" replace />;
    }
   return (
     <>
