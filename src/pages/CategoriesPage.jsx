@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Pencil, Trash2 } from "lucide-react";
 import { FaTrash, FaEdit } from "react-icons/fa";
-import SubcategoryModal from "./SubcategoryModal";
+import SubcategoryModal from "../components/modal/SubcategoryModal";
 
 const CategoriesPage = () => {
   const [categories, setCategories] = useState([

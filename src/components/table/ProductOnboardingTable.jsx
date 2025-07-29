@@ -1,5 +1,4 @@
 import { useState } from "react";
-
 import { useMode } from "../../contexts/themeModeContext";
 import { Edit, Delete } from "@mui/icons-material";
 import EditMetaData from "../modal/EditMetaData";
@@ -33,7 +32,7 @@ function ProductOnboardingTable({
       className={`mt-10 p-2 rounded-lg w-full  sideBarNone ${theme ? "bg-white" : "bg-zinc-800"}`}
     >
       <div className="w-full">
-        <div className="grid grid-cols-8 border-b py-2 border-gray-300 border-dotted">
+        <div className="grid grid-cols-8 border-b py-4 text-sm border-gray-300 border-dotted">
           <div
             className={`text-center ${theme ? "text-[#4110a2]" : "text-[#b898fa]"}  font-semibold`}
           >
@@ -62,7 +61,7 @@ function ProductOnboardingTable({
           <div
             className={`text-center ${theme ? "text-[#4110a2]" : "text-[#b898fa]"}  font-semibold`}
           >
-            Sub Category
+            SubCategory
           </div>
           <div
             className={`text-center ${theme ? "text-[#4110a2]" : "text-[#b898fa]"}  font-semibold`}
@@ -77,14 +76,14 @@ function ProductOnboardingTable({
         </div>
         <div >
           {onboardingData.map((data, index) => (
-            <div key={index} className=" grid grid-cols-8  border-b py-2 border-gray-300 border-dotted" >
-              <div className={`text-center font-medium ${theme ? "text-black":"text-white"}`}>{data.image}</div>
-              <div className={`text-center font-medium ${theme ? "text-black":"text-white"}`}>{data.productName}</div>
-              <div className={`text-center font-medium ${theme ? "text-black":"text-white"}`}>{data.code}</div>
-              <div className={`text-center font-medium ${theme ? "text-black":"text-white"}`}>{data.mrp}</div>
-              <div className={`text-center font-medium ${theme ? "text-black":"text-white"}`}>{data.category}</div>
-              <div className={`text-center font-medium ${theme ? "text-black":"text-white"}`}>{data.subCategory}</div>
-              <div className={`text-center font-medium ${theme ? "text-black":"text-white"}`}>{data.productDescription}</div>
+            <div key={index} className=" grid grid-cols-8  text-sm border-b py-4 border-gray-300 border-dotted" >
+              <div className={`text-center font-medium ${theme ? "text-zinc-800":"text-white"}`}>{data.image}</div>
+              <div className={`text-center font-medium ${theme ? "text-zinc-800":"text-white"}`}>{data.productName}</div>
+              <div className={`text-center font-medium ${theme ? "text-zinc-800":"text-white"}`}>{data.code}</div>
+              <div className={`text-center font-medium ${theme ? "text-zinc-800":"text-white"}`}>{data.mrp}</div>
+              <div className={`text-center font-medium ${theme ? "text-zinc-800":"text-white"}`}>{data.category}</div>
+              <div className={`text-center font-medium ${theme ? "text-zinc-800":"text-white"}`}>{data.subCategory}</div>
+              <div className={`text-center font-medium ${theme ? "text-zinc-800":"text-white"}`}>{data.productDescription}</div>
               <div>
                 <div className={`text-center font-medium ${theme ? "text-black" : "text-white"}`}>
                   <button
