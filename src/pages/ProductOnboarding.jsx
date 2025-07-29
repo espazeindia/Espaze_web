@@ -1,11 +1,17 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useMode } from "../contexts/themeModeContext";
 import AddMetaData from "../components/modal/AddMetaData";
 import ProductOnboardingTable from "../components/table/ProductOnboardingTable";
+import { notifyError } from "../utils/toast";
+import { useNavigate } from "react-router-dom";
+import ProductOnboardingServices from "../services/ProductOnboardingServices";
 
 function ProductOnboarding() {
-  const [page,setPage]=useState(0)
-  const [limit,setLimit]=useState(10)
+  const router = useNavigate();
+  const [page, setPage] = useState(0);
+  const [pageDetails, setPageDetails] = useState({});
+  const [total, setTotalDetails] = useState({});
+  const [limit, setLimit] = useState(10);
   const [openAddMetaData, setOpenAddMetaData] = useState(false);
 
   const handleOpenAddMetaDataModal = () => {
@@ -22,7 +28,7 @@ function ProductOnboarding() {
       code: "ghu243g",
       mrp: 34,
       image: "",
-      id : 0
+      id: 0,
     },
     {
       productName: "Pineapple",
@@ -32,29 +38,74 @@ function ProductOnboarding() {
       code: "bth653v",
       mrp: 60,
       image: "",
-      id: 1
+      id: 1,
     },
   ]);
 
+  const [search, setSearch] = useState("");
+  const [searchInput, setSearchInput] = useState("");
 
+  useEffect(() => {
+    const getMetadata = async () => {
+      try {
+        console.log(limit, page, search);
+        const result = await ProductOnboardingServices.FetchMetadata(limit, page, search);
+        if (result.success) {
+          
+          const { total_pages, metadata, has_previous, has_next, total } = result.data;
+          console.log(metadata)
+          const transformedMetadata = metadata.map((data) => {
+            return {
+              productName: data.name,
+              productDescription: data.description,
+              category: data.category_id,
+              subCategory: data.subcategory_id,
+              code: data.hsn_code,
+              mrp: data.mrp,
+              image: data.image,
+              id: data.product_id,
+            };
+          });
+          setPageDetails({ next: has_next, prev: has_previous });
+          setTotalDetails({ total: total, total_pages: total_pages });
+          setOnboardingData(transformedMetadata)
+        }
+      } catch (err) {
+        if (err === "cookie error") {
+          Cookies.remove("EspazeCookie");
+          router("/login");
+          notifyError("Cookie error, please relogin and try again");
+        } else {
+          notifyError(err.message);
+        }
+      }
+    };
+    getMetadata();
+  }, [search, page, limit]);
 
-  const [searchData, setSearchData] = useState("");
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setSearch(searchInput);
+    }, 500);
+    return () => {
+      clearTimeout(timeout);
+    };
+  }, [searchInput]);
 
-  const handleChange = (e) => {
-    setSearchData(e.target.value);
-  };
-
+  const handleChangeDebounce = useCallback((searchData) => {
+    setSearchInput(searchData);
+  }, []);
 
   return (
     <div
-      className={`p-5 min-h-full ${
-        theme ? "bg-zinc-100 text-black" : "bg-neutral-950 text-white"
-      }`}
+      className={`p-5 min-h-full ${theme ? "bg-zinc-100 text-black" : "bg-neutral-950 text-white"}`}
     >
       <div className=" font-bold text-2xl">Product Onboarding</div>
       <div className="flex justify-between mt-5">
         <input
-          onChange={handleChange}
+          onChange={(e) => {
+            handleChangeDebounce(e.target.value);
+          }}
           className={`w-[70vw] p-1 px-4  rounded-md  focus:outline-0
           ${
             theme
@@ -67,9 +118,7 @@ function ProductOnboarding() {
           <div
             className={`p-1 px-6 rounded-md font-medium
           ${
-            theme
-              ? "text-zinc-700 border-1 border-zinc-700"
-              : "border-zinc-200 border-1 text-white"
+            theme ? "text-zinc-700 border-1 border-zinc-700" : "border-zinc-200 border-1 text-white"
           }`}
           >
             Filters
@@ -87,7 +136,14 @@ function ProductOnboarding() {
           </button>
         </div>
       </div>
-      <ProductOnboardingTable onboardingData={onboardingData} setOnboardingData={setOnboardingData} setPage={setPage} page={page} limit={limit} setLimit={setLimit}/>
+      <ProductOnboardingTable
+        onboardingData={onboardingData}
+        setOnboardingData={setOnboardingData}
+        setPage={setPage}
+        page={page}
+        limit={limit}
+        setLimit={setLimit}
+      />
       <AddMetaData
         isOpen={openAddMetaData}
         onClose={() => {

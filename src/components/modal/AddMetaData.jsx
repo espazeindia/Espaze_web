@@ -13,7 +13,7 @@ import {
   Textarea,
 } from "@mui/joy";
 import { useMode } from "../../contexts/themeModeContext";
-import { notifyError } from "../../utils/toast";
+import { notifyError, notifySuccess } from "../../utils/toast";
 import ProductOnboardingServices from "../../services/ProductOnboardingServices";
 import { Description } from "@mui/icons-material";
 
@@ -50,25 +50,22 @@ function AddMetaData({ isOpen, onClose, setOnboardingData }) {
         category_id: saveData.category,
         subcategory_id: saveData.subCategory,
         mrp: parseFloat(saveData.mrp),
-        hsn_code : saveData.code
+        hsn_code: saveData.code,
       };
       const res = await ProductOnboardingServices.CreateMetaData(body);
       const result = {
-      productName : res.data.metadata_name,
-      productDescription: res.data.metadata_description,
-      category: res.data.metadata_category_id,
-      subCategory: res.data.metadata_subcategory_id,
-      code: res.data.hsn_code,
-      mrp: res.data.metadata_mrp,
-      image: res.data.metadata_image,
-      id : res.data.metadata_id
-      }
-      if(res.success === true )setOnboardingData((prevData) =>[
-      ...prevData,result
-    ]
-    )
-      
-
+        productName: res.name,
+        productDescription: res.data.description,
+        category: res.data.category_id,
+        subCategory: res.data.subcategory_id,
+        code: res.data.hsn_code,
+        mrp: res.data.mrp,
+        image: res.data.image,
+        id: res.data.product_id,
+      };
+      if (res.success === true) {
+        notifySuccess(res.message)
+        setOnboardingData((prevData) => [...prevData, result]);}
     } catch (err) {
       if (err === "cookie error") {
         notifyError("Cookie error, please relogin and try again");
@@ -88,9 +85,7 @@ function AddMetaData({ isOpen, onClose, setOnboardingData }) {
             : { backgroundColor: "#18181b", border: "none" }
         }
       >
-        <ModalClose
-          style={{ zIndex: "10", color: "#ffffff", fontWeight: "bold" }}
-        />
+        <ModalClose style={{ zIndex: "10", color: "#ffffff", fontWeight: "bold" }} />
         <DialogTitle sx={theme ? { color: "#000000" } : { color: "#ffffff" }}>
           Add Meta Data
         </DialogTitle>
@@ -98,9 +93,7 @@ function AddMetaData({ isOpen, onClose, setOnboardingData }) {
           <form onSubmit={handleSubmit}>
             <div className="grid grid-cols-2 gap-5">
               <FormControl size="lg" className="space-y-1">
-                <label className={theme ? "text-zinc-800" : "text-zinc-300"}>
-                  Product Name
-                </label>
+                <label className={theme ? "text-zinc-800" : "text-zinc-300"}>Product Name</label>
                 <Input
                   sx={
                     theme
@@ -151,9 +144,7 @@ function AddMetaData({ isOpen, onClose, setOnboardingData }) {
                 />
               </FormControl>
               <FormControl size="lg" className="space-y-1">
-                <label className={theme ? "text-zinc-800" : "text-zinc-300"}>
-                  Category
-                </label>
+                <label className={theme ? "text-zinc-800" : "text-zinc-300"}>Category</label>
                 <Input
                   sx={
                     theme
@@ -177,9 +168,7 @@ function AddMetaData({ isOpen, onClose, setOnboardingData }) {
                 />
               </FormControl>
               <FormControl size="lg" className="space-y-1">
-                <label className={theme ? "text-zinc-800" : "text-zinc-300"}>
-                  Sub Category
-                </label>
+                <label className={theme ? "text-zinc-800" : "text-zinc-300"}>Sub Category</label>
                 <Input
                   sx={
                     theme
@@ -203,9 +192,7 @@ function AddMetaData({ isOpen, onClose, setOnboardingData }) {
                 />
               </FormControl>
               <FormControl size="lg" className="space-y-1">
-                <label className={theme ? "text-zinc-800" : "text-zinc-300"}>
-                  Code
-                </label>
+                <label className={theme ? "text-zinc-800" : "text-zinc-300"}>Code</label>
                 <Input
                   sx={
                     theme
@@ -229,9 +216,7 @@ function AddMetaData({ isOpen, onClose, setOnboardingData }) {
                 />
               </FormControl>
               <FormControl size="lg" className="space-y-1">
-                <label className={theme ? "text-zinc-800" : "text-zinc-300"}>
-                  MRP
-                </label>
+                <label className={theme ? "text-zinc-800" : "text-zinc-300"}>MRP</label>
                 <Input
                   sx={
                     theme
@@ -257,9 +242,7 @@ function AddMetaData({ isOpen, onClose, setOnboardingData }) {
                 />
               </FormControl>
               <FormControl size="lg" className="space-y-1">
-                <label className={theme ? "text-zinc-800" : "text-zinc-300"}>
-                  Image
-                </label>
+                <label className={theme ? "text-zinc-800" : "text-zinc-300"}>Image</label>
                 <Input
                   sx={
                     theme

@@ -22,8 +22,19 @@ const ProductOnboardingServices = {
       return requests.post("/metadata/createMetadata", body, {
         headers: { Authorization: `Bearer ${token}` },
       });
-    }else{
-        throw new Error("cookie error")
+    } else {
+      throw new Error("cookie error");
+    }
+  },
+  FetchMetadata: async (limit, page, search) => {
+    const token = getValidCookie();
+    if (token != "Cookie not found" || token != "cookie error") {
+      return requests.get("/metadata/getMetadata", {
+        headers: { Authorization: `Bearer ${token}` },
+        params: { limit: limit, offset: page, search: search },
+      });
+    } else {
+      throw new Error("cookie error");
     }
   },
 };
