@@ -15,9 +15,8 @@ import {
 import { useMode } from "../../contexts/themeModeContext";
 import { notifyError, notifySuccess } from "../../utils/toast";
 import ProductOnboardingServices from "../../services/ProductOnboardingServices";
-import { Description } from "@mui/icons-material";
 
-function AddMetaData({ isOpen, onClose, setOnboardingData }) {
+function AddMetaData({ isOpen, onClose, setReload }) {
   const { theme } = useMode();
 
   const [saveData, setSaveData] = useState({
@@ -53,19 +52,12 @@ function AddMetaData({ isOpen, onClose, setOnboardingData }) {
         hsn_code: saveData.code,
       };
       const res = await ProductOnboardingServices.CreateMetaData(body);
-      const result = {
-        productName: res.name,
-        productDescription: res.data.description,
-        category: res.data.category_id,
-        subCategory: res.data.subcategory_id,
-        code: res.data.hsn_code,
-        mrp: res.data.mrp,
-        image: res.data.image,
-        id: res.data.product_id,
-      };
       if (res.success === true) {
-        notifySuccess(res.message)
-        setOnboardingData((prevData) => [...prevData, result]);}
+        notifySuccess(res.message);
+        setReload((prevData)=>!prevData)
+      } else {
+        notifyError("Error Adding Metadata");
+      }
     } catch (err) {
       if (err === "cookie error") {
         notifyError("Cookie error, please relogin and try again");

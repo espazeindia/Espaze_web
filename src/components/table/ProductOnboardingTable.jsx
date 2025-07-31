@@ -12,6 +12,9 @@ function ProductOnboardingTable({
   setPage,
   setLimit,
   limit,
+  pageDetails,
+  totalDetails,
+  loading,
 }) {
   const { theme } = useMode();
   const [editModal, setEditModal] = useState(false);
@@ -29,7 +32,9 @@ function ProductOnboardingTable({
   };
   return (
     <div
-      className={`mt-10 p-2 rounded-lg w-full  sideBarNone ${theme ? "bg-white" : "bg-zinc-800"}`}
+      className={`mt-10 p-2 rounded-lg w-full  sideBarNone ${theme ? "bg-white" : "bg-zinc-800"} ${
+        loading && "animate-pulse"
+      }`}
     >
       <div className="w-full">
         <div className="grid grid-cols-8 border-b py-4 text-sm border-gray-300 border-dotted">
@@ -74,47 +79,90 @@ function ProductOnboardingTable({
             Actions
           </div>
         </div>
-        <div >
-          {onboardingData.map((data, index) => (
-            <div key={index} className=" grid grid-cols-8  text-sm border-b py-4 border-gray-300 border-dotted" >
-              <div className={`text-center font-medium ${theme ? "text-zinc-800":"text-white"}`}>{data.image}</div>
-              <div className={`text-center font-medium ${theme ? "text-zinc-800":"text-white"}`}>{data.productName}</div>
-              <div className={`text-center font-medium ${theme ? "text-zinc-800":"text-white"}`}>{data.code}</div>
-              <div className={`text-center font-medium ${theme ? "text-zinc-800":"text-white"}`}>{data.mrp}</div>
-              <div className={`text-center font-medium ${theme ? "text-zinc-800":"text-white"}`}>{data.category}</div>
-              <div className={`text-center font-medium ${theme ? "text-zinc-800":"text-white"}`}>{data.subCategory}</div>
-              <div className={`text-center font-medium ${theme ? "text-zinc-800":"text-white"}`}>{data.productDescription}</div>
-              <div>
-                <div className={`text-center font-medium ${theme ? "text-black" : "text-white"}`}>
-                  <button
-                    className={`${
-                      theme
-                        ? "text-green-600 hover:text-green-700"
-                        : "text-green-400 hover:text-green-700"
-                    }`}
-                    onClick={() => {
-                      handleEdit(data);
-                    }}
+        <div>
+          {!loading
+            ? onboardingData.map((data, index) => (
+                <div
+                  key={index}
+                  className=" grid grid-cols-8  text-sm border-b py-4 border-gray-300 border-dotted"
+                >
+                  <div
+                    className={`text-center font-medium ${theme ? "text-zinc-800" : "text-white"}`}
                   >
-                    <Edit />
-                  </button>
-                  <button
-                    className={` hover:text-red-600 ${theme ? "text-red-500" : "text-red-500"}`}
-                    onClick={() => {
-                      handleDelete(data.id);
-                    }}
+                    {data.image}
+                  </div>
+                  <div
+                    className={`text-center font-medium ${theme ? "text-zinc-800" : "text-white"}`}
                   >
-                    <Delete />
-                  </button>
+                    {data.productName}
+                  </div>
+                  <div
+                    className={`text-center font-medium ${theme ? "text-zinc-800" : "text-white"}`}
+                  >
+                    {data.code}
+                  </div>
+                  <div
+                    className={`text-center font-medium ${theme ? "text-zinc-800" : "text-white"}`}
+                  >
+                    {data.mrp}
+                  </div>
+                  <div
+                    className={`text-center font-medium ${theme ? "text-zinc-800" : "text-white"}`}
+                  >
+                    {data.category}
+                  </div>
+                  <div
+                    className={`text-center font-medium ${theme ? "text-zinc-800" : "text-white"}`}
+                  >
+                    {data.subCategory}
+                  </div>
+                  <div
+                    className={`text-center font-medium ${theme ? "text-zinc-800" : "text-white"}`}
+                  >
+                    {data.productDescription}
+                  </div>
+
+                  <div className={`text-center flex items-center justify-center gap-3 font-medium ${theme ? "text-black" : "text-white"}`}>
+                    <button
+                      className={`${
+                        theme
+                          ? "text-green-600 hover:text-green-700"
+                          : "text-green-400 hover:text-green-700"
+                      }`}
+                      onClick={() => {
+                        handleEdit(data);
+                      }}
+                    >
+                      <Edit />
+                    </button>
+                    <button
+                      className={` hover:text-red-600 ${theme ? "text-red-500" : "text-red-500"}`}
+                      onClick={() => {
+                        handleDelete(data.id);
+                      }}
+                    >
+                      <Delete />
+                    </button>
+                  </div>
                 </div>
-              </div>
-            
-            </div>
-            
-          ))}
+              ))
+            : Array.from({ length: limit }).map((_, index) => (
+                <div
+                  key={index}
+                  className="border-b h-14 border-gray-300 border-dotted w-full"
+                ></div>
+              ))}
         </div>
       </div>
-      <BottomPagination page={page} setPage={setPage} limit={limit} setLimit={setLimit} />
+      <BottomPagination
+        page={page}
+        setPage={setPage}
+        limit={limit}
+        setLimit={setLimit}
+        pageDetails={pageDetails}
+        totalDetails={totalDetails}
+        loading={loading}
+      />
       <EditMetaData
         isOpen={editModal}
         onClose={() => {

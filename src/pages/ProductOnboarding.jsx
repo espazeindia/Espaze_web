@@ -8,52 +8,32 @@ import ProductOnboardingServices from "../services/ProductOnboardingServices";
 
 function ProductOnboarding() {
   const router = useNavigate();
+  const { theme } = useMode();
+
   const [page, setPage] = useState(0);
   const [pageDetails, setPageDetails] = useState({});
-  const [total, setTotalDetails] = useState({});
+  const [totalDetails, setTotalDetails] = useState({});
   const [limit, setLimit] = useState(10);
   const [openAddMetaData, setOpenAddMetaData] = useState(false);
+  const [onboardingData, setOnboardingData] = useState([]);
+  const [search, setSearch] = useState("");
+  const [searchInput, setSearchInput] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [reload, setReload] = useState(false);
 
   const handleOpenAddMetaDataModal = () => {
     setOpenAddMetaData(true);
   };
-  const { theme } = useMode();
-
-  const [onboardingData, setOnboardingData] = useState([
-    {
-      productName: "Mango",
-      productDescription: "Summer is here",
-      category: "Fruit and vegetable",
-      subCategory: "Fruit",
-      code: "ghu243g",
-      mrp: 34,
-      image: "",
-      id: 0,
-    },
-    {
-      productName: "Pineapple",
-      productDescription: "Very juicy",
-      category: "Fruit and vegetable",
-      subCategory: "Fruit",
-      code: "bth653v",
-      mrp: 60,
-      image: "",
-      id: 1,
-    },
-  ]);
-
-  const [search, setSearch] = useState("");
-  const [searchInput, setSearchInput] = useState("");
 
   useEffect(() => {
     const getMetadata = async () => {
       try {
+        setLoading(true);
         console.log(limit, page, search);
         const result = await ProductOnboardingServices.FetchMetadata(limit, page, search);
-        if (result.success) {
-          
+        if (result.success === true) {
           const { total_pages, metadata, has_previous, has_next, total } = result.data;
-          console.log(metadata)
+          console.log(metadata);
           const transformedMetadata = metadata.map((data) => {
             return {
               productName: data.name,
@@ -66,10 +46,16 @@ function ProductOnboarding() {
               id: data.product_id,
             };
           });
-          setPageDetails({ next: has_next, prev: has_previous });
-          setTotalDetails({ total: total, total_pages: total_pages });
-          setOnboardingData(transformedMetadata)
+          
+            setPageDetails({ next: has_next, prev: has_previous });
+            setTotalDetails({ total: total, total_pages: total_pages });
+            setOnboardingData(transformedMetadata);
+          
+        } else {
+          notifyError(`Error Fetching Metadata ${result.message}`);
         }
+
+        setLoading(false);
       } catch (err) {
         if (err === "cookie error") {
           Cookies.remove("EspazeCookie");
@@ -78,10 +64,11 @@ function ProductOnboarding() {
         } else {
           notifyError(err.message);
         }
+        setLoading(false);
       }
     };
     getMetadata();
-  }, [search, page, limit]);
+  }, [search, page, limit, reload]);
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -143,13 +130,16 @@ function ProductOnboarding() {
         page={page}
         limit={limit}
         setLimit={setLimit}
+        pageDetails={pageDetails}
+        totalDetails={totalDetails}
+        loading={loading}
       />
       <AddMetaData
         isOpen={openAddMetaData}
         onClose={() => {
           setOpenAddMetaData(false);
         }}
-        setOnboardingData={setOnboardingData}
+        setReload={setReload}
       />
     </div>
   );
