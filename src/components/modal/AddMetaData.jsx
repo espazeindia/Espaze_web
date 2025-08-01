@@ -15,10 +15,12 @@ import {
 import { useMode } from "../../contexts/themeModeContext";
 import { notifyError, notifySuccess } from "../../utils/toast";
 import ProductOnboardingServices from "../../services/ProductOnboardingServices";
+import { LoaderCircle } from "lucide-react";
 
 function AddMetaData({ isOpen, onClose, setReload }) {
   const { theme } = useMode();
 
+  const[loading,setLoading] = useState(false);
   const [saveData, setSaveData] = useState({
     productName: "",
     productDescription: "",
@@ -42,6 +44,7 @@ function AddMetaData({ isOpen, onClose, setReload }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+       setLoading(true)
       const body = {
         name: saveData.productName,
         description: saveData.productDescription,
@@ -59,12 +62,14 @@ function AddMetaData({ isOpen, onClose, setReload }) {
         notifyError("Error Adding Metadata");
       }
     } catch (err) {
+      console.log(err)
       if (err === "cookie error") {
         notifyError("Cookie error, please relogin and try again");
       } else {
         notifyError(err.message);
       }
     }
+    setLoading(false);
     onClose();
   };
   return (
@@ -261,14 +266,14 @@ function AddMetaData({ isOpen, onClose, setReload }) {
             </div>
             <div className="flex justify-end">
               <button
-                className={`p-2 font-medium rounded-lg w-20 mt-8 
+                className={`p-2 font-medium rounded-lg w-20 mt-8 flex justify-center items-center
                 ${
                   theme
                     ? "border border-green-600 text-green-600 hover:bg-green-600 hover:text-white"
                     : "border border-green-500 hover:bg-green-600 hover:text-white text-green-500"
                 }`}
               >
-                Add
+                {loading?<LoaderCircle className='animate-spin h-7'/>:<>Add</>}
               </button>
             </div>
           </form>
