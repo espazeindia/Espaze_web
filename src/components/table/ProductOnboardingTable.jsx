@@ -15,6 +15,7 @@ function ProductOnboardingTable({
   pageDetails,
   totalDetails,
   loading,
+  setReload
 }) {
   const { theme } = useMode();
   const [editModal, setEditModal] = useState(false);
@@ -178,6 +179,7 @@ function ProductOnboardingTable({
         }}
         deleteProduct={deleteProduct}
         setOnboardingData={setOnboardingData}
+        setReload={setReload}
       />
     </div>
   );

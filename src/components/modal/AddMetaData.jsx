@@ -44,7 +44,7 @@ function AddMetaData({ isOpen, onClose, setReload }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-       setLoading(true)
+      setLoading(true)
       const body = {
         name: saveData.productName,
         description: saveData.productDescription,
@@ -62,7 +62,7 @@ function AddMetaData({ isOpen, onClose, setReload }) {
         notifyError("Error Adding Metadata");
       }
     } catch (err) {
-      console.log(err)
+      // console.log(err)
       if (err === "cookie error") {
         notifyError("Cookie error, please relogin and try again");
       } else {

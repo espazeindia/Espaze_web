@@ -133,6 +133,7 @@ function ProductOnboarding() {
         pageDetails={pageDetails}
         totalDetails={totalDetails}
         loading={loading}
+        setReload={setReload}
       />
       <AddMetaData
         isOpen={openAddMetaData}
