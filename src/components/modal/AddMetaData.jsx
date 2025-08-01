@@ -44,7 +44,7 @@ function AddMetaData({ isOpen, onClose, setReload }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      setLoading(true);
+      setLoading(true)
       const body = {
         name: saveData.productName,
         description: saveData.productDescription,
