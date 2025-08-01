@@ -36,60 +36,62 @@ function BottomPagination({ page, setPage, limit, setLimit, pageDetails, totalDe
           }}
           value={limit}
           onChange={(e) => handleChange(e.target.value)}
-          className={` focus:outline-0 p-1 ${theme ? "text-zinc-800" : "text-white"}`}
+          className={` focus:outline-0 cursor-pointer  p-1 ${theme ? "text-zinc-800" : "text-white"}`}
         >
           <option value={10}>10</option>
           <option value={15}>15</option>
           <option value={20}>20</option>
         </select>
       </div>
-      (loading ? <div>Loading...</div> :
-      <div className=" flex gap-3 mr-10">
-        {!pageDetails.next && page - 2 >= 0 && (
-          <div
-            className={` rounded-full h-7 text-sm font-bold  w-7 flex justify-center items-center  ${
-              theme ? "text-black" : "text-white"
-            } cursor-pointer`}
-            onClick={() => setPage(page - 2)}
-          >
-            {page - 1}
+      {loading ? (
+        <div>Loading...</div>
+      ) : (
+        <div className=" flex gap-3 mr-10">
+          {!pageDetails.next && page - 2 >= 0 && (
+            <div
+              className={` rounded-full h-7 text-sm font-bold  w-7 flex justify-center items-center  ${
+                theme ? "text-black" : "text-white"
+              } cursor-pointer`}
+              onClick={() => setPage(page - 2)}
+            >
+              {page - 1}
+            </div>
+          )}
+          {pageDetails.prev && (
+            <div
+              className={` rounded-full h-7 text-sm font-bold  w-7 flex justify-center items-center  ${
+                theme ? "text-black" : "text-white"
+              } cursor-pointer`}
+              onClick={() => setPage(page - 1)}
+            >
+              {page}
+            </div>
+          )}
+          <div className=" rounded-full h-7 text-sm font-bold  w-7 flex justify-center items-center  bg-[#7e50da] text-white cursor-pointer">
+            {page + 1}
           </div>
-        )}
-        {pageDetails.prev && (
-          <div
-            className={` rounded-full h-7 text-sm font-bold  w-7 flex justify-center items-center  ${
-              theme ? "text-black" : "text-white"
-            } cursor-pointer`}
-            onClick={() => setPage(page - 1)}
-          >
-            {page}
-          </div>
-        )}
-        <div className=" rounded-full h-7 text-sm font-bold  w-7 flex justify-center items-center  bg-[#7e50da] text-white cursor-pointer">
-          {page + 1}
+          {pageDetails.next && page + 2 <= totalDetails.total_pages && (
+            <div
+              className={` rounded-full h-7 text-sm font-bold  w-7 flex justify-center items-center  ${
+                theme ? "text-black" : "text-white"
+              } cursor-pointer`}
+              onClick={() => setPage(page + 1)}
+            >
+              {page + 2}
+            </div>
+          )}
+          {!pageDetails.prev && page + 3 <= totalDetails.total_pages && (
+            <div
+              className={` rounded-full h-7 text-sm font-bold  w-7 flex justify-center items-center  ${
+                theme ? "text-black" : "text-white"
+              } cursor-pointer`}
+              onClick={() => setPage(page + 2)}
+            >
+              {page + 3}
+            </div>
+          )}
         </div>
-        {pageDetails.next && page + 2 <= totalDetails.total_pages && (
-          <div
-            className={` rounded-full h-7 text-sm font-bold  w-7 flex justify-center items-center  ${
-              theme ? "text-black" : "text-white"
-            } cursor-pointer`}
-            onClick={() => setPage(page + 1)}
-          >
-            {page + 2}
-          </div>
-        )}
-        {!pageDetails.prev && page + 3 <= totalDetails.total_pages && (
-          <div
-            className={` rounded-full h-7 text-sm font-bold  w-7 flex justify-center items-center  ${
-              theme ? "text-black" : "text-white"
-            } cursor-pointer`}
-            onClick={() => setPage(page + 2)}
-          >
-            {page + 3}
-          </div>
-        )}
-      </div>
-      )
+      )}
     </div>
   );
 }

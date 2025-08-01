@@ -46,13 +46,10 @@ function ProductOnboarding() {
               id: data.product_id,
             };
           });
-          
-            setPageDetails({ next: has_next, prev: has_previous });
-            setTotalDetails({ total: total, total_pages: total_pages });
-            setOnboardingData(transformedMetadata);
-          
-        } else {
-          notifyError(`Error Fetching Metadata ${result.message}`);
+
+          setPageDetails({ next: has_next, prev: has_previous });
+          setTotalDetails({ total: total, total_pages: total_pages });
+          setOnboardingData(transformedMetadata);
         }
 
         setLoading(false);
@@ -62,7 +59,7 @@ function ProductOnboarding() {
           router("/login");
           notifyError("Cookie error, please relogin and try again");
         } else {
-          notifyError(err.message);
+          notifyError(err?.response?.data?.message || err.message);
         }
         setLoading(false);
       }

@@ -12,7 +12,7 @@ import { useMode } from "../contexts/themeModeContext";
 
 function Login() {
   const navigate = useNavigate();
-  const { theme,toggleTheme } = useMode();
+  const { theme, toggleTheme } = useMode();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -20,18 +20,26 @@ function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const emailRegex= /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+    if(!emailRegex.test(formData.email)){
+      notifyError("Invalid Email Format")
+      return
+    }
     try {
-      const res = await LoginServices.LoginOperationalGuy({email:formData.email,password:formData.password});
-      console.log("result",res)
+      const res = await LoginServices.LoginOperationalGuy({
+        email: formData.email,
+        password: formData.password,
+      });
       if (res.success) {
         notifySuccess(res.message);
-        Cookies.set("EspazeCookie",res.token);
+        Cookies.set("EspazeCookie", res.token);
         navigate("/");
-      }else{
-        notifyError(res.message)
       }
     } catch (err) {
-      notifyError(err.message);
+      console.log(err);
+      notifyError(err?.response?.data?.message || err.message);
     }
   };
 
@@ -55,18 +63,15 @@ function Login() {
         } shadow-xl `}
       >
         <div className="flex flex-col overflow-y-auto md:flex-row">
-
           <main className="flex flex-col items-center justify-center p-6 sm:p-12">
-           { theme ? <img src={Logo} className="w-16 mb-3" /> : <img src={Logo2} className="w-16 mb-3" /> }
+            {theme ? (
+              <img src={Logo} className="w-16 mb-3" />
+            ) : (
+              <img src={Logo2} className="w-16 mb-3" />
+            )}
             <div className="w-full">
-              <h1 className="mb-4 text-3xl font-semibold  text-center">
-                Welcome Back
-              </h1>
-              <h2
-                className={`text-center ${
-                  theme ? "text-zinc-600" : "text-zinc-400"
-                }  mb-6`}
-              >
+              <h1 className="mb-4 text-3xl font-semibold  text-center">Welcome Back</h1>
+              <h2 className={`text-center ${theme ? "text-zinc-600" : "text-zinc-400"}  mb-6`}>
                 Welcome back! Please enter your details.
               </h2>
 
@@ -77,6 +82,7 @@ function Login() {
                     name="email"
                     value={formData.email}
                     onChange={handleChange}
+                    type="email"
                     required
                     fullWidth
                     size="lg"

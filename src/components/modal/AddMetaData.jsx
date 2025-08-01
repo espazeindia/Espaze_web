@@ -20,7 +20,7 @@ import { LoaderCircle } from "lucide-react";
 function AddMetaData({ isOpen, onClose, setReload }) {
   const { theme } = useMode();
 
-  const[loading,setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [saveData, setSaveData] = useState({
     productName: "",
     productDescription: "",
@@ -44,7 +44,7 @@ function AddMetaData({ isOpen, onClose, setReload }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-       setLoading(true)
+      setLoading(true);
       const body = {
         name: saveData.productName,
         description: saveData.productDescription,
@@ -57,16 +57,13 @@ function AddMetaData({ isOpen, onClose, setReload }) {
       const res = await ProductOnboardingServices.CreateMetaData(body);
       if (res.success === true) {
         notifySuccess(res.message);
-        setReload((prevData)=>!prevData)
-      } else {
-        notifyError("Error Adding Metadata");
+        setReload((prevData) => !prevData);
       }
     } catch (err) {
-      console.log(err)
       if (err === "cookie error") {
         notifyError("Cookie error, please relogin and try again");
       } else {
-        notifyError(err.message);
+        notifyError(err?.response?.data?.message || res.message);
       }
     }
     setLoading(false);
@@ -273,7 +270,7 @@ function AddMetaData({ isOpen, onClose, setReload }) {
                     : "border border-green-500 hover:bg-green-600 hover:text-white text-green-500"
                 }`}
               >
-                {loading?<LoaderCircle className='animate-spin h-7'/>:<>Add</>}
+                {loading ? <LoaderCircle className="animate-spin h-7" /> : <>Add</>}
               </button>
             </div>
           </form>
