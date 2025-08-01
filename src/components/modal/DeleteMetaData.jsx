@@ -19,10 +19,9 @@ function DeleteProductModal({
   setReload
 }) {
   const handleDelete = async () => {
-    console.log(deleteProduct);
     try {
       const res = await ProductOnboardingServices.DeleteMetadata(
-        deleteProduct.id
+        deleteProduct
       );
       if (res.success === true) {
         setOnboardingData((prevData) =>
