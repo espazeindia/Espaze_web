@@ -41,7 +41,7 @@ const SubcategoryModal = ({ category, onClose }) => {
   };
 
   return (
-    <div className="fixed top-0 right-0 h-full w-[600px] bg-[#f5f5f5] shadow-lg z-50 flex flex-col">
+    <div className="fixed top-0 right-0 h-full w-[1000px] bg-[#f5f5f5] shadow-lg z-50 flex flex-col">
       <div className="flex items-center justify-between px-6 py-4 border-b border-gray-300 bg-[#f5f5f5]">
         <button onClick={onClose} className="text-black hover:text-gray-700">
           <ArrowLeft />
