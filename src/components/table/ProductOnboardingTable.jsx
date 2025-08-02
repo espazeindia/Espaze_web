@@ -80,7 +80,7 @@ function ProductOnboardingTable({
             Actions
           </div>
         </div>
-        <div>
+        <div className=" h-[50vh] overflow-scroll sideBarNone">
           {!loading
             ? onboardingData.map((data, index) => (
                 <div
@@ -163,6 +163,7 @@ function ProductOnboardingTable({
         pageDetails={pageDetails}
         totalDetails={totalDetails}
         loading={loading}
+        textSize="base"
       />
       <EditMetaData
         isOpen={editModal}
