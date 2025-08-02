@@ -3,7 +3,7 @@ import Cookies from "js-cookie";
 import { FormControl, Input } from "@mui/joy";
 import Logo from "../assets/img/logo2.png";
 import Logo2 from "../assets/img/logo.png";
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import LoginServices from "../services/LoginServices";
 import { notifyError, notifySuccess } from "../utils/toast";
 import { useNavigate } from "react-router-dom";
@@ -71,11 +71,71 @@ function Login() {
             )}
 
             <div className="w-full">
-              <h1 className="mb-4 text-3xl font-semibold  text-center">Welcome Back</h1>
-              <h2 className={`text-center ${theme ? "text-zinc-600" : "text-zinc-400"}  mb-6`}>
+              <h1 className="mb-4 text-3xl font-semibold  text-center">
+                Welcome Back
+              </h1>
+              <h2
+                className={`text-center ${
+                  theme ? "text-zinc-600" : "text-zinc-400"
+                }  mb-6`}
+              >
                 Welcome back! Please enter your details.
               </h2>
+              {/* <div
+                className={`rounded-lg p-1 flex w-full justify-center gap-2 mt-4
+                 ${
+                   theme
+                     ? "bg-zinc-200 text-zinc-800"
+                     : "bg-zinc-800 text-white"
+                 }`}
+              >
+                <Link to="/operational-login" className="w-1/2">
+                  <a
+                    className={`block text-center px-4 py-2 rounded-lg text-gray-300 ${
+                      theme ? "bg-zinc-600" : "bg-zinc-700"
+                    }`}
+                  > Login as a Operational Guy</a>
+                </Link>
+                <Link to="/operational-login" className="w-1/2">
+                  <a
+                    className={`block text-center px-4 py-2 rounded-lg text-gray-300 ${
+                      theme ? "bg-zinc-600" : "bg-zinc-700"
+                    }`}
+                  > Login as a Operational Guy</a>
+                </Link>
+              </div> */}
+              {/* <div className={`rounded-lg p-1 flex w-full justify-center gap-2 mt-4
+                 ${
+                   theme
+                     ? "bg-zinc-200 text-zinc-800"
+                     : "bg-zinc-800 text-white"
+                 }`}>
+                 <NavLink
+                to="/operational-login"
+                className={({ isActive }) =>
+                  `mt-10 w-full text-center rounded-lg py-2 px-4 font-medium transition-colors ${
+                    isActive
+                      ? "bg-blue-500 text-white"
+                      : "bg-zinc-700 text-gray-300 hover:bg-zinc-600"
+                  }`
+                }
+              >
+                Login as Operational Guy?
+              </NavLink>
 
+              <NavLink
+                to="/seller-login"
+                className={({ isActive }) =>
+                  `mt-7 w-full text-center rounded-lg py-2 px-4 font-medium transition-colors ${
+                    isActive
+                      ? "bg-blue-500 text-white"
+                      : "bg-zinc-700 text-gray-300 hover:bg-zinc-600"
+                  }`
+                }
+              >
+                Login as Seller?
+              </NavLink>
+              </div> */}
               <form onSubmit={handleSubmit} className="flex flex-col gap-4">
                 <FormControl size="lg" className="space-y-1">
                   <label className="text-lg  font-semibold">Email</label>
@@ -113,12 +173,20 @@ function Login() {
                 </button>
               </form>
 
-              <p className="mt-10">
+              <p className="mt-5">
                 <Link
-                  className="text-[16px] w-fit mx-auto font-medium block text-center hover:underline"
+                  className="text-sm w-fit mx-auto text-blue-600 cursor-pointer block text-center underline"
                   to="/forgot-password"
                 >
                   Forgot Password?
+                </Link>
+              </p>
+              <p className="mt-7">
+                <Link
+                  className="text-[16px] w-fit mx-auto font-medium block text-center hover:underline"
+                  to="/seller-login"
+                >
+                  Login as Seller?
                 </Link>
               </p>
             </div>

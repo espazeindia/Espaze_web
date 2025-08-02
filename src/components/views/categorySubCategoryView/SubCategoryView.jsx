@@ -3,6 +3,7 @@ import { FaTrash, FaEdit } from "react-icons/fa";
 import AddSubcategoryModal from "../../modal/AddSubcategoryModal";
 import EditSubcategoryModal from "../../modal/EditSubcategoryModal";
 import DeleteSubcategoryModal from "../../modal/DeleteSubcategoryModal";
+import { useMode } from "../../../contexts/themeModeContext";
 
 const initialSubcategories = {
   1: ["Tomatoes", "Onions", "Potatoes"],
