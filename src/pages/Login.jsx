@@ -58,12 +58,17 @@ function Login() {
       }`}
     >
       <div
-        className={`flex h-full w-fit mx-auto overflow-hidden rounded-lg  ${
+        className={`flex h-full w-fit mx-auto overflow-hidden rounded-lg ${
           theme ? "bg-white" : "bg-neutral-950"
-        } shadow-xl `}
+        } shadow-xl`}
       >
         <div className="flex flex-col overflow-y-auto md:flex-row">
           <main className="flex flex-col items-center justify-center p-6 sm:p-12">
+            {theme ? (
+              <img src={Logo} className="w-16 mb-3" />
+            ) : (
+              <img src={Logo2} className="w-16 mb-3" />
+            )}
             {theme ? (
               <img src={Logo} className="w-16 mb-3" />
             ) : (
@@ -104,38 +109,35 @@ function Login() {
                   />
                 </FormControl>
 
-                <button
-                  type="submit"
-                  className="w-full bg-[#8b5cf6] py-2 mt-3 rounded-lg font-semibold text-white text-lg hover:bg-[#8b5cf6]"
-                >
-                  Login
-                </button>
-              </form>
+                  <button
+                    type="submit"
+                    className="w-full bg-[#8b5cf6] py-2 mt-3 rounded-lg font-semibold text-white text-lg hover:bg-[#8b5cf6]"
+                  >
+                    Login
+                  </button>
 
-              {/* Links */}
+                  <p className="text-blue-500 text-center mt-2 text-sm hover:underline cursor-pointer">
+                    Resend OTP
+                  </p>
+                </form>
+              )}
+
               <p className="mt-10">
                 <Link
-                  className="text-[16px] w-fit mx-auto font-medium  block text-center  hover:underline"
+                  className="text-[16px] w-fit mx-auto font-medium block text-center hover:underline"
                   to="/forgot-password"
                 >
                   Forgot Password?
                 </Link>
               </p>
-              <p className="mt-1">
-                {/* <Link
-                  className="text-lg w-fit mx-auto font-medium text-[#8b5cf6] block text-center  hover:underline"
-                  to="/signup"
-                >
-                  Create an Account
-                </Link> */}
-              </p>
             </div>
           </main>
         </div>
       </div>
+
       <button
         onClick={toggleTheme}
-        className={` hover:cursor-pointer p-2 rounded-full w-10 h-10 flex items-center justify-center fixed bottom-2 right-2 ${
+        className={`hover:cursor-pointer p-2 rounded-full w-10 h-10 flex items-center justify-center fixed bottom-2 right-2 ${
           theme ? "text-black bg-white" : "text-white bg-black"
         }`}
       >
