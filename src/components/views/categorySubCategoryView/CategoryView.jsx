@@ -4,9 +4,14 @@ import { useMode } from "../../../contexts/themeModeContext";
 import AddCategory from "../../modal/AddCategory";
 import EditCategory from "../../modal/EditCategory";
 import DeleteCategoryModal from "../../modal/DeleteCategoryModal";
+import BottomPagination from "../../pagination/BottomPagination";
 
 const CategoriesPage = ({ categories, setCategories, selectedCategory, setSelectedCategory }) => {
   const { theme } = useMode();
+  const [page, setPage] = useState(0);
+  const [limit, setLimit] = useState(10);
+  const [totalDetails, setTotalDetails] = useState({ total: 24, total_pages: 4 });
+  const [loading, setLoading] = useState(false);
 
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [categoryToDelete, setCategoryToDelete] = useState(null);
@@ -59,16 +64,19 @@ const CategoriesPage = ({ categories, setCategories, selectedCategory, setSelect
         </button>
       </div>
 
-      <div
-        className={`rounded-lg overflow-hidden ${
-          theme ? "bg-white text-gray-800" : "bg-zinc-800 text-white"
-        }`}
-      >
+      <div className={`rounded-lg ${theme ? "bg-white text-gray-800" : "bg-zinc-800 text-white"}`}>
+        <div
+          className={`grid px-3 py-2 font-semibold grid-cols-[1fr_8fr_1.5fr]`}
+        >
+          <div>Image</div>
+          <div>Category Name</div>
+          <div>Actions</div>
+        </div>
         {categories.map((cat) => (
           <div
             key={cat.id}
             onClick={() => openSubcategories(cat)}
-            className={`flex justify-between items-center px-4 py-3 border-b cursor-pointer   ${
+            className={`grid grid-cols-[1fr_8fr_1.5fr] items-center px-4 py-2 border-b cursor-pointer   ${
               selectedCategory.id === cat.id
                 ? " bg-[#7e50da] text-white"
                 : theme
@@ -76,21 +84,31 @@ const CategoriesPage = ({ categories, setCategories, selectedCategory, setSelect
                 : "border-zinc-700 hover:bg-zinc-100"
             }`}
           >
-            <span className="text-base">{cat.name}</span>
-            <div className="flex gap-3">
+            <div className=" w-8 h-8 rounded-sm bg-gray-200"></div>
+            <span className="text-lg">{cat.name}</span>
+            <div className="flex items-center gap-3 ml-2">
               <FaEdit
                 onClick={(e) => handleEdit(cat)}
                 className="text-green-600 cursor-pointer hover:text-green-800"
-                size={16}
+                size={18}
               />
               <FaTrash
                 onClick={(e) => handleDelete(cat)}
                 className="text-red-600 cursor-pointer hover:text-red-800"
-                size={16}
+                size={18}
               />
             </div>
           </div>
         ))}
+        <BottomPagination
+          page={page}
+          setPage={setPage}
+          limit={limit}
+          setLimit={setLimit}
+          totalDetails={totalDetails}
+          loading={loading}
+          textSize="sm"
+        />
       </div>
       <AddCategory
         isOpen={openAddModal}

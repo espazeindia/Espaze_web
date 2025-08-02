@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useMode } from "../../contexts/themeModeContext";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
-function BottomPagination({ page, setPage, limit, setLimit, pageDetails, totalDetails, loading }) {
+function BottomPagination({ page, setPage, limit, setLimit, totalDetails, loading ,textSize }) {
   const { theme } = useMode();
 
   // State to track which 3 pages are currently visible
@@ -55,12 +55,12 @@ function BottomPagination({ page, setPage, limit, setLimit, pageDetails, totalDe
 
   return (
     <div
-      className={`p-2 mt-2 ${
+      className={`p-2 mt-2 text-${textSize} ${
         theme ? "text-[#4110a2]" : "text-[#b898fa]"
       }  font-semibold flex items-center justify-between `}
     >
       <div className=" flex items-center ">
-        <div className="mx-5">
+        <div className="mx-3">
           Showing <span className={theme ? "text-zinc-800" : "text-white"}>{page * limit + 1}</span>{" "}
           -
           <span className={theme ? "text-zinc-800" : "text-white"}>
@@ -69,7 +69,7 @@ function BottomPagination({ page, setPage, limit, setLimit, pageDetails, totalDe
               ? totalDetails.total
               : parseInt(page * limit + limit)}{" "}
           </span>
-          of Total{" "}
+          of {" "}
           <span className={theme ? "text-zinc-800" : "text-white"}>{totalDetails.total}</span>{" "}
           Results
         </div>
@@ -93,7 +93,7 @@ function BottomPagination({ page, setPage, limit, setLimit, pageDetails, totalDe
       {loading ? (
         <div>Loading...</div>
       ) : (
-        <div className=" flex items-center gap-3 mr-10">
+        <div className=" flex items-center gap-3">
           {/* Left Navigation Arrow - for page window (always visible) */}
           <div
             className={` rounded-full h-8 w-8 flex justify-center items-center text-lg font-bold border transition-colors ${
@@ -131,7 +131,7 @@ function BottomPagination({ page, setPage, limit, setLimit, pageDetails, totalDe
               </div>
             ))}
             {/* Fill empty slots if less than 3 pages */}
-            {visiblePages.length < 3 &&
+            {/* {visiblePages.length < 3 &&
               Array.from({ length: 3 - visiblePages.length }).map((_, index) => (
                 <div
                   key={`empty-${index}`}
@@ -141,7 +141,7 @@ function BottomPagination({ page, setPage, limit, setLimit, pageDetails, totalDe
                 >
                   -
                 </div>
-              ))}
+              ))} */}
           </div>
 
           {/* Right Navigation Arrow - for page window (always visible) */}

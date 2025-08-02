@@ -4,6 +4,7 @@ import AddSubcategoryModal from "../../modal/AddSubcategoryModal";
 import EditSubcategoryModal from "../../modal/EditSubcategoryModal";
 import DeleteSubcategoryModal from "../../modal/DeleteSubcategoryModal";
 import { useMode } from "../../../contexts/themeModeContext";
+import BottomPagination from "../../pagination/BottomPagination";
 
 const initialSubcategories = {
   1: ["Tomatoes", "Onions", "Potatoes"],
@@ -13,18 +14,22 @@ const initialSubcategories = {
 };
 
 const SubcategoryModal = ({ category }) => {
+  const { theme } = useMode();
   const [search, setSearch] = useState("");
-  const [subcategories, setSubcategories] = useState( []);
+  const [subcategories, setSubcategories] = useState([]);
+  const [page, setPage] = useState(0);
+  const [limit, setLimit] = useState(10);
+  const [totalDetails, setTotalDetails] = useState({ total: 24, total_pages: 4 });
+  const [loading, setLoading] = useState(false);
 
   const [openAddModal, setOpenAddModal] = useState(false);
   const [openEditModal, setOpenEditModal] = useState(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(null);
 
-
-  useEffect(()=>{
-    setSubcategories(initialSubcategories[category.id]|| [])
-  },[category])
+  useEffect(() => {
+    setSubcategories(initialSubcategories[category.id] || []);
+  }, [category]);
 
   const handleAdd = (name) => {
     setSubcategories([...subcategories, name]);
@@ -65,36 +70,53 @@ const SubcategoryModal = ({ category }) => {
         </button>
       </div>
 
-      <div className="flex-grow overflow-y-auto px-6 pb-6">
+      <div className=" px-6 pb-6">
         <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-          {subcategories
-            
-            .map((sub, index) => (
-              <div
-                key={index}
-                className="flex justify-between items-center px-4 py-3 border-b border-gray-200 last:border-b-0"
-              >
-                <span className="text-base">{sub}</span>
-                <div className="flex gap-3">
-                  <FaEdit
-                    onClick={() => {
-                      setSelectedIndex(index);
-                      setOpenEditModal(true);
-                    }}
-                    className="text-green-600 cursor-pointer hover:text-green-800"
-                    size={16}
-                  />
-                  <FaTrash
-                    onClick={() => {
-                      setSelectedIndex(index);
-                      setOpenDeleteModal(true);
-                    }}
-                    className="text-red-600 cursor-pointer hover:text-red-800"
-                    size={16}
-                  />
-                </div>
+          <div
+            className={`rounded-t-lg grid px-3 py-2 font-semibold grid-cols-[1fr_8fr_1.5fr]  items-center ${
+              theme ? "bg-white text-gray-800" : "bg-zinc-800 text-white"
+            }`}
+          >
+            <div>Image</div>
+            <div>Category Name</div>
+            <div>Actions</div>
+          </div>
+          {subcategories.map((sub, index) => (
+            <div
+              key={index}
+              className="grid grid-cols-[1fr_8fr_1.5fr]  items-center px-4 py-3 border-b border-gray-200 last:border-b-0"
+            >
+              <div className=" w-8 h-8 rounded-sm bg-gray-200"></div>
+              <div className="text-base">{sub}</div>
+              <div className="flex gap-3">
+                <FaEdit
+                  onClick={() => {
+                    setSelectedIndex(index);
+                    setOpenEditModal(true);
+                  }}
+                  className="text-green-600 cursor-pointer hover:text-green-800"
+                  size={16}
+                />
+                <FaTrash
+                  onClick={() => {
+                    setSelectedIndex(index);
+                    setOpenDeleteModal(true);
+                  }}
+                  className="text-red-600 cursor-pointer hover:text-red-800"
+                  size={16}
+                />
               </div>
-            ))}
+            </div>
+          ))}
+          <BottomPagination
+            page={page}
+            setPage={setPage}
+            limit={limit}
+            setLimit={setLimit}
+            totalDetails={totalDetails}
+            loading={loading}
+            textSize="sm"
+          />
         </div>
       </div>
       {openAddModal && (
