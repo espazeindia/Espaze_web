@@ -21,11 +21,11 @@ function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const emailRegex= /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
-    if(!emailRegex.test(formData.email)){
-      notifyError("Invalid Email Format")
-      return
+    if (!emailRegex.test(formData.email)) {
+      notifyError("Invalid Email Format");
+      return;
     }
     try {
       const res = await LoginServices.LoginOperationalGuy({
@@ -69,11 +69,7 @@ function Login() {
             ) : (
               <img src={Logo2} className="w-16 mb-3" />
             )}
-            {theme ? (
-              <img src={Logo} className="w-16 mb-3" />
-            ) : (
-              <img src={Logo2} className="w-16 mb-3" />
-            )}
+
             <div className="w-full">
               <h1 className="mb-4 text-3xl font-semibold  text-center">Welcome Back</h1>
               <h2 className={`text-center ${theme ? "text-zinc-600" : "text-zinc-400"}  mb-6`}>
@@ -109,18 +105,13 @@ function Login() {
                   />
                 </FormControl>
 
-                  <button
-                    type="submit"
-                    className="w-full bg-[#8b5cf6] py-2 mt-3 rounded-lg font-semibold text-white text-lg hover:bg-[#8b5cf6]"
-                  >
-                    Login
-                  </button>
-
-                  <p className="text-blue-500 text-center mt-2 text-sm hover:underline cursor-pointer">
-                    Resend OTP
-                  </p>
-                </form>
-              )}
+                <button
+                  type="submit"
+                  className="w-full bg-[#8b5cf6] py-2 mt-3 rounded-lg font-semibold text-white text-lg hover:bg-[#8b5cf6]"
+                >
+                  Login
+                </button>
+              </form>
 
               <p className="mt-10">
                 <Link

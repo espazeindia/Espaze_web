@@ -9,7 +9,8 @@ import { validate } from "./utils/jwt-verify";
 import { routes } from "./routes/index";
 
 const Login = lazy(() => import("./pages/Login"));
-const SignUp = lazy(() => import("./pages/SignUp"));
+const LoginSeller = lazy(() => import("./pages/LoginSeller"));
+// const SignUp = lazy(() => import("./pages/SignUp"));
 const ForgetPassword = lazy(() => import("./pages/ForgetPassword"));
 const Layout = lazy(() => import("./components/layout/Layout"));
 const Page404 = lazy(()=> import("./pages/Page404"));
@@ -73,7 +74,8 @@ function App() {
           <Router>
             <Suspense fallback={<div>Loading...</div>}>
               <Routes>
-                <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
+                <Route path="/operational-login" element={<PublicRoute><Login /></PublicRoute>} />
+                <Route path="/login" element={<PublicRoute><LoginSeller /></PublicRoute>} />
                 {/* <Route path="/signup" element={<PublicRoute><SignUp /></PublicRoute>} /> */}
                 <Route path="/forgot-password" element={<PublicRoute><ForgetPassword /></PublicRoute>} />
 
