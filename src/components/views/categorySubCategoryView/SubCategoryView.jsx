@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { FaTrash, FaEdit } from "react-icons/fa";
+import { Edit, Delete } from "@mui/icons-material";
 import AddSubcategoryModal from "../../modal/AddSubcategoryModal";
 import EditSubcategoryModal from "../../modal/EditSubcategoryModal";
 import DeleteSubcategoryModal from "../../modal/DeleteSubcategoryModal";
@@ -19,7 +19,10 @@ const SubcategoryModal = ({ category }) => {
   const [subcategories, setSubcategories] = useState([]);
   const [page, setPage] = useState(0);
   const [limit, setLimit] = useState(10);
-  const [totalDetails, setTotalDetails] = useState({ total: 24, total_pages: 4 });
+  const [totalDetails, setTotalDetails] = useState({
+    total: 24,
+    total_pages: 4,
+  });
   const [loading, setLoading] = useState(false);
 
   const [openAddModal, setOpenAddModal] = useState(false);
@@ -49,75 +52,94 @@ const SubcategoryModal = ({ category }) => {
   };
 
   return (
-    <div className=" w-[50%] bg-[#f5f5f5]">
-      <div className="flex items-center justify-between px-6 py-4  ">
-        <h2 className="text-xl font-semibold">{category.name}</h2>
-      </div>
+    <div
+      className={` h-full w-[50%] p-4 border-r border-gray-300 ${
+        theme ? "bg-zinc-100 text-black" : "bg-neutral-950 text-white"
+      }`}
+    >
+      <h2 className="font-bold text-2xl mb-6">{category.name}</h2>
 
-      <div className="flex items-center gap-3 px-6 py-4">
+      <div className="flex items-center gap-3 mb-6">
         <input
           type="text"
           placeholder="Search subcategory..."
-          className="flex-grow border border-gray-300 p-2 rounded-md bg-white focus:outline-none focus:ring-0"
+          className={`flex-1 p-2 px-4 rounded-md focus:outline-none ${
+            theme
+              ? "bg-white text-zinc-700 shadow-sm"
+              : "bg-zinc-800 text-zinc-200 shadow-sm"
+          }`}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
         <button
           onClick={() => setOpenAddModal(true)}
-          className="px-4 py-2 border border-green-600 text-green-600 rounded-md hover:bg-green-50"
+          className={`p-2 px-6 rounded-md font-medium ${
+            theme
+              ? "text-green-600 border border-green-600"
+              : "text-green-500 border border-green-500"
+          }`}
         >
           Add
         </button>
       </div>
 
-      <div className=" px-6 pb-6">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-          <div
-            className={`rounded-t-lg grid px-3 py-2 font-semibold grid-cols-[1fr_8fr_1.5fr]  items-center ${
-              theme ? "bg-white text-gray-800" : "bg-zinc-800 text-white"
-            }`}
-          >
-            <div>Image</div>
-            <div>Category Name</div>
-            <div>Actions</div>
-          </div>
-          {subcategories.map((sub, index) => (
-            <div
-              key={index}
-              className="grid grid-cols-[1fr_8fr_1.5fr]  items-center px-4 py-3 border-b border-gray-200 last:border-b-0"
-            >
-              <div className=" w-8 h-8 rounded-sm bg-gray-200"></div>
-              <div className="text-base">{sub}</div>
-              <div className="flex gap-3">
-                <FaEdit
-                  onClick={() => {
-                    setSelectedIndex(index);
-                    setOpenEditModal(true);
-                  }}
-                  className="text-green-600 cursor-pointer hover:text-green-800"
-                  size={16}
-                />
-                <FaTrash
-                  onClick={() => {
-                    setSelectedIndex(index);
-                    setOpenDeleteModal(true);
-                  }}
-                  className="text-red-600 cursor-pointer hover:text-red-800"
-                  size={16}
-                />
-              </div>
-            </div>
-          ))}
-          <BottomPagination
-            page={page}
-            setPage={setPage}
-            limit={limit}
-            setLimit={setLimit}
-            totalDetails={totalDetails}
-            loading={loading}
-            textSize="sm"
-          />
+      <div
+        className={`rounded-lg  ${
+          theme ? "bg-white text-gray-800" : "bg-zinc-800 text-white"
+        }`}
+      >
+        <div
+          className={`rounded-t-lg grid px-3 py-2 text-sm font-semibold grid-cols-[1fr_8fr_1.5fr] border-b border-gray-200 last:border-b-0 items-center
+            ${theme ? "text-[#4110a2]" : "text-[#b898fa]"}`}
+        >
+          <div>Image</div>
+          <div>Category Name</div>
+          <div>Actions</div>
         </div>
+        {subcategories.map((sub, index) => (
+          <div
+            key={index}
+            className="grid grid-cols-[1fr_8fr_1.5fr]  items-center px-4 py-3 border-b border-gray-200 last:border-b-0"
+          >
+            <div className=" w-8 h-8 rounded-sm bg-gray-200"></div>
+            <div className="text-sm font-semibold">{sub}</div>
+            <div className="text-center flex items-center gap-2 font-medium ">
+              <button
+                className={`${
+                  theme
+                    ? "text-green-600 hover:text-green-700"
+                    : "text-green-400 hover:text-green-700"
+                }`}
+                onClick={() => {
+                  setSelectedIndex(index);
+                  setOpenEditModal(true);
+                }}
+              >
+                <Edit />
+              </button>
+              <button
+                className={` hover:text-red-600 ${
+                  theme ? "text-red-500" : "text-red-500"
+                }`}
+                onClick={() => {
+                  setSelectedIndex(index);
+                  setOpenDeleteModal(true);
+                }}
+              >
+                <Delete />
+              </button>
+            </div>
+          </div>
+        ))}
+        <BottomPagination
+          page={page}
+          setPage={setPage}
+          limit={limit}
+          setLimit={setLimit}
+          totalDetails={totalDetails}
+          loading={loading}
+          textSize="sm"
+        />
       </div>
       {openAddModal && (
         <AddSubcategoryModal

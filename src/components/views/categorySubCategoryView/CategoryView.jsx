@@ -1,16 +1,24 @@
 import { useEffect, useState } from "react";
-import { FaTrash, FaEdit } from "react-icons/fa";
 import { useMode } from "../../../contexts/themeModeContext";
+import { Edit, Delete } from "@mui/icons-material";
 import AddCategory from "../../modal/AddCategory";
 import EditCategory from "../../modal/EditCategory";
 import DeleteCategoryModal from "../../modal/DeleteCategoryModal";
 import BottomPagination from "../../pagination/BottomPagination";
 
-const CategoriesPage = ({ categories, setCategories, selectedCategory, setSelectedCategory }) => {
+const CategoriesPage = ({
+  categories,
+  setCategories,
+  selectedCategory,
+  setSelectedCategory,
+}) => {
   const { theme } = useMode();
   const [page, setPage] = useState(0);
   const [limit, setLimit] = useState(10);
-  const [totalDetails, setTotalDetails] = useState({ total: 24, total_pages: 4 });
+  const [totalDetails, setTotalDetails] = useState({
+    total: 24,
+    total_pages: 4,
+  });
   const [loading, setLoading] = useState(false);
 
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
@@ -49,7 +57,9 @@ const CategoriesPage = ({ categories, setCategories, selectedCategory, setSelect
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search category..."
           className={`flex-1 p-2 px-4 rounded-md focus:outline-none ${
-            theme ? "bg-white text-zinc-700 shadow-sm" : "bg-zinc-800 text-zinc-200 shadow-sm"
+            theme
+              ? "bg-white text-zinc-700 shadow-sm"
+              : "bg-zinc-800 text-zinc-200 shadow-sm"
           }`}
         />
         <button
@@ -64,9 +74,14 @@ const CategoriesPage = ({ categories, setCategories, selectedCategory, setSelect
         </button>
       </div>
 
-      <div className={`rounded-lg ${theme ? "bg-white text-gray-800" : "bg-zinc-800 text-white"}`}>
+      <div
+        className={`rounded-lg ${
+          theme ? "bg-white text-gray-800" : "bg-zinc-800 text-white"
+        }`}
+      >
         <div
-          className={`grid px-3 py-2 font-semibold grid-cols-[1fr_8fr_1.5fr]`}
+          className={`grid border-b border-gray-200 last:border-b-0 px-3 text-sm py-2 font-semibold grid-cols-[1fr_8fr_1.5fr] 
+            ${theme ? "text-[#4110a2]" : "text-[#b898fa]"}`}
         >
           <div>Image</div>
           <div>Category Name</div>
@@ -76,27 +91,35 @@ const CategoriesPage = ({ categories, setCategories, selectedCategory, setSelect
           <div
             key={cat.id}
             onClick={() => openSubcategories(cat)}
-            className={`grid grid-cols-[1fr_8fr_1.5fr] items-center px-4 py-2 border-b cursor-pointer   ${
-              selectedCategory.id === cat.id
-                ? " bg-[#7e50da] text-white"
-                : theme
-                ? "border-zinc-300 hover:bg-zinc-100"
-                : "border-zinc-700 hover:bg-zinc-100"
+            className={`grid grid-cols-[1fr_8fr_1.5fr] items-center px-4 py-2 border-b border-gray-200 cursor-pointer   ${
+              selectedCategory.id === cat.id 
+                ?  theme ? "bg-violet-200":"bg-[#7e50da] text-white"
+               : theme
+                ? " hover:bg-violet-100"
+                : " hover:bg-violet-100 hover:text-black"
             }`}
           >
             <div className=" w-8 h-8 rounded-sm bg-gray-200"></div>
-            <span className="text-lg">{cat.name}</span>
-            <div className="flex items-center gap-3 ml-2">
-              <FaEdit
+            <span className="text-sm font-semibold">{cat.name}</span>
+            <div className="text-center flex items-center gap-2 font-medium ">
+              <button
+                className={`${
+                  theme
+                    ? "text-green-600 hover:text-green-700"
+                    : "text-green-400 hover:text-green-700"
+                }`}
                 onClick={(e) => handleEdit(cat)}
-                className="text-green-600 cursor-pointer hover:text-green-800"
-                size={18}
-              />
-              <FaTrash
+              >
+                <Edit />
+              </button>
+              <button
+                className={` hover:text-red-600 ${
+                  theme ? "text-red-500" : "text-red-500"
+                }`}
                 onClick={(e) => handleDelete(cat)}
-                className="text-red-600 cursor-pointer hover:text-red-800"
-                size={18}
-              />
+              >
+                <Delete />
+              </button>
             </div>
           </div>
         ))}

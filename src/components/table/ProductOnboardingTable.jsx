@@ -123,7 +123,8 @@ function ProductOnboardingTable({
                     {data.productDescription}
                   </div>
 
-                  <div className={`text-center flex items-center justify-center gap-3 font-medium ${theme ? "text-black" : "text-white"}`}>
+                  <div className={`text-center flex items-center justify-center gap-3 font-medium 
+                    ${theme ? "text-black" : "text-white"}`}>
                     <button
                       className={`${
                         theme
