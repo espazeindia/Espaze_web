@@ -12,7 +12,6 @@ function ProductOnboardingTable({
   setPage,
   setLimit,
   limit,
-  pageDetails,
   totalDetails,
   loading,
   setReload
@@ -161,7 +160,6 @@ function ProductOnboardingTable({
         setPage={setPage}
         limit={limit}
         setLimit={setLimit}
-        pageDetails={pageDetails}
         totalDetails={totalDetails}
         loading={loading}
         textSize="base"

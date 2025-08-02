@@ -11,7 +11,6 @@ function ProductOnboarding() {
   const { theme } = useMode();
 
   const [page, setPage] = useState(0);
-  const [pageDetails, setPageDetails] = useState({});
   const [totalDetails, setTotalDetails] = useState({});
   const [limit, setLimit] = useState(10);
   const [openAddMetaData, setOpenAddMetaData] = useState(false);
@@ -32,7 +31,7 @@ function ProductOnboarding() {
         console.log(limit, page, search);
         const result = await ProductOnboardingServices.FetchMetadata(limit, page, search);
         if (result.success === true) {
-          const { total_pages, metadata, has_previous, has_next, total } = result.data;
+          const { total_pages, metadata, total } = result.data;
           console.log(metadata);
           const transformedMetadata = metadata.map((data) => {
             return {
@@ -46,8 +45,6 @@ function ProductOnboarding() {
               id: data.product_id,
             };
           });
-
-          setPageDetails({ next: has_next, prev: has_previous });
           setTotalDetails({ total: total, total_pages: total_pages });
           setOnboardingData(transformedMetadata);
         }
@@ -127,7 +124,6 @@ function ProductOnboarding() {
         page={page}
         limit={limit}
         setLimit={setLimit}
-        pageDetails={pageDetails}
         totalDetails={totalDetails}
         loading={loading}
         setReload={setReload}
