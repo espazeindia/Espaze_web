@@ -41,7 +41,7 @@ const routes = [
     access : ["operations"]
   },
    {
-    path: "/categoriespage/:categoryId",
+    path: "/categories",
     component: CategoriesPage,
     access: ["operations"]
   },
@@ -86,7 +86,7 @@ const sidebarRoutes = [
     access : ["operations"]
   },
  {
-  path: "/categoriespage/:categoryId",
+  path: "/categories",
   icon: ShoppingCart,
   name : "Category",
   access: ["operations"]  
