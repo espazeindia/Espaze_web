@@ -81,61 +81,47 @@ function Login() {
               >
                 Welcome back! Please enter your details.
               </h2>
-              {/* <div
-                className={`rounded-lg p-1 flex w-full justify-center gap-2 mt-4
+              <div
+                className={`rounded-lg p-1 py-1.5 flex w-full justify-center gap-2 mt-4 mb-6
                  ${
                    theme
-                     ? "bg-zinc-200 text-zinc-800"
-                     : "bg-zinc-800 text-white"
+                     ? "bg-violet-200 text-violet-800"
+                     : "bg-violet-200 text-violet-800"
                  }`}
               >
-                <Link to="/operational-login" className="w-1/2">
-                  <a
-                    className={`block text-center px-4 py-2 rounded-lg text-gray-300 ${
-                      theme ? "bg-zinc-600" : "bg-zinc-700"
-                    }`}
-                  > Login as a Operational Guy</a>
-                </Link>
-                <Link to="/operational-login" className="w-1/2">
-                  <a
-                    className={`block text-center px-4 py-2 rounded-lg text-gray-300 ${
-                      theme ? "bg-zinc-600" : "bg-zinc-700"
-                    }`}
-                  > Login as a Operational Guy</a>
-                </Link>
-              </div> */}
-              {/* <div className={`rounded-lg p-1 flex w-full justify-center gap-2 mt-4
-                 ${
-                   theme
-                     ? "bg-zinc-200 text-zinc-800"
-                     : "bg-zinc-800 text-white"
-                 }`}>
-                 <NavLink
-                to="/operational-login"
-                className={({ isActive }) =>
-                  `mt-10 w-full text-center rounded-lg py-2 px-4 font-medium transition-colors ${
-                    isActive
-                      ? "bg-blue-500 text-white"
-                      : "bg-zinc-700 text-gray-300 hover:bg-zinc-600"
-                  }`
-                }
-              >
-                Login as Operational Guy?
-              </NavLink>
-
-              <NavLink
-                to="/seller-login"
-                className={({ isActive }) =>
-                  `mt-7 w-full text-center rounded-lg py-2 px-4 font-medium transition-colors ${
-                    isActive
-                      ? "bg-blue-500 text-white"
-                      : "bg-zinc-700 text-gray-300 hover:bg-zinc-600"
-                  }`
-                }
-              >
-                Login as Seller?
-              </NavLink>
-              </div> */}
+                <NavLink
+                  to="/seller-login"
+                  className={({ isActive }) =>
+                    `py-1.5 px-2 text-sm font-medium rounded-lg text-center w-1/2  ${
+                      isActive
+                        ? theme
+                          ? "bg-[#8b5cf6] text-white"
+                          : "bg-[#8b5cf6] text-white"
+                        : theme
+                        ? "bg-violet-200 text-violet-800"
+                        : "bg-violet-200 text-violet-800"
+                    }`
+                  }
+                >
+                  Seller
+                </NavLink>
+                <NavLink
+                  to="/operational-login"
+                  className={({ isActive }) =>
+                    `py-1.5 px-2 text-sm font-medium rounded-lg text-center w-1/2 ${
+                      isActive
+                        ? theme
+                          ? "bg-[#8b5cf6] text-white"
+                          : "bg-[#8b5cf6] text-white"
+                        : theme
+                        ? "bg-violet-200 text-violet-800"
+                        : "bg-violet-200 text-violet-800"
+                    }`
+                  }
+                >
+                  Operational Guy
+                </NavLink>
+              </div>
               <form onSubmit={handleSubmit} className="flex flex-col gap-4">
                 <FormControl size="lg" className="space-y-1">
                   <label className="text-lg  font-semibold">Email</label>
@@ -181,14 +167,14 @@ function Login() {
                   Forgot Password?
                 </Link>
               </p>
-              <p className="mt-7">
+              {/* <p className="mt-7">
                 <Link
                   className="text-[16px] w-fit mx-auto font-medium block text-center hover:underline"
                   to="/seller-login"
                 >
                   Login as Seller?
                 </Link>
-              </p>
+              </p> */}
             </div>
           </main>
         </div>

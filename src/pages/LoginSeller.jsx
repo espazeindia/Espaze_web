@@ -3,7 +3,7 @@ import Cookies from "js-cookie";
 import { FormControl, Input } from "@mui/joy";
 import Logo from "../assets/img/logo2.png";
 import Logo2 from "../assets/img/logo.png";
-import { Link } from "react-router-dom";
+import { Link,NavLink } from "react-router-dom";
 import AdminServices from "../services/AdminServices";
 import { notifyError, notifySuccess } from "../utils/toast";
 import { useNavigate } from "react-router-dom";
@@ -90,7 +90,32 @@ function Login() {
               >
                 Please enter your phone number to continue.
               </h2>
-
+              <div
+                className={`rounded-lg p-1 py-1.5 flex w-full justify-center gap-2 mt-4 mb-6 bg-violet-200 text-violet-800`}
+              >
+                <NavLink
+                  to="/seller-login"
+                  className={({ isActive }) =>
+                    `py-1.5 px-2 text-sm font-medium rounded-lg text-center w-1/2  ${
+                      isActive ? theme ? "bg-[#8b5cf6] text-white" : "bg-[#8b5cf6] text-white" 
+                      : theme ? "bg-violet-200 text-violet-800":"bg-violet-200 text-violet-800"
+                    }`
+                  }
+                >
+                  Seller
+                </NavLink>
+                <NavLink
+                  to="/operational-login"
+                  className={({ isActive }) =>
+                    `py-1.5 px-2 text-sm font-medium rounded-lg text-center w-1/2 ${
+                      isActive ? theme ? "bg-[#8b5cf6] text-white" : "bg-[#8b5cf6] text-white" 
+                      : theme ? "bg-violet-200 text-violet-800":"bg-violet-200 text-violet-800"
+                    }`
+                  }
+                >
+                  Operational Guy
+                </NavLink>
+              </div>
               {!otpSent ? (
                 <form className="flex flex-col gap-4" onSubmit={(e) => e.preventDefault()}>
                   <FormControl size="lg" className="space-y-1">
@@ -140,14 +165,14 @@ function Login() {
                 </form>
               )}
 
-              <p className="mt-10">
+              {/* <p className="mt-10">
                 <Link
                   className="text-[16px] w-fit mx-auto font-medium block text-center hover:underline"
                   to="/operational-login"
                 >
                   Login as Operational Guy?
                 </Link>
-              </p>
+              </p> */}
             </div>
           </main>
         </div>
