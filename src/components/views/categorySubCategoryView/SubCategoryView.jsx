@@ -5,6 +5,8 @@ import EditSubcategoryModal from "../../modal/EditSubcategoryModal";
 import DeleteSubcategoryModal from "../../modal/DeleteSubcategoryModal";
 import { useMode } from "../../../contexts/themeModeContext";
 import BottomPagination from "../../pagination/BottomPagination";
+import CategoryServices from "../../../services/CategoryServices";
+import { notifyError } from "../../../utils/toast";
 
 const initialSubcategories = {
   1: ["Tomatoes", "Onions", "Potatoes"],
@@ -20,18 +22,50 @@ const SubcategoryModal = ({ category }) => {
   const [page, setPage] = useState(0);
   const [limit, setLimit] = useState(10);
   const [totalDetails, setTotalDetails] = useState({
-    total: 24,
-    total_pages: 4,
+    total: 0,
+    total_pages: 0,
   });
   const [loading, setLoading] = useState(false);
-
+  const [reload,setReload] = useState(false);
   const [openAddModal, setOpenAddModal] = useState(false);
   const [openEditModal, setOpenEditModal] = useState(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(null);
 
   useEffect(() => {
-    setSubcategories(initialSubcategories[category.id] || []);
+    const getSubcategory = async() =>{
+      try {
+        const res = await CategoryServices.FetchSubcategory(limit, page, search,category.id)
+        if(res.success === true){
+          const {sub_category,total,total_pages} = res.data
+          let transSubcategory = [];
+          if( sub_category && sub_category.length > 0 ){
+            transSubcategory = sub_category.map((sub)=>{
+            return{
+              id: sub.id,
+              name : sub.subcategory_name,
+              image : sub.subcategory_image
+            }
+          })
+          }
+          setTotalDetails({
+            total:total,
+            total_pages: total_pages
+          })
+          setSubcategories(transSubcategory);
+        }     
+      } catch (err) {
+        if (err === "cookie error") {
+          Cookies.remove("EspazeCookie");
+          router("/login");
+          notifyError("Cookie error, please relogin and try again");
+        } else {
+          notifyError(err?.response?.data?.message || err.message);
+        }
+      }
+    }
+    if(category.id){
+    getSubcategory();}
   }, [category]);
 
   const handleAdd = (name) => {
@@ -102,7 +136,7 @@ const SubcategoryModal = ({ category }) => {
             className="grid grid-cols-[1fr_8fr_1.5fr]  items-center px-4 py-3 border-b border-gray-200 last:border-b-0"
           >
             <div className=" w-8 h-8 rounded-sm bg-gray-200"></div>
-            <div className="text-sm font-semibold">{sub}</div>
+            <div className="text-sm font-semibold">{sub.name}</div>
             <div className="text-center flex items-center gap-2 font-medium ">
               <button
                 className={`${
@@ -146,6 +180,8 @@ const SubcategoryModal = ({ category }) => {
           isOpen={openAddModal}
           onClose={() => setOpenAddModal(false)}
           onAdd={handleAdd}
+          category = {category}
+          setReload = {setReload}
         />
       )}
 

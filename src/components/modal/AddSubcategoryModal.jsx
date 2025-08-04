@@ -9,13 +9,39 @@ import {
   Input,
 } from "@mui/joy";
 import { useMode } from "../../contexts/themeModeContext";
+import { notifyError, notifySuccess } from "../../utils/toast";
+import CategoryServices from "../../services/CategoryServices";
 
-function AddSubcategoryModal({ isOpen, onClose, onAdd }) {
+
+function AddSubcategoryModal({ isOpen, onClose, onAdd, category, setReload }) {
   const { theme } = useMode();
   const [subcategory, setSubcategory] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async(e) => {
     e.preventDefault();
+    try {
+      const body = {
+        category_id : category.id,
+        subcategory_name : subcategory,
+        subcategory_image : "hello"
+      }
+      const res = await CategoryServices.CreateSubcategory(body)
+      if(res.success === true){
+        notifySuccess(res.message)
+        setReload((prevData)=>{
+          return !prevData
+        })
+      }
+    } catch (err) {
+      if (err === "cookie error") {
+          Cookies.remove("EspazeCookie");
+          router("/login");
+          notifyError("Cookie error, please relogin and try again");
+        } else {
+          notifyError(err?.response?.data?.message || err.message);
+        }
+      
+    }
     if (subcategory.trim() !== "") {
       onAdd(subcategory.trim());
       setSubcategory("");

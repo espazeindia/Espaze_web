@@ -8,6 +8,7 @@ import {
 } from "@mui/joy";
 import { DeleteOutline } from "@mui/icons-material";
 import { useMode } from "../../contexts/themeModeContext";
+import CategoryServices from "../../services/CategoryServices";
 
 function DeleteSubcategoryModal({
   isOpen,
@@ -17,7 +18,15 @@ function DeleteSubcategoryModal({
 }) {
   const { theme } = useMode();
 
-  const handleConfirmDelete = () => {
+  const handleConfirmDelete = async() => {
+    try {
+      const res = await CategoryServices.DeleteSubcategory()
+      if(res.success === true){
+        
+      }
+    } catch (error) {
+      
+    }
     onDelete();   
     onClose();
   };

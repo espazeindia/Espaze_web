@@ -9,6 +9,7 @@ import {
   ModalDialog,
 } from "@mui/joy";
 import { useMode } from "../../contexts/themeModeContext";
+import CategoryServices from "../../services/CategoryServices";
 
 function EditSubcategoryModal({ isOpen, onClose, subcategoryToEdit, onEdit }) {
   const { theme } = useMode();
@@ -20,8 +21,16 @@ function EditSubcategoryModal({ isOpen, onClose, subcategoryToEdit, onEdit }) {
     }
   }, [subcategoryToEdit]);
 
-  const handleEdit = (e) => {
+  const handleEdit = async(e) => {
     e.preventDefault();
+    try {
+      const res = await CategoryServices.UpdateSubcategory();
+      if( res.success === true ){
+        
+      }
+    } catch (error) {
+      
+    }
     if (editedName.trim()) {
       onEdit(editedName.trim());
       onClose();

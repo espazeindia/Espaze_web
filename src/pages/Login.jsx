@@ -90,9 +90,9 @@ function Login() {
                  }`}
               >
                 <NavLink
-                  to="/seller-login"
+                  to="/login"
                   className={({ isActive }) =>
-                    `py-1.5 px-2 text-sm font-medium rounded-lg text-center w-1/2  ${
+                    `py-2 px-2 text-sm font-medium rounded-md text-center w-1/2  ${
                       isActive
                         ? theme
                           ? "bg-[#8b5cf6] text-white"
@@ -108,7 +108,7 @@ function Login() {
                 <NavLink
                   to="/operational-login"
                   className={({ isActive }) =>
-                    `py-1.5 px-2 text-sm font-medium rounded-lg text-center w-1/2 ${
+                    `py-2 px-2 text-sm font-medium rounded-md text-center w-1/2 ${
                       isActive
                         ? theme
                           ? "bg-[#8b5cf6] text-white"

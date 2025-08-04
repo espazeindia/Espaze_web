@@ -4,16 +4,12 @@ import SubCategoryView from "../components/views/categorySubCategoryView/SubCate
 
 function CategoriesPage() {
   const [selectedCategory, setSelectedCategory] = useState("");
-  const [categories, setCategories] = useState([
-    { id: 1, image: "", name: "Fruits & Vegetables" },
-    { id: 2, image: "", name: "Books" },
-    { id: 3, image: "", name: "Home Appliances" },
-    { id: 4, image: "", name: "Fashion" },
-  ]);
+  const [categories, setCategories] = useState([]);
 
   useEffect(() => {
+    if(categories.length>0) 
     setSelectedCategory(categories[0]);
-  }, []);
+  }, [categories]);
 
   return (
     <div className=" h-full flex">

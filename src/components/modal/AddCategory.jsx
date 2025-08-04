@@ -8,20 +8,44 @@ import {
   ModalClose,
   ModalDialog,
 } from "@mui/joy";
+import { notifyError, notifySuccess } from "../../utils/toast";
 import { useMode } from "../../contexts/themeModeContext";
+import CategoryServices from "../../services/CategoryServices";
 
-function AddCategory({ isOpen, onClose, setCategories }) {
+function AddCategory({ isOpen, onClose, setCategories,setReload }) {
   const { theme } = useMode();
   const [category, setCategory] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async(e) => {
     e.preventDefault();
+    try {
+      const body = {
+        category_name : category,
+        category_image : "hello"
+      }
+      const res = await CategoryServices.CreateCategory(body)
+      if(res.success === true){
+        notifySuccess(res.message)
+        setReload((prevData)=>{
+          return !prevData
+        })
+      }
+    } catch (error) {
+      if (err === "cookie error") {
+          Cookies.remove("EspazeCookie");
+          router("/login");
+          notifyError("Cookie error, please relogin and try again");
+        } else {
+          notifyError(err?.response?.data?.message || err.message);
+        }
+      
+    }
     if (category.trim() !== "") {
       const newCategory = {
         id: Date.now(),
         name: category.trim(),
       };
-      setCategories((prev) => [...prev, newCategory]);
+      
       setCategory("");
       onClose();
     }

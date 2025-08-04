@@ -5,6 +5,8 @@ import AddCategory from "../../modal/AddCategory";
 import EditCategory from "../../modal/EditCategory";
 import DeleteCategoryModal from "../../modal/DeleteCategoryModal";
 import BottomPagination from "../../pagination/BottomPagination";
+import CategoryServices from "../../../services/CategoryServices";
+import {handleChangeDebounce} from "../../../utils/useDebounce";
 
 const CategoriesPage = ({
   categories,
@@ -16,10 +18,11 @@ const CategoriesPage = ({
   const [page, setPage] = useState(0);
   const [limit, setLimit] = useState(10);
   const [totalDetails, setTotalDetails] = useState({
-    total: 24,
-    total_pages: 4,
+    total: 0,
+    total_pages: 0,
   });
   const [loading, setLoading] = useState(false);
+  const [reload, setReload] = useState(false);
 
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [categoryToDelete, setCategoryToDelete] = useState(null);
@@ -28,10 +31,46 @@ const CategoriesPage = ({
   const [openAddModal, setOpenAddModal] = useState(false);
   const [search, setSearch] = useState("");
 
+const debounce = handleChangeDebounce(search);
+
   const handleEdit = (category) => {
     setCategoryToEdit(category);
     setOpenEditModal(true);
   };
+
+  useEffect(() => {
+    const getCategory = async () => {
+      try {
+        // setLoading(true)
+        const res = await CategoryServices.FetchCategory(limit, page, debounce);
+        if (res.success === true) {
+          const { category, total, total_pages } = res.data;
+          const transformedCategories = category.map((cat) => {
+            return {
+              id: cat.id,
+              name: cat.category_name,
+              image: cat.category_image,
+            };
+          });
+          setTotalDetails({
+            total : total,
+            total_pages : total_pages
+          })
+          setCategories(transformedCategories);
+        }
+      } catch (err) {
+        if (err === "cookie error") {
+          Cookies.remove("EspazeCookie");
+          router("/login");
+          notifyError("Cookie error, please relogin and try again");
+        } else {
+          notifyError(err?.response?.data?.message || err.message);
+        }
+      }
+    };
+    getCategory();
+  }, [limit, page, debounce, reload]);
+
 
   const handleDelete = (category) => {
     setCategoryToDelete(category);
@@ -92,9 +131,11 @@ const CategoriesPage = ({
             key={cat.id}
             onClick={() => openSubcategories(cat)}
             className={`grid grid-cols-[1fr_8fr_1.5fr] items-center px-4 py-2 border-b border-gray-200 cursor-pointer   ${
-              selectedCategory.id === cat.id 
-                ?  theme ? "bg-violet-200":"bg-[#7e50da] text-white"
-               : theme
+              selectedCategory.id === cat.id
+                ? theme
+                  ? "bg-violet-200"
+                  : "bg-[#7e50da] text-white"
+                : theme
                 ? " hover:bg-violet-100"
                 : " hover:bg-violet-100 hover:text-black"
             }`}
@@ -137,6 +178,7 @@ const CategoriesPage = ({
         isOpen={openAddModal}
         onClose={() => setOpenAddModal(false)}
         setCategories={setCategories}
+        setReload={setReload}
       />
       <EditCategory
         isOpen={openEditModal}

@@ -94,9 +94,9 @@ function Login() {
                 className={`rounded-lg p-1 py-1.5 flex w-full justify-center gap-2 mt-4 mb-6 bg-violet-200 text-violet-800`}
               >
                 <NavLink
-                  to="/seller-login"
+                  to="/login"
                   className={({ isActive }) =>
-                    `py-1.5 px-2 text-sm font-medium rounded-lg text-center w-1/2  ${
+                    `py-2 px-2 text-sm font-medium rounded-md text-center w-1/2  ${
                       isActive ? theme ? "bg-[#8b5cf6] text-white" : "bg-[#8b5cf6] text-white" 
                       : theme ? "bg-violet-200 text-violet-800":"bg-violet-200 text-violet-800"
                     }`
@@ -107,7 +107,7 @@ function Login() {
                 <NavLink
                   to="/operational-login"
                   className={({ isActive }) =>
-                    `py-1.5 px-2 text-sm font-medium rounded-lg text-center w-1/2 ${
+                    `py-2 px-2 text-sm font-medium rounded-md text-center w-1/2 ${
                       isActive ? theme ? "bg-[#8b5cf6] text-white" : "bg-[#8b5cf6] text-white" 
                       : theme ? "bg-violet-200 text-violet-800":"bg-violet-200 text-violet-800"
                     }`

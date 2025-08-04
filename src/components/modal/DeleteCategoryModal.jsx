@@ -8,12 +8,21 @@ import {
 } from "@mui/joy";
 import { DeleteOutline } from "@mui/icons-material";
 import { useMode } from "../../contexts/themeModeContext";
+import CategoryServices from "../../services/CategoryServices";
 
 function DeleteCategoryModal({ isOpen, onClose, data, categories, setCategories }) {
   const { theme } = useMode();
 
-  const handleDelete = () => {
-    const updatedCategories = categories.filter(
+  const handleDelete = async() => {
+    try {
+      const res = await CategoryServices.DeleteCategory()
+      if(res.success === true){
+        
+      }
+    } catch (error) {
+      
+    }
+     const updatedCategories = categories.filter(
       (category) => category.id !== data?.id
     );
     setCategories(updatedCategories);
