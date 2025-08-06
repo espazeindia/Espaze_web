@@ -1,27 +1,18 @@
-import React from "react";
-import {
-  DialogContent,
-  DialogTitle,
-  Modal,
-  ModalClose,
-  ModalDialog,
-} from "@mui/joy";
+import React, { useState } from "react";
+import { DialogContent, DialogTitle, Modal, ModalClose, ModalDialog } from "@mui/joy";
 import { DeleteOutline } from "@mui/icons-material";
 import { useMode } from "../../contexts/themeModeContext";
 import CategoryServices from "../../services/CategoryServices";
 import { notifyError, notifySuccess } from "../../utils/toast";
+import { LoaderCircle } from "lucide-react";
 
-function DeleteSubcategoryModal({
-  isOpen,
-  onClose,
-  data,
-  onDelete, 
-  setReload,
-}) {
+function DeleteSubcategoryModal({ isOpen, onClose, data, setReload, setSelectedSub }) {
   const { theme } = useMode();
+  const [loading, setLoading] = useState(false);
 
-  const handleConfirmDelete = async() => {
-     try {
+  const handleConfirmDelete = async () => {
+    setLoading(true);
+    try {
       const res = await CategoryServices.DeleteSubcategory(data.id);
       if (res.success === true) {
         notifySuccess(res.message);
@@ -34,7 +25,8 @@ function DeleteSubcategoryModal({
         notifyError(err?.response?.data?.message || err.message);
       }
     }
-    onDelete();   
+    setSelectedSub(null);
+    setLoading(false);
     onClose();
   };
 
@@ -64,13 +56,9 @@ function DeleteSubcategoryModal({
             <div className="text-3xl font-semibold ml-2">Caution</div>
           </div>
 
-          <div
-            className={`${
-              theme ? "text-black" : "text-white"
-            } mt-4 text-center`}
-          >
+          <div className={`${theme ? "text-black" : "text-white"} mt-4 text-center`}>
             Are you sure you want to delete{" "}
-            <strong>{data && data.name  || "this subcategory"}</strong>?
+            <strong>{(data && data.name) || "this subcategory"}</strong>?
           </div>
 
           <div className="flex justify-end gap-3 mt-8">
@@ -84,7 +72,7 @@ function DeleteSubcategoryModal({
               onClick={handleConfirmDelete}
               className="border border-red-500 text-red-500 px-6 py-1 rounded-lg transition-all duration-700 hover:cursor-pointer font-semibold hover:text-white hover:bg-red-500"
             >
-              Delete
+              {loading ? <LoaderCircle className="animate-spin h-7" /> : <>Delete</>}
             </button>
           </div>
         </DialogContent>

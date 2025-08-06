@@ -13,20 +13,19 @@ import {
 import { useMode } from "../../contexts/themeModeContext";
 import CategoryServices from "../../services/CategoryServices";
 import { notifyError, notifySuccess } from "../../utils/toast";
+import { LoaderCircle } from "lucide-react";
 
 function EditSubcategoryModal({ isOpen, onClose, subcategoryToEdit, onEdit, setReload }) {
   const { theme } = useMode();
   const [editedName, setEditedName] = useState("");
   const [categoryOfSub, setCategoryOfSub] = useState("");
   const [categories, setCategories] = useState([]);
-  
-
-   useEffect(() => {
-    console.log(categoryOfSub)
-  }, [categoryOfSub]);
+  const [loading, setLoading] = useState(false);
+  const [categoryLoading, setCategoryLoading] = useState(false);
 
   useEffect(() => {
     const categoryCall = async () => {
+      setCategoryLoading(true);
       try {
         const res = await CategoryServices.FetchAllCategory();
         if (res.success === true) {
@@ -41,6 +40,7 @@ function EditSubcategoryModal({ isOpen, onClose, subcategoryToEdit, onEdit, setR
           notifyError(err?.response?.data?.message || err.message);
         }
       }
+      setCategoryLoading(false);
     };
     categoryCall();
   }, []);
@@ -53,6 +53,7 @@ function EditSubcategoryModal({ isOpen, onClose, subcategoryToEdit, onEdit, setR
   }, [subcategoryToEdit]);
 
   const handleSubmit = async (e) => {
+    setLoading(true);
     e.preventDefault();
     try {
       const body = {
@@ -60,9 +61,7 @@ function EditSubcategoryModal({ isOpen, onClose, subcategoryToEdit, onEdit, setR
         subcategory_image: "hello",
         category_id: categoryOfSub,
       };
-      const res = await CategoryServices.UpdateSubcategory(
-        body, subcategoryToEdit.id
-      );
+      const res = await CategoryServices.UpdateSubcategory(body, subcategoryToEdit.id);
       if (res.success === true) {
         setReload((prevData) => {
           return !prevData;
@@ -78,6 +77,7 @@ function EditSubcategoryModal({ isOpen, onClose, subcategoryToEdit, onEdit, setR
         notifyError(err?.response?.data?.message || err.message);
       }
     }
+    setLoading(false);
     onClose();
   };
 
@@ -124,9 +124,7 @@ function EditSubcategoryModal({ isOpen, onClose, subcategoryToEdit, onEdit, setR
                   />
                 </FormControl>
                 <FormControl size="lg" className="space-y-1">
-                  <label className={theme ? "text-zinc-800" : "text-zinc-300"}>
-                    Image
-                  </label>
+                  <label className={theme ? "text-zinc-800" : "text-zinc-300"}>Image</label>
                   <Input
                     sx={
                       theme
@@ -150,14 +148,9 @@ function EditSubcategoryModal({ isOpen, onClose, subcategoryToEdit, onEdit, setR
                     placeholder="select Image"
                   />
                 </FormControl>
-                <FormControl size="lg" className="space-y-1 w-full">
-                  <label className={theme ? "text-zinc-800" : "text-zinc-300"}>
-                    Category
-                  </label>
-                  <Select
-                    value={categoryOfSub}
-                    onChange={(_,val) => setCategoryOfSub(val)}
-                  >
+                <FormControl size="lg" className={`space-y-1 w-full ${categoryLoading ? "cursor-not-allowed": "cursor-pointer"} `}>
+                  <label className={theme ? "text-zinc-800" : "text-zinc-300"}>Category</label>
+                  <Select value={categoryOfSub} onChange={(_, val) => setCategoryOfSub(val)} disabled={categoryLoading}>
                     {categories.map((category) => (
                       <Option key={category.id} value={category.id} label={category.category_name}>
                         {category.category_name}
@@ -170,14 +163,14 @@ function EditSubcategoryModal({ isOpen, onClose, subcategoryToEdit, onEdit, setR
               <div className="flex justify-end">
                 <button
                   type="submit"
-                  className={`p-2 font-medium rounded-lg w-24 mt-8 transition-all
+                  className={`p-2 font-medium rounded-lg w-24 mt-8 transition-all flex justify-center items-center
                   ${
                     theme
                       ? "border border-green-600 text-green-600 hover:bg-green-600 hover:text-white"
                       : "border border-green-500 text-green-500 hover:bg-green-600 hover:text-white"
                   }`}
                 >
-                  Save
+                  {loading ? <LoaderCircle className="animate-spin h-7" /> : <>Edit</>}
                 </button>
               </div>
             </form>

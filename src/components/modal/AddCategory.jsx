@@ -11,13 +11,16 @@ import {
 import { notifyError, notifySuccess } from "../../utils/toast";
 import { useMode } from "../../contexts/themeModeContext";
 import CategoryServices from "../../services/CategoryServices";
+import { LoaderCircle } from "lucide-react";
 
 function AddCategory({ isOpen, onClose, setCategories,setReload }) {
   const { theme } = useMode();
   const [category, setCategory] = useState("");
+  const [loading,setLoading]=useState(false)
 
   const handleSubmit = async(e) => {
     e.preventDefault();
+    setLoading(true)
     try {
       const body = {
         category_name : category,
@@ -41,6 +44,7 @@ function AddCategory({ isOpen, onClose, setCategories,setReload }) {
       
     }
       setCategory("");
+      setLoading(false)
       onClose();
   };
 
@@ -134,16 +138,15 @@ function AddCategory({ isOpen, onClose, setCategories,setReload }) {
               </div>
               <div className="flex justify-end">
                 <button
-                  type="submit"
-                  className={`p-2 font-medium rounded-lg w-20 mt-8
-                  ${
-                    theme
-                      ? "border border-green-600 text-green-600 hover:bg-green-600 hover:text-white"
-                      : "border border-green-500 text-green-500 hover:bg-green-600 hover:text-white"
-                  }`}
-                >
-                  Add
-                </button>
+                className={`p-2 font-medium rounded-lg w-20 mt-8 flex justify-center items-center
+                ${
+                  theme
+                    ? "border border-green-600 text-green-600 hover:bg-green-600 hover:text-white"
+                    : "border border-green-500 hover:bg-green-600 hover:text-white text-green-500"
+                }`}
+              >
+                {loading ? <LoaderCircle className="animate-spin h-7" /> : <>Add</>}
+              </button>
               </div>
             </form>
           </DialogContent>

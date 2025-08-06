@@ -7,6 +7,7 @@ import { useMode } from "../../../contexts/themeModeContext";
 import BottomPagination from "../../pagination/BottomPagination";
 import CategoryServices from "../../../services/CategoryServices";
 import { notifyError } from "../../../utils/toast";
+import { handleChangeDebounce } from "../../../utils/useDebounce";
 
 const SubcategoryModal = ({ category }) => {
   const { theme } = useMode();
@@ -19,35 +20,38 @@ const SubcategoryModal = ({ category }) => {
     total_pages: 0,
   });
   const [loading, setLoading] = useState(false);
-  const [reload,setReload] = useState(false);
+  const [reload, setReload] = useState(false);
   const [openAddModal, setOpenAddModal] = useState(false);
   const [openEditModal, setOpenEditModal] = useState(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [selectedSub, setSelectedSub] = useState(null);
 
+  const debounce = handleChangeDebounce(search);
+
   useEffect(() => {
-    const getSubcategory = async() =>{
+    const getSubcategory = async () => {
+      setLoading(true);
       try {
-        const res = await CategoryServices.FetchSubcategory(limit, page, search,category.id)
-        if(res.success === true){
-          const {sub_category,total,total_pages} = res.data
+        const res = await CategoryServices.FetchSubcategory(limit, page, debounce, category.id);
+        if (res.success === true) {
+          const { sub_category, total, total_pages } = res.data;
           let transSubcategory = [];
-          if( sub_category && sub_category.length > 0 ){
-            transSubcategory = sub_category.map((sub)=>{
-            return{
-              id: sub.id,
-              name : sub.subcategory_name,
-              image : sub.subcategory_image,
-              categoryOfSub : sub.category_id
-            }
-          })
+          if (sub_category && sub_category.length > 0) {
+            transSubcategory = sub_category.map((sub) => {
+              return {
+                id: sub.id,
+                name: sub.subcategory_name,
+                image: sub.subcategory_image,
+                categoryOfSub: sub.category_id,
+              };
+            });
           }
           setTotalDetails({
-            total:total,
-            total_pages: total_pages
-          })
+            total: total,
+            total_pages: total_pages,
+          });
           setSubcategories(transSubcategory);
-        }     
+        }
       } catch (err) {
         if (err === "cookie error") {
           Cookies.remove("EspazeCookie");
@@ -57,20 +61,16 @@ const SubcategoryModal = ({ category }) => {
           notifyError(err?.response?.data?.message || err.message);
         }
       }
+      setLoading(false);
+    };
+    if (category.id) {
+      getSubcategory();
     }
-    if(category.id){
-    getSubcategory();}
-  }, [category,reload]);
+  }, [category, page, limit, debounce, reload]);
 
   const handleEdit = (newName) => {
     const updated = [...subcategories];
     updated[selectedSub] = newName;
-    setSubcategories(updated);
-    setSelectedSub(null);
-  };
-
-  const handleDelete = () => {
-    const updated = subcategories.filter((_, i) => i !== selectedSub);
     setSubcategories(updated);
     setSelectedSub(null);
   };
@@ -81,16 +81,14 @@ const SubcategoryModal = ({ category }) => {
         theme ? "bg-zinc-100 text-black" : "bg-neutral-950 text-white"
       }`}
     >
-      <h2 className="font-bold text-2xl mb-6">{category.name}</h2>
+      <h2 className="font-bold text-2xl mb-6">{category.name || "No Result for Sub-Category"}</h2>
 
       <div className="flex items-center gap-3 mb-6">
         <input
           type="text"
           placeholder="Search subcategory..."
           className={`flex-1 p-2 px-4 rounded-md focus:outline-none ${
-            theme
-              ? "bg-white text-zinc-700 shadow-sm"
-              : "bg-zinc-800 text-zinc-200 shadow-sm"
+            theme ? "bg-white text-zinc-700 shadow-sm" : "bg-zinc-800 text-zinc-200 shadow-sm"
           }`}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
@@ -107,11 +105,7 @@ const SubcategoryModal = ({ category }) => {
         </button>
       </div>
 
-      <div
-        className={`rounded-lg  ${
-          theme ? "bg-white text-gray-800" : "bg-zinc-800 text-white"
-        }`}
-      >
+      <div className={`rounded-lg  ${theme ? "bg-white text-gray-800" : "bg-zinc-800 text-white"}`}>
         <div
           className={`rounded-t-lg grid px-3 py-2 text-sm font-semibold grid-cols-[1fr_8fr_1.5fr] border-b border-gray-200 last:border-b-0 items-center
             ${theme ? "text-[#4110a2]" : "text-[#b898fa]"}`}
@@ -120,41 +114,51 @@ const SubcategoryModal = ({ category }) => {
           <div>Category Name</div>
           <div>Actions</div>
         </div>
-        {subcategories.map((sub, index) => (
-          <div
-            key={index}
-            className="grid grid-cols-[1fr_8fr_1.5fr]  items-center px-4 py-2 border-b border-gray-200 last:border-b-0"
-          >
-            <div className=" w-8 h-8 rounded-sm bg-gray-200"></div>
-            <div className="text-sm font-semibold">{sub.name}</div>
-            <div className="text-center flex items-center gap-2 font-medium ">
-              <button
-                className={`${
-                  theme
-                    ? "text-green-600 hover:text-green-700"
-                    : "text-green-400 hover:text-green-700"
-                }`}
-                onClick={() => {
-                  setSelectedSub(sub);
-                  setOpenEditModal(true);
-                }}
+        {!loading ? (
+          subcategories.length > 0 ? (
+            subcategories.map((sub, index) => (
+              <div
+                key={index}
+                className="grid grid-cols-[1fr_8fr_1.5fr]  items-center px-4 py-2 border-b border-gray-200 last:border-b-0"
               >
-                <Edit />
-              </button>
-              <button
-                className={` hover:text-red-600 ${
-                  theme ? "text-red-500" : "text-red-500"
-                }`}
-                onClick={() => {
-                  setSelectedSub(sub);
-                  setOpenDeleteModal(true);
-                }}
-              >
-                <Delete />
-              </button>
+                <div className=" w-8 h-8 rounded-sm bg-gray-200"></div>
+                <div className="text-sm font-semibold">{sub.name}</div>
+                <div className="text-center flex items-center gap-2 font-medium ">
+                  <button
+                    className={`${
+                      theme
+                        ? "text-green-600 hover:text-green-700"
+                        : "text-green-400 hover:text-green-700"
+                    }`}
+                    onClick={() => {
+                      setSelectedSub(sub);
+                      setOpenEditModal(true);
+                    }}
+                  >
+                    <Edit />
+                  </button>
+                  <button
+                    className={` hover:text-red-600 ${theme ? "text-red-500" : "text-red-500"}`}
+                    onClick={() => {
+                      setSelectedSub(sub);
+                      setOpenDeleteModal(true);
+                    }}
+                  >
+                    <Delete />
+                  </button>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className=" w-full h-[50vh] flex justify-center items-center text-xl font-semibold">
+              No Sub-Categories Found, Try Adding One
             </div>
-          </div>
-        ))}
+          )
+        ) : (
+          Array.from({ length: limit }).map((_, index) => (
+            <div key={index} className="border-b h-12 border-gray-300 border-dotted w-full"></div>
+          ))
+        )}
         <BottomPagination
           page={page}
           setPage={setPage}
@@ -169,8 +173,8 @@ const SubcategoryModal = ({ category }) => {
         <AddSubcategoryModal
           isOpen={openAddModal}
           onClose={() => setOpenAddModal(false)}
-          category = {category}
-          setReload = {setReload}
+          category={category}
+          setReload={setReload}
         />
       )}
 
@@ -181,7 +185,7 @@ const SubcategoryModal = ({ category }) => {
             setOpenEditModal(false);
             setSelectedSub(null);
           }}
-          subcategoryToEdit= {selectedSub}
+          subcategoryToEdit={selectedSub}
           onEdit={handleEdit}
           setReload={setReload}
         />
@@ -194,8 +198,8 @@ const SubcategoryModal = ({ category }) => {
           setSelectedSub(null);
         }}
         data={selectedSub}
-        onDelete={handleDelete}
         setReload={setReload}
+        setSelectedSub={setSelectedSub}
       />
     </div>
   );

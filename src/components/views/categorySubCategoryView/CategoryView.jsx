@@ -6,15 +6,10 @@ import EditCategory from "../../modal/EditCategory";
 import DeleteCategoryModal from "../../modal/DeleteCategoryModal";
 import BottomPagination from "../../pagination/BottomPagination";
 import CategoryServices from "../../../services/CategoryServices";
-import {handleChangeDebounce} from "../../../utils/useDebounce";
+import { handleChangeDebounce } from "../../../utils/useDebounce";
 import { notifyError, notifySuccess } from "../../../utils/toast";
 
-const CategoriesPage = ({
-  categories,
-  setCategories,
-  selectedCategory,
-  setSelectedCategory,
-}) => {
+const CategoriesPage = ({ categories, setCategories, selectedCategory, setSelectedCategory }) => {
   const { theme } = useMode();
   const [page, setPage] = useState(0);
   const [limit, setLimit] = useState(10);
@@ -32,7 +27,7 @@ const CategoriesPage = ({
   const [openAddModal, setOpenAddModal] = useState(false);
   const [search, setSearch] = useState("");
 
-const debounce = handleChangeDebounce(search);
+  const debounce = handleChangeDebounce(search);
 
   const handleEdit = (category) => {
     setCategoryToEdit(category);
@@ -42,21 +37,25 @@ const debounce = handleChangeDebounce(search);
   useEffect(() => {
     const getCategory = async () => {
       try {
-        // setLoading(true)
+        setLoading(true);
         const res = await CategoryServices.FetchCategory(limit, page, debounce);
         if (res.success === true) {
           const { category, total, total_pages } = res.data;
-          const transformedCategories = category.map((cat) => {
-            return {
-              id: cat.id,
-              name: cat.category_name,
-              image: cat.category_image,
-            };
-          });
+          let transformedCategories = [];
+          if (category && category.length > 0) {
+            transformedCategories = category.map((cat) => {
+              return {
+                id: cat.id,
+                name: cat.category_name,
+                image: cat.category_image,
+              };
+            });
+          }
+
           setTotalDetails({
-            total : total,
-            total_pages : total_pages
-          })
+            total: total,
+            total_pages: total_pages,
+          });
           setCategories(transformedCategories);
         }
       } catch (err) {
@@ -68,10 +67,10 @@ const debounce = handleChangeDebounce(search);
           notifyError(err?.response?.data?.message || err.message);
         }
       }
+      setLoading(false);
     };
     getCategory();
   }, [limit, page, debounce, reload]);
-
 
   const handleDelete = (category) => {
     setCategoryToDelete(category);
@@ -97,9 +96,7 @@ const debounce = handleChangeDebounce(search);
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search category..."
           className={`flex-1 p-2 px-4 rounded-md focus:outline-none ${
-            theme
-              ? "bg-white text-zinc-700 shadow-sm"
-              : "bg-zinc-800 text-zinc-200 shadow-sm"
+            theme ? "bg-white text-zinc-700 shadow-sm" : "bg-zinc-800 text-zinc-200 shadow-sm"
           }`}
         />
         <button
@@ -114,11 +111,7 @@ const debounce = handleChangeDebounce(search);
         </button>
       </div>
 
-      <div
-        className={`rounded-lg ${
-          theme ? "bg-white text-gray-800" : "bg-zinc-800 text-white"
-        }`}
-      >
+      <div className={`rounded-lg ${theme ? "bg-white text-gray-800" : "bg-zinc-800 text-white"}`}>
         <div
           className={`grid border-b border-gray-200 last:border-b-0 px-3 text-sm py-2 font-semibold grid-cols-[1fr_8fr_1.5fr] 
             ${theme ? "text-[#4110a2]" : "text-[#b898fa]"}`}
@@ -127,44 +120,54 @@ const debounce = handleChangeDebounce(search);
           <div>Category Name</div>
           <div>Actions</div>
         </div>
-        {categories.map((cat) => (
-          <div
-            key={cat.id}
-            onClick={() => openSubcategories(cat)}
-            className={`grid grid-cols-[1fr_8fr_1.5fr] items-center px-4 py-2 border-b border-gray-200 cursor-pointer   ${
-              selectedCategory.id === cat.id
-                ? theme
-                  ? "bg-violet-200"
-                  : "bg-[#7e50da] text-white"
-                : theme
-                ? " hover:bg-violet-100"
-                : " hover:bg-violet-100 hover:text-black"
-            }`}
-          >
-            <div className=" w-8 h-8 rounded-sm bg-gray-200"></div>
-            <span className="text-sm font-semibold">{cat.name}</span>
-            <div className="text-center flex items-center gap-2 font-medium ">
-              <button
-                className={`${
-                  theme
-                    ? "text-green-600 hover:text-green-700"
-                    : "text-green-400 hover:text-green-700"
+        {!loading ? (
+          categories.length > 0 ? (
+            categories.map((cat) => (
+              <div
+                key={cat.id}
+                onClick={() => openSubcategories(cat)}
+                className={`grid grid-cols-[1fr_8fr_1.5fr] items-center px-4 py-2 border-b border-gray-200 cursor-pointer   ${
+                  selectedCategory.id === cat.id
+                    ? theme
+                      ? "bg-violet-200"
+                      : "bg-[#7e50da] text-white"
+                    : theme
+                    ? " hover:bg-violet-100"
+                    : " hover:bg-violet-100 hover:text-black"
                 }`}
-                onClick={(e) => handleEdit(cat)}
               >
-                <Edit />
-              </button>
-              <button
-                className={` hover:text-red-600 ${
-                  theme ? "text-red-500" : "text-red-500"
-                }`}
-                onClick={(e) => handleDelete(cat)}
-              >
-                <Delete />
-              </button>
+                <div className=" w-8 h-8 rounded-sm bg-gray-200"></div>
+                <span className="text-sm font-semibold">{cat.name}</span>
+                <div className="text-center flex items-center gap-2 font-medium ">
+                  <button
+                    className={`${
+                      theme
+                        ? "text-green-600 hover:text-green-700"
+                        : "text-green-400 hover:text-green-700"
+                    }`}
+                    onClick={(e) => handleEdit(cat)}
+                  >
+                    <Edit />
+                  </button>
+                  <button
+                    className={` hover:text-red-600 ${theme ? "text-red-500" : "text-red-500"}`}
+                    onClick={(e) => handleDelete(cat)}
+                  >
+                    <Delete />
+                  </button>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className=" w-full h-[50vh] flex justify-center items-center text-xl font-semibold">
+              No Categories Found,Try Adding One
             </div>
-          </div>
-        ))}
+          )
+        ) : (
+          Array.from({ length: limit }).map((_, index) => (
+            <div key={index} className="border-b h-12 border-gray-300 border-dotted w-full"></div>
+          ))
+        )}
         <BottomPagination
           page={page}
           setPage={setPage}
@@ -192,8 +195,6 @@ const debounce = handleChangeDebounce(search);
         isOpen={openDeleteModal}
         onClose={() => setOpenDeleteModal(false)}
         categoryToDelete={categoryToDelete}
-        categories={categories}
-        setCategories={setCategories}
         setReload={setReload}
       />
     </div>

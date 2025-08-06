@@ -14,7 +14,7 @@ function ProductOnboardingTable({
   limit,
   totalDetails,
   loading,
-  setReload
+  setReload,
 }) {
   const { theme } = useMode();
   const [editModal, setEditModal] = useState(false);
@@ -80,8 +80,9 @@ function ProductOnboardingTable({
           </div>
         </div>
         <div className=" h-[50vh] overflow-scroll sideBarNone">
-          {!loading
-            ? onboardingData.map((data, index) => (
+          {!loading ? (
+            onboardingData.length > 0 ? (
+              onboardingData.map((data, index) => (
                 <div
                   key={index}
                   className=" grid grid-cols-8  text-sm border-b py-4 border-gray-300 border-dotted"
@@ -122,8 +123,10 @@ function ProductOnboardingTable({
                     {data.productDescription}
                   </div>
 
-                  <div className={`text-center flex items-center justify-center gap-3 font-medium 
-                    ${theme ? "text-black" : "text-white"}`}>
+                  <div
+                    className={`text-center flex items-center justify-center gap-3 font-medium 
+                    ${theme ? "text-black" : "text-white"}`}
+                  >
                     <button
                       className={`${
                         theme
@@ -147,12 +150,14 @@ function ProductOnboardingTable({
                   </div>
                 </div>
               ))
-            : Array.from({ length: limit }).map((_, index) => (
-                <div
-                  key={index}
-                  className="border-b h-14 border-gray-300 border-dotted w-full"
-                ></div>
-              ))}
+            ) : (
+              <div className=" w-full h-[48vh] flex justify-center items-center text-2xl font-semibold"> No Metadata Found</div>
+            )
+          ) : (
+            Array.from({ length: limit }).map((_, index) => (
+              <div key={index} className="border-b h-14 border-gray-300 border-dotted w-full"></div>
+            ))
+          )}
         </div>
       </div>
       <BottomPagination

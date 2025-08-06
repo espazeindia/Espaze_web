@@ -11,14 +11,17 @@ import {
 import { useMode } from "../../contexts/themeModeContext";
 import { notifyError, notifySuccess } from "../../utils/toast";
 import CategoryServices from "../../services/CategoryServices";
+import { LoaderCircle } from "lucide-react";
 
 
 function AddSubcategoryModal({ isOpen, onClose, onAdd, category, setReload }) {
   const { theme } = useMode();
   const [subcategory, setSubcategory] = useState("");
+  const [loading,setLoading]=useState(false)
 
   const handleSubmit = async(e) => {
     e.preventDefault();
+    setLoading(true)
     try {
       const body = {
         category_id : category.id,
@@ -43,6 +46,7 @@ function AddSubcategoryModal({ isOpen, onClose, onAdd, category, setReload }) {
       
     }
       setSubcategory("");
+      setLoading(false)
       onClose();
   };
 
@@ -137,14 +141,14 @@ function AddSubcategoryModal({ isOpen, onClose, onAdd, category, setReload }) {
               <div className="flex justify-end">
                 <button
                   type="submit"
-                  className={`p-2 font-medium rounded-lg w-20 mt-8
+                  className={`p-2 font-medium rounded-lg w-20 mt-8 flex items-center  justify-center
                   ${
                     theme
                       ? "border border-green-600 text-green-600 hover:bg-green-600 hover:text-white"
                       : "border border-green-500 text-green-500 hover:bg-green-600 hover:text-white"
                   }`}
                 >
-                  Add
+                  {loading ? <LoaderCircle className="animate-spin h-7" /> : <>Add</>}
                 </button>
               </div>
             </form>

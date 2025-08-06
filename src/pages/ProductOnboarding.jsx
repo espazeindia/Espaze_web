@@ -32,19 +32,22 @@ function ProductOnboarding() {
         const result = await ProductOnboardingServices.FetchMetadata(limit, page, search);
         if (result.success === true) {
           const { total_pages, metadata, total } = result.data;
-          console.log(metadata);
-          const transformedMetadata = metadata.map((data) => {
-            return {
-              productName: data.name,
-              productDescription: data.description,
-              category: data.category_id,
-              subCategory: data.subcategory_id,
-              code: data.hsn_code,
-              mrp: data.mrp,
-              image: data.image,
-              id: data.product_id,
-            };
-          });
+          let transformedMetadata = [];
+          if (metadata && metadata.length > 0) {
+            transformedMetadata = metadata.map((data) => {
+              return {
+                productName: data.name,
+                productDescription: data.description,
+                category: data.category_id,
+                subCategory: data.subcategory_id,
+                code: data.hsn_code,
+                mrp: data.mrp,
+                image: data.image,
+                id: data.product_id,
+              };
+            });
+          }
+
           setTotalDetails({ total: total, total_pages: total_pages });
           setOnboardingData(transformedMetadata);
         }
