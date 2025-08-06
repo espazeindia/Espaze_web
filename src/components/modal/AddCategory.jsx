@@ -40,15 +40,8 @@ function AddCategory({ isOpen, onClose, setCategories,setReload }) {
         }
       
     }
-    if (category.trim() !== "") {
-      const newCategory = {
-        id: Date.now(),
-        name: category.trim(),
-      };
-      
       setCategory("");
       onClose();
-    }
   };
 
   return (

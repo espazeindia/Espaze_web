@@ -42,11 +42,8 @@ function AddSubcategoryModal({ isOpen, onClose, onAdd, category, setReload }) {
         }
       
     }
-    if (subcategory.trim() !== "") {
-      onAdd(subcategory.trim());
       setSubcategory("");
       onClose();
-    }
   };
 
   return (

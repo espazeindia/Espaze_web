@@ -9,23 +9,30 @@ import {
 import { DeleteOutline } from "@mui/icons-material";
 import { useMode } from "../../contexts/themeModeContext";
 import CategoryServices from "../../services/CategoryServices";
+import { notifyError, notifySuccess } from "../../utils/toast";
 
 function DeleteSubcategoryModal({
   isOpen,
   onClose,
   data,
   onDelete, 
+  setReload,
 }) {
   const { theme } = useMode();
 
   const handleConfirmDelete = async() => {
-    try {
-      const res = await CategoryServices.DeleteSubcategory()
-      if(res.success === true){
-        
+     try {
+      const res = await CategoryServices.DeleteSubcategory(data.id);
+      if (res.success === true) {
+        notifySuccess(res.message);
+        setReload((prevData) => !prevData);
       }
-    } catch (error) {
-      
+    } catch (err) {
+      if (err === "cookie error") {
+        notifyError("Cookie error, please relogin and try again");
+      } else {
+        notifyError(err?.response?.data?.message || err.message);
+      }
     }
     onDelete();   
     onClose();
@@ -63,7 +70,7 @@ function DeleteSubcategoryModal({
             } mt-4 text-center`}
           >
             Are you sure you want to delete{" "}
-            <strong>{data || "this subcategory"}</strong>?
+            <strong>{data && data.name  || "this subcategory"}</strong>?
           </div>
 
           <div className="flex justify-end gap-3 mt-8">

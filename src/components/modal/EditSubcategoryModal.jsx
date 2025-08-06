@@ -7,34 +7,78 @@ import {
   Modal,
   ModalClose,
   ModalDialog,
+  Select,
+  Option,
 } from "@mui/joy";
 import { useMode } from "../../contexts/themeModeContext";
 import CategoryServices from "../../services/CategoryServices";
+import { notifyError, notifySuccess } from "../../utils/toast";
 
-function EditSubcategoryModal({ isOpen, onClose, subcategoryToEdit, onEdit }) {
+function EditSubcategoryModal({ isOpen, onClose, subcategoryToEdit, onEdit, setReload }) {
   const { theme } = useMode();
   const [editedName, setEditedName] = useState("");
+  const [categoryOfSub, setCategoryOfSub] = useState("");
+  const [categories, setCategories] = useState([]);
+  
+
+   useEffect(() => {
+    console.log(categoryOfSub)
+  }, [categoryOfSub]);
+
+  useEffect(() => {
+    const categoryCall = async () => {
+      try {
+        const res = await CategoryServices.FetchAllCategory();
+        if (res.success === true) {
+          setCategories(res.data);
+        }
+      } catch (err) {
+        if (err === "cookie error") {
+          Cookies.remove("EspazeCookie");
+          router("/login");
+          notifyError("Cookie error, please relogin and try again");
+        } else {
+          notifyError(err?.response?.data?.message || err.message);
+        }
+      }
+    };
+    categoryCall();
+  }, []);
 
   useEffect(() => {
     if (subcategoryToEdit) {
-      setEditedName(subcategoryToEdit);
+      setEditedName(subcategoryToEdit.name);
+      setCategoryOfSub(subcategoryToEdit.categoryOfSub);
     }
   }, [subcategoryToEdit]);
 
-  const handleEdit = async(e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await CategoryServices.UpdateSubcategory();
-      if( res.success === true ){
-        
+      const body = {
+        subcategory_name: editedName,
+        subcategory_image: "hello",
+        category_id: categoryOfSub,
+      };
+      const res = await CategoryServices.UpdateSubcategory(
+        body, subcategoryToEdit.id
+      );
+      if (res.success === true) {
+        setReload((prevData) => {
+          return !prevData;
+        });
+        notifySuccess(res.message);
       }
-    } catch (error) {
-      
+    } catch (err) {
+      if (err === "cookie error") {
+        Cookies.remove("EspazeCookie");
+        router("/login");
+        notifyError("Cookie error, please relogin and try again");
+      } else {
+        notifyError(err?.response?.data?.message || err.message);
+      }
     }
-    if (editedName.trim()) {
-      onEdit(editedName.trim());
-      onClose();
-    }
+    onClose();
   };
 
   return (
@@ -60,7 +104,7 @@ function EditSubcategoryModal({ isOpen, onClose, subcategoryToEdit, onEdit }) {
           </DialogTitle>
 
           <DialogContent sx={{ overflowX: "hidden" }}>
-            <form onSubmit={handleEdit}>
+            <form onSubmit={handleSubmit}>
               <div className="grid grid-cols-2 gap-7">
                 <FormControl size="lg" className="space-y-1 w-full">
                   <label className={theme ? "text-zinc-800" : "text-zinc-300"}>
@@ -105,6 +149,21 @@ function EditSubcategoryModal({ isOpen, onClose, subcategoryToEdit, onEdit }) {
                     size="lg"
                     placeholder="select Image"
                   />
+                </FormControl>
+                <FormControl size="lg" className="space-y-1 w-full">
+                  <label className={theme ? "text-zinc-800" : "text-zinc-300"}>
+                    Category
+                  </label>
+                  <Select
+                    value={categoryOfSub}
+                    onChange={(_,val) => setCategoryOfSub(val)}
+                  >
+                    {categories.map((category) => (
+                      <Option key={category.id} value={category.id} label={category.category_name}>
+                        {category.category_name}
+                      </Option>
+                    ))}
+                  </Select>
                 </FormControl>
               </div>
 

@@ -9,21 +9,35 @@ import {
 import { DeleteOutline } from "@mui/icons-material";
 import { useMode } from "../../contexts/themeModeContext";
 import CategoryServices from "../../services/CategoryServices";
+import { notifyError, notifySuccess } from "../../utils/toast";
 
-function DeleteCategoryModal({ isOpen, onClose, data, categories, setCategories }) {
+function DeleteCategoryModal({
+  isOpen,
+  onClose,
+  categoryToDelete,
+  categories,
+  setCategories,
+  setReload
+}) {
   const { theme } = useMode();
 
-  const handleDelete = async() => {
+  const handleDelete = async () => {
     try {
-      const res = await CategoryServices.DeleteCategory()
-      if(res.success === true){
-        
+      const res = await CategoryServices.DeleteCategory(categoryToDelete.id);
+      if (res.success === true) {
+        notifySuccess(res.message);
+        setReload((prevData) => !prevData);
       }
-    } catch (error) {
-      
+    } catch (err) {
+      if (err === "cookie error") {
+        notifyError("Cookie error, please relogin and try again");
+      } else {
+        notifyError(err?.response?.data?.message || err.message);
+      }
     }
-     const updatedCategories = categories.filter(
-      (category) => category.id !== data?.id
+
+    const updatedCategories = categories.filter(
+      (category) => category.id !== categoryToDelete?.id
     );
     setCategories(updatedCategories);
     onClose();
@@ -55,9 +69,13 @@ function DeleteCategoryModal({ isOpen, onClose, data, categories, setCategories 
             <div className="text-3xl font-semibold ml-2">Caution</div>
           </div>
 
-          <div className={`${theme ? "text-black" : "text-white"} mt-4 text-center`}>
+          <div
+            className={`${
+              theme ? "text-black" : "text-white"
+            } mt-4 text-center`}
+          >
             Are you sure you want to delete{" "}
-            <strong>{data?.name || "this category"}</strong>?
+            <strong>{categoryToDelete?.name || "this category"}</strong>?
           </div>
 
           <div className="flex justify-end gap-3 mt-8">

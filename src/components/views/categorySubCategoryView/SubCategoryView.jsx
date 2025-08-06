@@ -8,13 +8,6 @@ import BottomPagination from "../../pagination/BottomPagination";
 import CategoryServices from "../../../services/CategoryServices";
 import { notifyError } from "../../../utils/toast";
 
-const initialSubcategories = {
-  1: ["Tomatoes", "Onions", "Potatoes"],
-  2: ["Fiction", "Non-fiction", "Academic"],
-  3: ["Washing Machine", "Microwave"],
-  4: ["Men", "Women"],
-};
-
 const SubcategoryModal = ({ category }) => {
   const { theme } = useMode();
   const [search, setSearch] = useState("");
@@ -30,7 +23,7 @@ const SubcategoryModal = ({ category }) => {
   const [openAddModal, setOpenAddModal] = useState(false);
   const [openEditModal, setOpenEditModal] = useState(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
-  const [selectedIndex, setSelectedIndex] = useState(null);
+  const [selectedSub, setSelectedSub] = useState(null);
 
   useEffect(() => {
     const getSubcategory = async() =>{
@@ -44,7 +37,8 @@ const SubcategoryModal = ({ category }) => {
             return{
               id: sub.id,
               name : sub.subcategory_name,
-              image : sub.subcategory_image
+              image : sub.subcategory_image,
+              categoryOfSub : sub.category_id
             }
           })
           }
@@ -66,23 +60,19 @@ const SubcategoryModal = ({ category }) => {
     }
     if(category.id){
     getSubcategory();}
-  }, [category]);
-
-  const handleAdd = (name) => {
-    setSubcategories([...subcategories, name]);
-  };
+  }, [category,reload]);
 
   const handleEdit = (newName) => {
     const updated = [...subcategories];
-    updated[selectedIndex] = newName;
+    updated[selectedSub] = newName;
     setSubcategories(updated);
-    setSelectedIndex(null);
+    setSelectedSub(null);
   };
 
   const handleDelete = () => {
-    const updated = subcategories.filter((_, i) => i !== selectedIndex);
+    const updated = subcategories.filter((_, i) => i !== selectedSub);
     setSubcategories(updated);
-    setSelectedIndex(null);
+    setSelectedSub(null);
   };
 
   return (
@@ -107,7 +97,7 @@ const SubcategoryModal = ({ category }) => {
         />
         <button
           onClick={() => setOpenAddModal(true)}
-          className={`p-2 px-6 rounded-md font-medium ${
+          className={`p-2 px-6 rounded-md font-medium cursor-pointer  hover:bg-green-600 hover:text-white ${
             theme
               ? "text-green-600 border border-green-600"
               : "text-green-500 border border-green-500"
@@ -133,7 +123,7 @@ const SubcategoryModal = ({ category }) => {
         {subcategories.map((sub, index) => (
           <div
             key={index}
-            className="grid grid-cols-[1fr_8fr_1.5fr]  items-center px-4 py-3 border-b border-gray-200 last:border-b-0"
+            className="grid grid-cols-[1fr_8fr_1.5fr]  items-center px-4 py-2 border-b border-gray-200 last:border-b-0"
           >
             <div className=" w-8 h-8 rounded-sm bg-gray-200"></div>
             <div className="text-sm font-semibold">{sub.name}</div>
@@ -145,7 +135,7 @@ const SubcategoryModal = ({ category }) => {
                     : "text-green-400 hover:text-green-700"
                 }`}
                 onClick={() => {
-                  setSelectedIndex(index);
+                  setSelectedSub(sub);
                   setOpenEditModal(true);
                 }}
               >
@@ -156,7 +146,7 @@ const SubcategoryModal = ({ category }) => {
                   theme ? "text-red-500" : "text-red-500"
                 }`}
                 onClick={() => {
-                  setSelectedIndex(index);
+                  setSelectedSub(sub);
                   setOpenDeleteModal(true);
                 }}
               >
@@ -179,21 +169,21 @@ const SubcategoryModal = ({ category }) => {
         <AddSubcategoryModal
           isOpen={openAddModal}
           onClose={() => setOpenAddModal(false)}
-          onAdd={handleAdd}
           category = {category}
           setReload = {setReload}
         />
       )}
 
-      {openEditModal && selectedIndex !== null && (
+      {openEditModal && (
         <EditSubcategoryModal
           isOpen={openEditModal}
           onClose={() => {
             setOpenEditModal(false);
-            setSelectedIndex(null);
+            setSelectedSub(null);
           }}
-          subcategoryToEdit={subcategories[selectedIndex]}
+          subcategoryToEdit= {selectedSub}
           onEdit={handleEdit}
+          setReload={setReload}
         />
       )}
 
@@ -201,10 +191,11 @@ const SubcategoryModal = ({ category }) => {
         isOpen={openDeleteModal}
         onClose={() => {
           setOpenDeleteModal(false);
-          setSelectedIndex(null);
+          setSelectedSub(null);
         }}
-        data={subcategories[selectedIndex]}
+        data={selectedSub}
         onDelete={handleDelete}
+        setReload={setReload}
       />
     </div>
   );

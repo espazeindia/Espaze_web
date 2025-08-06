@@ -106,7 +106,7 @@ function ProductOnboarding() {
           </div>
           <button
             onClick={handleOpenAddMetaDataModal}
-            className={`p-1 px-7 rounded-md font-medium
+            className={`p-1 px-7 rounded-md font-medium cursor-pointer  hover:bg-green-600 hover:text-white 
            ${
              theme
                ? "text-green-600 border-1 border-green-600"

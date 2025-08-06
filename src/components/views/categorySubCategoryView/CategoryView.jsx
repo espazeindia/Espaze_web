@@ -7,6 +7,7 @@ import DeleteCategoryModal from "../../modal/DeleteCategoryModal";
 import BottomPagination from "../../pagination/BottomPagination";
 import CategoryServices from "../../../services/CategoryServices";
 import {handleChangeDebounce} from "../../../utils/useDebounce";
+import { notifyError, notifySuccess } from "../../../utils/toast";
 
 const CategoriesPage = ({
   categories,
@@ -103,7 +104,7 @@ const debounce = handleChangeDebounce(search);
         />
         <button
           onClick={() => setOpenAddModal(true)}
-          className={`p-2 px-6 rounded-md font-medium ${
+          className={`p-2 px-6 rounded-md font-medium  hover:bg-green-600 hover:text-white cursor-pointer ${
             theme
               ? "text-green-600 border border-green-600"
               : "text-green-500 border border-green-500"
@@ -185,13 +186,15 @@ const debounce = handleChangeDebounce(search);
         onClose={() => setOpenEditModal(false)}
         categoryToEdit={categoryToEdit}
         setCategories={setCategories}
+        setReload={setReload}
       />
       <DeleteCategoryModal
         isOpen={openDeleteModal}
         onClose={() => setOpenDeleteModal(false)}
-        data={categoryToDelete}
+        categoryToDelete={categoryToDelete}
         categories={categories}
         setCategories={setCategories}
+        setReload={setReload}
       />
     </div>
   );

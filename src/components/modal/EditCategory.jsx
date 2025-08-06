@@ -10,8 +10,9 @@ import {
 } from "@mui/joy";
 import { useMode } from "../../contexts/themeModeContext";
 import CategoryServices from "../../services/CategoryServices";
+import { notifyError, notifySuccess } from "../../utils/toast";
 
-function EditCategory({ isOpen, onClose, categoryToEdit, setCategories }) {
+function EditCategory({ isOpen, onClose, categoryToEdit, setReload }) {
   const { theme } = useMode();
   const [editedName, setEditedName] = useState("");
 
@@ -21,26 +22,31 @@ function EditCategory({ isOpen, onClose, categoryToEdit, setCategories }) {
     }
   }, [categoryToEdit]);
 
-  const handleEdit = async(e) => {
+  const handleEdit = async (e) => {
     e.preventDefault();
     try {
-      const res = await CategoryServices.UpdateCategory();
-      if( res.success === true ){
-        
-      }
-    } catch (error) {
-      
-    }
-    if (editedName.trim() !== "") {
-      setCategories((prev) =>
-        prev.map((cat) =>
-          cat.id === categoryToEdit.id
-            ? { ...cat, name: editedName.trim() }
-            : cat
-        )
+      const body = {
+        category_name: editedName,
+        category_image: "hello",
+      };
+      const res = await CategoryServices.UpdateCategory(
+        body,
+        categoryToEdit.id
       );
-      onClose();
+      if (res.success === true) {
+        setReload((prevData)=>{
+          return !prevData
+        });
+        notifySuccess(res.message);
+      }
+    } catch (err) {
+      if (err === "cookie error") {
+        notifyError("Cookie error, please relogin and try again");
+      } else {
+        notifyError(err?.response?.data?.message || err.message);
+      }
     }
+    onClose();
   };
 
   return (

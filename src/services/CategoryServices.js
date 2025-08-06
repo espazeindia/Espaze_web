@@ -45,7 +45,7 @@ const CategoryServices ={
   UpdateCategory: async (body, id) => {
     const token = getValidCookie();
     if (token != "Cookie not found" || token != "cookie error") {
-      return requests.put(`${id}`, body, {
+      return requests.put(`/category/updateCategory/${id}`, body, {
         headers : {Authorization: `Bearer ${token}`}
       });
     } else {
@@ -56,7 +56,7 @@ const CategoryServices ={
    DeleteCategory: async (id) => {
     const token = getValidCookie();
     if (token != "Cookie not found" || token != "cookie error") {
-      return requests.delete(`/${id}`, {
+      return requests.delete(`/category/deleteCategory/${id}`, {
         headers : {Authorization: `Bearer ${token}`}
       });
     } else {
@@ -92,7 +92,7 @@ const CategoryServices ={
   UpdateSubcategory: async (body, id) => {
     const token = getValidCookie();
     if (token != "Cookie not found" || token != "cookie error") {
-      return requests.put(`${id}`, body, {
+      return requests.put(`/category/subcategory/${id}`, body, {
         headers : {Authorization: `Bearer ${token}`}
       });
     } else {
@@ -103,13 +103,38 @@ const CategoryServices ={
    DeleteSubcategory: async (id) => {
     const token = getValidCookie();
     if (token != "Cookie not found" || token != "cookie error") {
-      return requests.delete(`/${id}`, {
+      return requests.delete(`/category/subcategory/${id}`, {
         headers : {Authorization: `Bearer ${token}`}
       });
     } else {
       throw new Error("cookie error");
     }
   },
+
+  //all
+
+  FetchAllCategory: async()=>{
+    const token = getValidCookie();
+    if (token != "Cookie not found" || token != "cookie error") {
+      return requests.get(`/category/getAllCategories`,{
+        headers : {Authorization: `Bearer ${token}`}
+        })
+    } else {
+      throw new Error("cookie error");
+    }
+  },
+
+  FetchAllSubCategory: async(id)=>{
+    const token = getValidCookie();
+    if (token != "Cookie not found" || token != "cookie error") {
+      return requests.get(`/category/getAllSubCategories/${id}`,{
+        headers : {Authorization: `Bearer ${token}`}
+        })
+    } else {
+      throw new Error("cookie error");
+    }
+  }
+
 
 
 
