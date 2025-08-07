@@ -3,7 +3,7 @@ import Cookies from "js-cookie";
 import { FormControl, Input } from "@mui/joy";
 import Logo from "../assets/img/logo2.png";
 import Logo2 from "../assets/img/logo.png";
-import { Link,NavLink } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import AdminServices from "../services/AdminServices";
 import { notifyError, notifySuccess } from "../utils/toast";
 import { useNavigate } from "react-router-dom";
@@ -16,6 +16,7 @@ function Login() {
   const [phone, setPhone] = useState("");
   const [otpSent, setOtpSent] = useState(false);
   const [otp, setOtp] = useState(new Array(6).fill(""));
+  const [activeTab, setActiveTab] = useState("seller");
 
   const handlePhoneChange = (e) => {
     setPhone(e.target.value);
@@ -43,7 +44,10 @@ function Login() {
     if (enteredOtp.length === 6) {
       try {
         const cookieTimeOut = 0.5;
-        const res = await AdminServices.loginAdminWithOtp({ phone, otp: enteredOtp });
+        const res = await AdminServices.loginAdminWithOtp({
+          phone,
+          otp: enteredOtp,
+        });
         if (res) {
           notifySuccess("Login Success!");
           Cookies.set("adminInfo", JSON.stringify(res), {
@@ -97,8 +101,13 @@ function Login() {
                   to="/login"
                   className={({ isActive }) =>
                     `py-2 px-2 text-sm font-medium rounded-md text-center w-1/2  ${
-                      isActive ? theme ? "bg-[#8b5cf6] text-white" : "bg-[#8b5cf6] text-white" 
-                      : theme ? "bg-violet-200 text-violet-800":"bg-violet-200 text-violet-800"
+                      isActive
+                        ? theme
+                          ? "bg-[#8b5cf6] text-white"
+                          : "bg-[#8b5cf6] text-white"
+                        : theme
+                        ? "bg-violet-200 text-violet-800"
+                        : "bg-violet-200 text-violet-800"
                     }`
                   }
                 >
@@ -108,18 +117,62 @@ function Login() {
                   to="/operational-login"
                   className={({ isActive }) =>
                     `py-2 px-2 text-sm font-medium rounded-md text-center w-1/2 ${
-                      isActive ? theme ? "bg-[#8b5cf6] text-white" : "bg-[#8b5cf6] text-white" 
-                      : theme ? "bg-violet-200 text-violet-800":"bg-violet-200 text-violet-800"
+                      isActive
+                        ? theme
+                          ? "bg-[#8b5cf6] text-white"
+                          : "bg-[#8b5cf6] text-white"
+                        : theme
+                        ? "bg-violet-200 text-violet-800"
+                        : "bg-violet-200 text-violet-800"
                     }`
                   }
                 >
                   Operational Guy
                 </NavLink>
               </div>
+              <h2 className="mb-4 text-2xl text-[#814cfc] font-bold text-center">
+                Seller Login
+              </h2>
+              <div className="rounded-lg p-1 py-1.5 flex w-full justify-center gap-2 mt-4 mb-6 bg-violet-200 text-violet-800">
+                <div
+                  onClick={() => setActiveTab("seller")}
+                  className={`cursor-pointer py-2 px-2 text-sm font-medium rounded-md text-center w-1/2 ${
+                    activeTab === "seller"
+                      ? "bg-[#8b5cf6] text-white"
+                      : theme
+                      ? "bg-violet-200 text-violet-800"
+                      : "bg-violet-200 text-violet-800"
+                  }`}
+                >
+                  Seller
+                </div>
+                <div
+                  onClick={() => setActiveTab("operational")}
+                  className={`cursor-pointer py-2 px-2 text-sm font-medium rounded-md text-center w-1/2 ${
+                    activeTab === "operational"
+                      ? "bg-[#8b5cf6] text-white"
+                      : theme
+                      ? "bg-violet-200 text-violet-800"
+                      : "bg-violet-200 text-violet-800"
+                  }`}
+                >
+                  Operational Guy
+                </div>
+              </div>
+              {activeTab === "seller" ? (
+        <div>{/* Seller-related content goes here */}</div>
+      ) : (
+        <div>{/* Operational guy-related content goes here */}</div>
+      )}
               {!otpSent ? (
-                <form className="flex flex-col gap-4" onSubmit={(e) => e.preventDefault()}>
+                <form
+                  className="flex flex-col gap-4"
+                  onSubmit={(e) => e.preventDefault()}
+                >
                   <FormControl size="lg" className="space-y-1">
-                    <label className="text-lg font-semibold">Phone Number</label>
+                    <label className="text-lg font-semibold">
+                      Phone Number
+                    </label>
                     <Input
                       name="phone"
                       value={phone}
