@@ -11,10 +11,12 @@ import {
 import { useMode } from "../../contexts/themeModeContext";
 import CategoryServices from "../../services/CategoryServices";
 import { notifyError, notifySuccess } from "../../utils/toast";
+import { LoaderCircle } from "lucide-react";
 
 function EditCategory({ isOpen, onClose, categoryToEdit, setReload }) {
   const { theme } = useMode();
   const [editedName, setEditedName] = useState("");
+  const [loading,setLoading]=useState(false)
 
   useEffect(() => {
     if (categoryToEdit) {
@@ -24,6 +26,7 @@ function EditCategory({ isOpen, onClose, categoryToEdit, setReload }) {
 
   const handleEdit = async (e) => {
     e.preventDefault();
+    setLoading(true)
     try {
       const body = {
         category_name: editedName,
@@ -46,6 +49,7 @@ function EditCategory({ isOpen, onClose, categoryToEdit, setReload }) {
         notifyError(err?.response?.data?.message || err.message);
       }
     }
+    setLoading(false)
     onClose();
   };
 
@@ -136,14 +140,14 @@ function EditCategory({ isOpen, onClose, categoryToEdit, setReload }) {
               <div className="flex justify-end">
                 <button
                   type="submit"
-                  className={`p-2 font-medium rounded-lg w-20 mt-8
+                  className={`p-2 font-medium rounded-lg w-20 mt-8 flex items-center justify-center
                   ${
                     theme
                       ? "border border-green-600 text-green-600 hover:bg-green-600 hover:text-white"
                       : "border border-green-500 text-green-500 hover:bg-green-600 hover:text-white"
                   }`}
                 >
-                  Edit
+                  {loading ? <LoaderCircle className="animate-spin h-7" /> : <>Edit</>}
                 </button>
               </div>
             </form>

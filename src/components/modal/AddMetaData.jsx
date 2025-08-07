@@ -21,10 +21,12 @@ import CategoryServices from "../../services/CategoryServices";
 function AddMetaData({ isOpen, onClose, setReload }) {
   const { theme } = useMode();
   const [categoryOfPro, setcategoryOfPro] = useState("");
-  const [categories,setCategories] = useState([])
-  const [subCategories,setSubCategories] = useState([])
-  const [subCategoryOfPro,setSubCategoryOfPro] = useState("")
+  const [categories, setCategories] = useState([]);
+  const [subCategories, setSubCategories] = useState([]);
+  const [subCategoryOfPro, setSubCategoryOfPro] = useState("");
   const [loading, setLoading] = useState(false);
+  const [categoryLoading, setCategoryLoading] = useState(true);
+  const [subCategoryLoading, setSubCategoryLoading] = useState(true);
   const [saveData, setSaveData] = useState({
     productName: "",
     productDescription: "",
@@ -43,8 +45,9 @@ function AddMetaData({ isOpen, onClose, setReload }) {
     });
   };
 
-    useEffect(() => {
+  useEffect(() => {
     const categoryCall = async () => {
+      setCategoryLoading(true);
       try {
         const res = await CategoryServices.FetchAllCategory();
         if (res.success === true) {
@@ -59,12 +62,14 @@ function AddMetaData({ isOpen, onClose, setReload }) {
           notifyError(err?.response?.data?.message || err.message);
         }
       }
+      setCategoryLoading(false);
     };
-    if(isOpen)categoryCall();
+    if (isOpen) categoryCall();
   }, [isOpen]);
 
   useEffect(() => {
     const SubCategoryCall = async () => {
+      setSubCategoryLoading(true);
       try {
         const res = await CategoryServices.FetchAllSubCategory(categoryOfPro);
         if (res.success === true) {
@@ -79,12 +84,13 @@ function AddMetaData({ isOpen, onClose, setReload }) {
           notifyError(err?.response?.data?.message || err.message);
         }
       }
+      setSubCategoryLoading(false);
     };
-    if(categoryOfPro !== "" && isOpen ){
-      SubCategoryCall()
-    };
+    if (categoryOfPro && categoryOfPro !== "" && isOpen) {
+      setSubCategoryOfPro("")
+      SubCategoryCall();
+    }
   }, [categoryOfPro]);
-
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -95,7 +101,7 @@ function AddMetaData({ isOpen, onClose, setReload }) {
         description: saveData.productDescription,
         image: saveData.image,
         category_id: categoryOfPro,
-        subcategory_id: saveData.subCategory,
+        subcategory_id: subCategoryOfPro,
         mrp: parseFloat(saveData.mrp),
         hsn_code: saveData.code,
       };
@@ -115,7 +121,21 @@ function AddMetaData({ isOpen, onClose, setReload }) {
     onClose();
   };
   return (
-    <Modal open={isOpen} onClose={onClose}>
+    <Modal
+      open={isOpen}
+      onClose={() => {
+        setSaveData({
+          productName: "",
+          productDescription: "",
+          code: "",
+          mrp: 0,
+          image: "",
+        });
+        setcategoryOfPro("")
+        setSubCategoryOfPro("")
+        onClose();
+      }}
+    >
       <ModalDialog
         size="lg"
         sx={
@@ -124,9 +144,7 @@ function AddMetaData({ isOpen, onClose, setReload }) {
             : { backgroundColor: "#18181b", border: "none" }
         }
       >
-        <ModalClose
-          style={{ zIndex: "10", color: "#ffffff", fontWeight: "bold" }}
-        />
+        <ModalClose style={{ zIndex: "10", color: "#ffffff", fontWeight: "bold" }} />
         <DialogTitle sx={theme ? { color: "#000000" } : { color: "#ffffff" }}>
           Add Meta Data
         </DialogTitle>
@@ -134,9 +152,7 @@ function AddMetaData({ isOpen, onClose, setReload }) {
           <form onSubmit={handleSubmit}>
             <div className="grid grid-cols-2 gap-5">
               <FormControl size="lg" className="space-y-1">
-                <label className={theme ? "text-zinc-800" : "text-zinc-300"}>
-                  Product Name
-                </label>
+                <label className={theme ? "text-zinc-800" : "text-zinc-300"}>Product Name</label>
                 <Input
                   sx={
                     theme
@@ -187,50 +203,46 @@ function AddMetaData({ isOpen, onClose, setReload }) {
                 />
               </FormControl>
               <FormControl size="lg" className="space-y-1">
-                <label className={theme ? "text-zinc-800" : "text-zinc-300"}>
-                  Category
-                </label>
+                <label className={theme ? "text-zinc-800" : "text-zinc-300"}>Category</label>
                 <Select
+                  disabled={categoryLoading}
                   value={categoryOfPro}
+                  placeholder={"Select Category"}
                   onChange={(_, val) => setcategoryOfPro(val)}
                 >
-                  {categories.map((category) => (
-                    <Option
-                      key={category.id}
-                      value={category.id}
-                      label={category.category_name}
-                    >
-                      {category.category_name}
-                    </Option>
-                  ))}
+                  {categories ? (
+                    categories.map((category) => (
+                      <Option key={category.id} value={category.id} label={category.category_name}>
+                        {category.category_name}
+                      </Option>
+                    ))
+                  ) : (
+                    <Option> No Category Available</Option>
+                  )}
                 </Select>
               </FormControl>
-              <FormControl size="lg" className="space-y-1">
-                <label className={theme ? "text-zinc-800" : "text-zinc-300"}>
-                  Sub Category
-                </label>
-                 <Select
+              <FormControl size="lg" className={`space-y-1 ${subCategoryLoading ? " cursor-not-allowed" : " cursor-pointer"}`}>
+                <label className={theme ? "text-zinc-800" : "text-zinc-300"}>Sub Category</label>
+                <Select
+                  disabled={subCategoryLoading}
                   value={subCategoryOfPro}
+                  placeholder={"Select Sub-Category"}
                   onChange={(_, val) => setSubCategoryOfPro(val)}
+                  
                 >
-                  {subCategories !==null ? subCategories.map((sub) => (
-                    <Option
-                      key={sub.id}
-                      value={sub.id}
-                      label={sub.subcategory_name}
-                    >
-                      {sub.subcategory_name}
-                    </Option>
-                  )):
-                  <Option>
-                    No SubCategory available
-                  </Option>}
+                  {subCategories !== null ? (
+                    subCategories.map((sub) => (
+                      <Option key={sub.id} value={sub.id} label={sub.subcategory_name}>
+                        {sub.subcategory_name}
+                      </Option>
+                    ))
+                  ) : (
+                    <Option>No SubCategory Available</Option>
+                  )}
                 </Select>
               </FormControl>
               <FormControl size="lg" className="space-y-1">
-                <label className={theme ? "text-zinc-800" : "text-zinc-300"}>
-                  Code
-                </label>
+                <label className={theme ? "text-zinc-800" : "text-zinc-300"}>Code</label>
                 <Input
                   sx={
                     theme
@@ -254,9 +266,7 @@ function AddMetaData({ isOpen, onClose, setReload }) {
                 />
               </FormControl>
               <FormControl size="lg" className="space-y-1">
-                <label className={theme ? "text-zinc-800" : "text-zinc-300"}>
-                  MRP
-                </label>
+                <label className={theme ? "text-zinc-800" : "text-zinc-300"}>MRP</label>
                 <Input
                   sx={
                     theme
@@ -282,9 +292,7 @@ function AddMetaData({ isOpen, onClose, setReload }) {
                 />
               </FormControl>
               <FormControl size="lg" className="space-y-1">
-                <label className={theme ? "text-zinc-800" : "text-zinc-300"}>
-                  Image
-                </label>
+                <label className={theme ? "text-zinc-800" : "text-zinc-300"}>Image</label>
                 <Input
                   sx={
                     theme
@@ -318,11 +326,7 @@ function AddMetaData({ isOpen, onClose, setReload }) {
                     : "border border-green-500 hover:bg-green-600 hover:text-white text-green-500"
                 }`}
               >
-                {loading ? (
-                  <LoaderCircle className="animate-spin h-7" />
-                ) : (
-                  <>Add</>
-                )}
+                {loading ? <LoaderCircle className="animate-spin h-7" /> : <>Add</>}
               </button>
             </div>
           </form>

@@ -7,8 +7,13 @@ function CategoriesPage() {
   const [categories, setCategories] = useState([]);
 
   useEffect(() => {
-    if(categories.length>0) 
-    setSelectedCategory(categories[0]);
+    console.log(categories)
+    if(categories.length>0) {
+      setSelectedCategory(categories[0]);
+    }
+    else{
+      setSelectedCategory("")
+    }
   }, [categories]);
 
   return (

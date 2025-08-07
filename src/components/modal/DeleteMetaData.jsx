@@ -1,35 +1,22 @@
-import React from "react";
-import {
-  DialogContent,
-  DialogTitle,
-  Modal,
-  ModalClose,
-  ModalDialog,
-} from "@mui/joy";
+import React,{useState} from "react";
+import { DialogContent, DialogTitle, Modal, ModalClose, ModalDialog } from "@mui/joy";
 import { DeleteOutline } from "@mui/icons-material";
 import { useMode } from "../../contexts/themeModeContext";
 import { notifyError, notifySuccess } from "../../utils/toast";
 import ProductOnboardingServices from "../../services/ProductOnboardingServices";
+import { LoaderCircle } from "lucide-react";
 
-function DeleteProductModal({
-  isOpen,
-  onClose,
-  deleteProduct,
-  setOnboardingData,
-  setReload
-}) {
+function DeleteProductModal({ isOpen, onClose, deleteProduct, setOnboardingData, setReload }) {
+  const [loading, setLoading] = useState(false);
   const handleDelete = async () => {
+    setLoading(true)
     try {
-      const res = await ProductOnboardingServices.DeleteMetadata(
-        deleteProduct
-      );
+      const res = await ProductOnboardingServices.DeleteMetadata(deleteProduct);
       if (res.success === true) {
-        setOnboardingData((prevData) =>
-          prevData.filter((item) => item.id !== deleteProduct)
-        );
+        setOnboardingData((prevData) => prevData.filter((item) => item.id !== deleteProduct));
         notifySuccess(res.message);
-        setReload((prevData)=>(!prevData))
-      } 
+        setReload((prevData) => !prevData);
+      }
     } catch (err) {
       if (err === "cookie error") {
         notifyError("Cookie error, please relogin and try again");
@@ -37,6 +24,7 @@ function DeleteProductModal({
         notifyError(err?.response?.data?.message || err.message);
       }
     }
+    setLoading(false)
     onClose();
   };
 
@@ -67,11 +55,7 @@ function DeleteProductModal({
             <div className="text-3xl font-semibold"> Caution</div>
           </div>
 
-          <div
-            className={`${
-              theme ? "text-black" : "text-white"
-            } mt-4 text-center`}
-          >
+          <div className={`${theme ? "text-black" : "text-white"} mt-4 text-center`}>
             Are you sure you want to delete ?
           </div>
           <div className="flex justify-end gap-3 mt-8">
@@ -85,7 +69,7 @@ function DeleteProductModal({
               onClick={handleDelete}
               className=" border border-red-500 text-red-500 px-6 py-1 rounded-lg transition-all hover:cursor-pointer duration-700 text-semibold hover:text-white hover:bg-red-500"
             >
-              Delete
+              {loading ? <LoaderCircle className="animate-spin h-7" /> : <>Delete</>}
             </button>
           </div>
         </DialogContent>

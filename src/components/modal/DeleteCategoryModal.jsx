@@ -1,4 +1,4 @@
-import React from "react";
+import React,{useState} from "react";
 import {
   DialogContent,
   DialogTitle,
@@ -10,19 +10,20 @@ import { DeleteOutline } from "@mui/icons-material";
 import { useMode } from "../../contexts/themeModeContext";
 import CategoryServices from "../../services/CategoryServices";
 import { notifyError, notifySuccess } from "../../utils/toast";
+import { LoaderCircle } from "lucide-react";
 
 function DeleteCategoryModal({
   isOpen,
   onClose,
   categoryToDelete,
-  categories,
-  setCategories,
   setReload
 }) {
   const { theme } = useMode();
+  const [loading,setLoading]=useState(false)
 
   const handleDelete = async () => {
     try {
+      setLoading(true)
       const res = await CategoryServices.DeleteCategory(categoryToDelete.id);
       if (res.success === true) {
         notifySuccess(res.message);
@@ -35,11 +36,7 @@ function DeleteCategoryModal({
         notifyError(err?.response?.data?.message || err.message);
       }
     }
-
-    const updatedCategories = categories.filter(
-      (category) => category.id !== categoryToDelete?.id
-    );
-    setCategories(updatedCategories);
+    setLoading(false)
     onClose();
   };
 
@@ -89,7 +86,7 @@ function DeleteCategoryModal({
               onClick={handleDelete}
               className="border border-red-500 text-red-500 px-6 py-1 rounded-lg transition-all duration-700 hover:cursor-pointer font-semibold hover:text-white hover:bg-red-500"
             >
-              Delete
+              {loading ? <LoaderCircle className="animate-spin h-7" /> : <>Delete</>}
             </button>
           </div>
         </DialogContent>
