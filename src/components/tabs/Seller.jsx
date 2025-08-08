@@ -3,14 +3,28 @@ import { FormControl, Input } from "@mui/joy";
 import { DarkMode, LightMode } from "@mui/icons-material";
 import Cookies from "js-cookie";
 import { useMode } from "../../contexts/themeModeContext";
+import LoginServices from "../../services/LoginServices";
+import { notifySuccess,notifyError } from "../../utils/toast";
 
 function Seller() {
-   const { theme, toggleTheme } = useMode();
+  const { theme, toggleTheme } = useMode();
   const [loginVia, setLoginVia] = useState("pin");
   const [phone, setPhone] = useState("");
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [pin, setPin] = useState(["", "", "", "", "", ""]);
   const [showOtpError, setShowOtpError] = useState(false);
+
+  const handleGetOtp = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await LoginServices.GetOtp({ phonenumber: phone });
+      if (res.success === true) {
+        notifySuccess(res.message);
+      }
+    } catch (err) {
+      notifyError(err?.response?.data?.message || err.message);
+    }
+  };
 
   const otpRefs = Array.from({ length: 6 }, () => useRef(null));
 
@@ -62,23 +76,34 @@ function Seller() {
 
   const isPinComplete = pin.every((digit) => digit !== "");
 
+  const handleLoginByOtp = async (e) => {
+    e.preventDefault();
+    if (isOtpComplete) {
+      const enteredOtp = otp.join("");
+      try {
+        const res = await LoginServices.LoginSellerByOtp({phonenumber: phone, otp : enteredOtp });
+        if (res.success) {
+          notifySuccess(res.message);
+          Cookies.set("EspazeCookie", res.token);
+          navigate("/");
+        }
+      } catch (error) {
+        notifyError(err?.response?.data?.message || err.message);
+      }
+    }
+  };
+
   const handleLoginByPin = async (e) => {
     e.preventDefault();
     if (isPinComplete) {
       const enteredPin = pin.join("");
       try {
-        const res = await AdminServices.loginAdminWithPin({
-          phone,
-          pin: enteredPin,
-        });
-
-        notifySuccess("Login Success!");
-        Cookies.set("adminInfo", JSON.stringify(res), {
-          expires: 0.5,
-          sameSite: "None",
-          secure: true,
-        });
-        navigate("/");
+        const res = await LoginServices.LoginSellerByPin({phonenumber: phone, pin : enteredPin });
+        if (res.success) {
+          notifySuccess(res.message);
+          Cookies.set("EspazeCookie", res.token);
+          navigate("/");
+        }
       } catch (err) {
         notifyError(err?.response?.data?.message || err.message);
       }
@@ -87,7 +112,9 @@ function Seller() {
 
   return (
     <div className="w-full">
-      <h2 className="flex justify-center text-lg font-bold mb-2 ">Seller Login</h2>
+      <h2 className="flex justify-center text-lg font-bold mb-2 ">
+        Seller Login
+      </h2>
       <div className="rounded-lg p-2 flex w-full justify-center gap-4 mb-2 ">
         <div
           className={`cursor-pointer p-1 text-sm border-2 font-bold rounded-md text-center w-1/2 ${
@@ -141,7 +168,7 @@ function Seller() {
             {loginVia === "otp" && (
               <button
                 type="button"
-                // onClick={handleGetOtp}
+                onClick={handleGetOtp}
                 className="bg-[#8b5cf6] rounded-lg font-semibold text-white text-sm hover:bg-[#8b5cf6] cursor-pointer"
               >
                 Get OTP
@@ -190,6 +217,7 @@ function Seller() {
         {loginVia === "pin" ? (
           <div>
             <button
+              onSubmit={handleLoginByPin}
               type="submit"
               className={`w-full py-2 mt-3 rounded-lg cursor-pointer font-semibold text-white text-lg ${
                 isPinComplete
@@ -200,18 +228,14 @@ function Seller() {
             >
               Login
             </button>
-            <p
-              className="text-blue-500 text-center mt-2 text-sm hover:underline cursor-pointer"
-              onClick={() => {
-                setActiveTab();
-              }}
-            >
+            <p className="text-blue-500 text-center mt-2 text-sm hover:underline cursor-pointer">
               Forgot PIN?
             </p>
           </div>
         ) : (
           <div>
             <button
+              onSubmit={handleLoginByOtp}
               type="submit"
               className={`w-full py-2 mt-3 rounded-lg cursor-pointer font-semibold text-white text-lg ${
                 isOtpComplete

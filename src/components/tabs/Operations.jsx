@@ -36,7 +36,7 @@ function Operations() {
         navigate("/");
       }
     } catch (err) {
-      console.log(err);
+      // console.log(err);
       notifyError(err?.response?.data?.message || err.message);
     }
   };

@@ -8,7 +8,7 @@ import { useMode } from "../contexts/themeModeContext";
 import Seller from "../components/tabs/Seller";
 import Operations from "../components/tabs/Operations";
 
-function LoginSeller() {
+function Login() {
   const { theme, toggleTheme } = useMode();
   const [user, setUser] = useState("seller");
 
@@ -19,7 +19,7 @@ function LoginSeller() {
       }`}
     >
       <div
-        className={`flex h-full w-[25vw] mx-auto overflow-hidden rounded-lg ${
+        className={`flex h-full  w-96 mx-auto overflow-hidden rounded-lg ${
           theme ? "bg-white" : "bg-neutral-950"
         } shadow-xl`}
       >
@@ -103,4 +103,4 @@ function LoginSeller() {
   );
 }
 
-export default LoginSeller;
+export default Login;
