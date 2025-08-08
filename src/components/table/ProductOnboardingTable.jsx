@@ -85,7 +85,7 @@ function ProductOnboardingTable({
               onboardingData.map((data, index) => (
                 <div
                   key={index}
-                  className=" grid grid-cols-8  text-sm border-b py-4 border-gray-300 border-dotted"
+                  className=" grid grid-cols-8 items-center  text-sm border-b py-4 border-gray-300 border-dotted"
                 >
                   <div
                     className={`text-center font-medium ${theme ? "text-zinc-800" : "text-white"}`}
@@ -110,12 +110,12 @@ function ProductOnboardingTable({
                   <div
                     className={`text-center font-medium ${theme ? "text-zinc-800" : "text-white"}`}
                   >
-                    {data.category}
+                    {data.category_name}
                   </div>
                   <div
                     className={`text-center font-medium ${theme ? "text-zinc-800" : "text-white"}`}
                   >
-                    {data.subCategory}
+                    {data.subcategory_name}
                   </div>
                   <div
                     className={`text-center font-medium ${theme ? "text-zinc-800" : "text-white"}`}

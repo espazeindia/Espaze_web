@@ -44,6 +44,8 @@ function ProductOnboarding() {
                 mrp: data.mrp,
                 image: data.image,
                 id: data.product_id,
+                category_name:data.category_name,
+                subcategory_name:data.subcategory_name
               };
             });
           }
