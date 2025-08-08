@@ -13,59 +13,81 @@ const LoginSeller = lazy(() => import("./pages/LoginSeller"));
 // const SignUp = lazy(() => import("./pages/SignUp"));
 const ForgetPassword = lazy(() => import("./pages/ForgetPassword"));
 const Layout = lazy(() => import("./components/layout/Layout"));
-const Page404 = lazy(()=> import("./pages/Page404"));
+const Page404 = lazy(() => import("./pages/Page404"));
 
 function App() {
-  const[filteredRoutes,setFilteredRoutes] = useState(
-    []
-  )
+  const [filteredRoutes, setFilteredRoutes] = useState([]);
+
   function PublicRoute({ children }) {
     const [isAuthenticated, setIsAuthenticated] = useState(null);
-  
-  
+
     useEffect(() => {
       const checkAuth = async () => {
         const cookie = Cookies.get("EspazeCookie");
-        console.log("cookie",cookie)
         if (cookie) {
-          const isValid = await validate(cookie);
-          const filterRoutes = routes.filter(
-            (route)=>route.access.includes(isValid.role)
-          )
-          setFilteredRoutes(filterRoutes)
-          setIsAuthenticated(isValid);
+          try {
+            const isValid = await validate(cookie);
+            if (isValid && isValid.role) {
+              setIsAuthenticated(true);
+            } else {
+              setIsAuthenticated(false);
+            }
+          } catch (error) {
+            console.error("Token validation error:", error);
+            setIsAuthenticated(false);
+          }
         } else {
           setIsAuthenticated(false);
         }
       };
-  
+
       checkAuth();
     }, []);
-  
+
     if (isAuthenticated === null) return <div>Loading...</div>;
-    return isAuthenticated ? <Navigate to={filteredRoutes[0].path} replace /> : children;
+    
+    // If authenticated, redirect to dashboard
+    if (isAuthenticated) {
+      return <Navigate to="/dashboard" replace />;
+    }
+    
+    // If not authenticated, show the login page
+    return children;
   }
 
   function ProtectedRoute({ children }) {
     const [isAuthenticated, setIsAuthenticated] = useState(null);
-  
+
     useEffect(() => {
       const checkAuth = async () => {
         const cookie = Cookies.get("EspazeCookie");
         if (cookie) {
-          const isValid = await validate(cookie);
-          setIsAuthenticated(true);
+          try {
+            const isValid = await validate(cookie);
+            setIsAuthenticated(isValid && isValid.role ? true : false);
+          } catch (error) {
+            console.error("Token validation error:", error);
+            setIsAuthenticated(false);
+          }
         } else {
           setIsAuthenticated(false);
         }
       };
-  
+
       checkAuth();
     }, []);
-  
+
     if (isAuthenticated === null) return <div>Loading...</div>;
-    return isAuthenticated ? children : <Navigate to="/login" replace />;
-   }
+    
+    // If not authenticated, redirect to login
+    if (!isAuthenticated) {
+      return <Navigate to="/login" replace />;
+    }
+    
+    // If authenticated, show the protected content
+    return children;
+  }
+
   return (
     <>
       <ToastContainer />
@@ -74,17 +96,45 @@ function App() {
           <Router>
             <Suspense fallback={<div>Loading...</div>}>
               <Routes>
-                <Route path="/operational-login" element={<PublicRoute><Login /></PublicRoute>} />
-                <Route path="/login" element={<PublicRoute><LoginSeller /></PublicRoute>} />
+                <Route
+                  path="/operational-login"
+                  element={
+                    <PublicRoute>
+                      <Login />
+                    </PublicRoute>
+                  }
+                />
+                <Route
+                  path="/login"
+                  element={
+                    <PublicRoute>
+                      <LoginSeller />
+                    </PublicRoute>
+                  }
+                />
                 {/* <Route path="/signup" element={<PublicRoute><SignUp /></PublicRoute>} /> */}
-                <Route path="/forgot-password" element={<PublicRoute><ForgetPassword /></PublicRoute>} />
+                <Route
+                  path="/forgot-password"
+                  element={
+                    <PublicRoute>
+                      <ForgetPassword />
+                    </PublicRoute>
+                  }
+                />
 
                 {/* Redirect "/" to "/dashboard" explicitly */}
                 <Route path="/" element={<Navigate to="/dashboard" replace />} />
-                <Route path="/*" element={<ProtectedRoute><Layout /></ProtectedRoute>} />
+                <Route
+                  path="/*"
+                  element={
+                    <ProtectedRoute>
+                      <Layout />
+                    </ProtectedRoute>
+                  }
+                />
 
                 {/* Catch-all route for unknown paths */}
-                <Route path="*" element={<Page404/>} />
+                <Route path="*" element={<Page404 />} />
               </Routes>
             </Suspense>
           </Router>
