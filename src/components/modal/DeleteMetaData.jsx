@@ -3,7 +3,7 @@ import { DialogContent, DialogTitle, Modal, ModalClose, ModalDialog } from "@mui
 import { DeleteOutline } from "@mui/icons-material";
 import { useMode } from "../../contexts/themeModeContext";
 import { notifyError, notifySuccess } from "../../utils/toast";
-import ProductOnboardingServices from "../../services/ProductOnboardingServices";
+import MetaDataServices from "../../services/MetaDataServices";
 import { LoaderCircle } from "lucide-react";
 
 function DeleteProductModal({ isOpen, onClose, deleteProduct, setOnboardingData, setReload }) {
@@ -11,7 +11,7 @@ function DeleteProductModal({ isOpen, onClose, deleteProduct, setOnboardingData,
   const handleDelete = async () => {
     setLoading(true)
     try {
-      const res = await ProductOnboardingServices.DeleteMetadata(deleteProduct);
+      const res = await MetaDataServices.DeleteMetadata(deleteProduct);
       if (res.success === true) {
         setOnboardingData((prevData) => prevData.filter((item) => item.id !== deleteProduct));
         notifySuccess(res.message);

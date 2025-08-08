@@ -13,7 +13,7 @@ import {
   Textarea,
 } from "@mui/joy";
 import { useMode } from "../../contexts/themeModeContext";
-import ProductOnboardingServices from "../../services/ProductOnboardingServices";
+import MetaDataServices from "../../services/MetaDataServices";
 import { notifySuccess, notifyError } from "../../utils/toast";
 import CategoryServices from "../../services/CategoryServices";
 import { LoaderCircle } from "lucide-react";
@@ -121,7 +121,7 @@ function EditMetaData({ isOpen, onClose, currentProduct, setOnboardingData }) {
         mrp: parseFloat(editedData.mrp),
         hsn_code: editedData.code,
       };
-      const res = await ProductOnboardingServices.UpdateMetaData(body, editedData.id);
+      const res = await MetaDataServices.UpdateMetaData(body, editedData.id);
       if (res.success === true) {
         setOnboardingData((prevData) =>
           prevData.map((data) => (data.id === editedData.id ? editedData : data))
