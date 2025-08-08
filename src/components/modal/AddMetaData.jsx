@@ -14,7 +14,7 @@ import {
 } from "@mui/joy";
 import { useMode } from "../../contexts/themeModeContext";
 import { notifyError, notifySuccess } from "../../utils/toast";
-import ProductOnboardingServices from "../../services/ProductOnboardingServices";
+import MetaDataServices from "../../services/MetaDataServices";
 import { LoaderCircle } from "lucide-react";
 import CategoryServices from "../../services/CategoryServices";
 
@@ -105,7 +105,7 @@ function AddMetaData({ isOpen, onClose, setReload }) {
         mrp: parseFloat(saveData.mrp),
         hsn_code: saveData.code,
       };
-      const res = await ProductOnboardingServices.CreateMetaData(body);
+      const res = await MetaDataServices.CreateMetaData(body);
       if (res.success === true) {
         notifySuccess(res.message);
         setReload((prevData) => !prevData);

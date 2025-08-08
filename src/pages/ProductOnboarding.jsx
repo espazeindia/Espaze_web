@@ -4,7 +4,7 @@ import AddMetaData from "../components/modal/AddMetaData";
 import ProductOnboardingTable from "../components/table/ProductOnboardingTable";
 import { notifyError } from "../utils/toast";
 import { useNavigate } from "react-router-dom";
-import ProductOnboardingServices from "../services/ProductOnboardingServices";
+import MetaDataServices from "../services/MetaDataServices";
 
 function ProductOnboarding() {
   const router = useNavigate();
@@ -29,7 +29,7 @@ function ProductOnboarding() {
       try {
         setLoading(true);
         console.log(limit, page, search);
-        const result = await ProductOnboardingServices.FetchMetadata(limit, page, search);
+        const result = await MetaDataServices.FetchMetadata(limit, page, search);
         if (result.success === true) {
           const { total_pages, metadata, total } = result.data;
           let transformedMetadata = [];

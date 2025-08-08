@@ -15,7 +15,7 @@ const getValidCookie = () => {
   return " cookie error";
 };
 
-const ProductOnboardingServices = {
+const MetaDataServices = {
   CreateMetaData: async (body) => {
     const token = getValidCookie();
     if (token != "Cookie not found" || token != "cookie error") {
@@ -60,4 +60,4 @@ const ProductOnboardingServices = {
   },
 };
 
-export default ProductOnboardingServices;
+export default MetaDataServices;
