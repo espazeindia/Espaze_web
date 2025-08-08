@@ -1,21 +1,31 @@
 import React, { useState, useRef } from "react";
 import { FormControl, Input } from "@mui/joy";
-import { DarkMode, LightMode } from "@mui/icons-material";
 import Cookies from "js-cookie";
 import { useMode } from "../../contexts/themeModeContext";
 import LoginServices from "../../services/LoginServices";
-import { notifySuccess,notifyError } from "../../utils/toast";
+import { notifySuccess, notifyError } from "../../utils/toast";
+import { useNavigate } from "react-router-dom";
+import { Phone, Lock, Key, Refresh } from "@mui/icons-material";
 
 function Seller() {
-  const { theme, toggleTheme } = useMode();
+  const { theme } = useMode();
+  const navigate = useNavigate();
   const [loginVia, setLoginVia] = useState("pin");
   const [phone, setPhone] = useState("");
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [pin, setPin] = useState(["", "", "", "", "", ""]);
   const [showOtpError, setShowOtpError] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isOtpLoading, setIsOtpLoading] = useState(false);
 
   const handleGetOtp = async (e) => {
     e.preventDefault();
+    if (!phone || phone.length < 10) {
+      notifyError("Please enter a valid phone number");
+      return;
+    }
+    
+    setIsOtpLoading(true);
     try {
       const res = await LoginServices.GetOtp({ phonenumber: phone });
       if (res.success === true) {
@@ -23,6 +33,8 @@ function Seller() {
       }
     } catch (err) {
       notifyError(err?.response?.data?.message || err.message);
+    } finally {
+      setIsOtpLoading(false);
     }
   };
 
@@ -79,16 +91,19 @@ function Seller() {
   const handleLoginByOtp = async (e) => {
     e.preventDefault();
     if (isOtpComplete) {
+      setIsLoading(true);
       const enteredOtp = otp.join("");
       try {
-        const res = await LoginServices.LoginSellerByOtp({phonenumber: phone, otp : enteredOtp });
+        const res = await LoginServices.LoginSellerByOtp({ phonenumber: phone, otp: enteredOtp });
         if (res.success) {
           notifySuccess(res.message);
           Cookies.set("EspazeCookie", res.token);
           navigate("/");
         }
       } catch (error) {
-        notifyError(err?.response?.data?.message || err.message);
+        notifyError(error?.response?.data?.message || error.message);
+      } finally {
+        setIsLoading(false);
       }
     }
   };
@@ -96,9 +111,10 @@ function Seller() {
   const handleLoginByPin = async (e) => {
     e.preventDefault();
     if (isPinComplete) {
+      setIsLoading(true);
       const enteredPin = pin.join("");
       try {
-        const res = await LoginServices.LoginSellerByPin({phonenumber: phone, pin : enteredPin });
+        const res = await LoginServices.LoginSellerByPin({ phonenumber: phone, pin: enteredPin });
         if (res.success) {
           notifySuccess(res.message);
           Cookies.set("EspazeCookie", res.token);
@@ -106,56 +122,87 @@ function Seller() {
         }
       } catch (err) {
         notifyError(err?.response?.data?.message || err.message);
+      } finally {
+        setIsLoading(false);
       }
     }
   };
 
+  const clearOtp = () => {
+    setOtp(["", "", "", "", "", ""]);
+    otpRefs[0].current?.focus();
+  };
+
+  const clearPin = () => {
+    setPin(["", "", "", "", "", ""]);
+    pinRefs[0].current?.focus();
+  };
+
   return (
-    <div className="w-full">
-      <h2 className="flex justify-center text-lg font-bold mb-2 ">
-        Seller Login
-      </h2>
-      <div className="rounded-lg p-2 flex w-full justify-center gap-4 mb-2 ">
-        <div
-          className={`cursor-pointer p-1 text-sm border-2 font-bold rounded-md text-center w-1/2 ${
-            loginVia === "pin"
-              ? "border-violet-800 bg-violet-200 text-violet-800"
-              : theme
-              ? "border-zinc-400 bg-zinc-100 text-zinc-700"
-              : "border-zinc-400 bg-zinc-100 text-zinc-700"
-          }`}
-          onClick={() => {
-            setLoginVia("pin");
-          }}
-        >
-          Pin Login
+    <div className="w-full space-y-4">
+      {/* Login method selector - Segmented buttons */}
+      <div className="space-y-3">
+        <div className="text-center">
+          <h3 className={`text-base font-semibold mb-1 ${
+            theme ? "text-gray-800" : "text-white"
+          }`}>
+            Choose Login Method
+          </h3>
+          <p className={`text-xs ${
+            theme ? "text-gray-600" : "text-gray-300"
+          }`}>
+            Select how you'd like to authenticate
+          </p>
         </div>
-        <div
-          className={`cursor-pointer p-1 text-sm border-2 font-bold rounded-md text-center w-1/2 ${
-            loginVia === "otp"
-              ? "border-violet-800 bg-violet-200 text-violet-800"
-              : theme
-              ? "border-zinc-400 bg-zinc-100 text-zinc-700"
-              : "border-zinc-400 bg-zinc-100 text-zinc-700"
-          }`}
-          onClick={() => {
-            setLoginVia("otp");
-          }}
-        >
-          OTP Login
+        
+        <div className="flex space-x-1 p-1 rounded-lg bg-gray-100 dark:bg-gray-800">
+          <button
+            className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2 ${
+              loginVia === "pin"
+                ? "bg-white dark:bg-gray-700 text-violet-600 dark:text-violet-400 shadow-sm"
+                : "text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
+            }`}
+            onClick={() => {
+              setLoginVia("pin");
+              clearOtp();
+            }}
+          >
+            <Lock fontSize="small" />
+            PIN
+          </button>
+          
+          <button
+            className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2 ${
+              loginVia === "otp"
+                ? "bg-white dark:bg-gray-700 text-violet-600 dark:text-violet-400 shadow-sm"
+                : "text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
+            }`}
+            onClick={() => {
+              setLoginVia("otp");
+              clearPin();
+            }}
+          >
+            <Key fontSize="small" />
+            OTP
+          </button>
         </div>
       </div>
+
       <form
-        onSubmit={(e) => e.preventDefault()}
-        className="flex flex-col gap-2"
+        onSubmit={loginVia === "pin" ? handleLoginByPin : handleLoginByOtp}
+        className="space-y-4"
       >
-        <FormControl size="lg" className="space-y-1  gap-1">
-          <label className="text-base font-semibold">Phone Number</label>
-          <div
-            className={`${
-              loginVia === "otp" ? "grid grid-cols-[3fr_1fr] gap-3" : ""
-            }`}
-          >
+        {/* Phone number input */}
+        <div className="space-y-1.5">
+          <label className={`text-sm font-semibold flex items-center gap-2 ${
+            theme ? "text-gray-700" : "text-gray-200"
+          }`}>
+            <Phone fontSize="small" />
+            Phone Number
+          </label>
+          <div className={`relative ${
+            loginVia === "otp" ? "grid grid-cols-[1fr,auto] gap-3" : ""
+          }`}>
             <Input
               name="phone"
               value={phone}
@@ -163,94 +210,112 @@ function Seller() {
               required
               fullWidth
               size="lg"
-              placeholder="Enter Phone Number"
+              placeholder="Enter your phone number"
+              className={`transition-all duration-300 ${
+                theme 
+                  ? "bg-white border-gray-200 focus:border-violet-500 focus:ring-violet-500/20" 
+                  : "bg-gray-800 border-gray-600 focus:border-violet-400 focus:ring-violet-400/20"
+              }`}
             />
             {loginVia === "otp" && (
               <button
                 type="button"
                 onClick={handleGetOtp}
-                className="bg-[#8b5cf6] rounded-lg font-semibold text-white text-sm hover:bg-[#8b5cf6] cursor-pointer"
+                disabled={isOtpLoading || !phone || phone.length < 10}
+                className={`px-3 py-2 rounded-lg font-semibold text-sm transition-all duration-300 flex items-center gap-2 ${
+                  isOtpLoading || !phone || phone.length < 10
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    : "bg-gradient-to-r from-violet-500 to-purple-600 text-white hover:from-violet-600 hover:to-purple-700 shadow-lg hover:shadow-xl transform hover:scale-105"
+                }`}
               >
+                {isOtpLoading ? (
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                ) : (
+                  <Refresh fontSize="small" />
+                )}
                 Get OTP
               </button>
             )}
           </div>
-        </FormControl>
-        {loginVia === "pin" ? (
-          <div className="text-base font-semibold">Enter Security Pin</div>
-        ) : (
-          <div className="text-base font-semibold">Enter OTP</div>
-        )}
-        <div className="flex justify-between gap-2">
-          {loginVia === "pin"
-            ? pin.map((digit, index) => (
-                <input
-                  key={index}
-                  ref={pinRefs[index]}
-                  maxLength="1"
-                  value={digit}
-                  onChange={(e) => handlePinChange(index, e.target.value)}
-                  onKeyDown={(e) => handlePinKeyDown(e, index)}
-                  className="w-10 h-10 text-center border rounded text-lg"
-                  inputMode="numeric"
-                  type="text"
-                />
-              ))
-            : otp.map((digit, index) => (
-                <input
-                  key={index}
-                  ref={otpRefs[index]}
-                  maxLength="1"
-                  value={digit}
-                  onChange={(e) => handleOtpChange(index, e.target.value)}
-                  onKeyDown={(e) => handleOtpKeyDown(e, index)}
-                  className="w-10 h-10 text-center border rounded text-lg"
-                  inputMode="numeric"
-                />
-              ))}
         </div>
-        {showOtpError && (
-          <p className="text-red-500 text-center text-sm">
-            Please enter all 6 digits
-          </p>
-        )}
-        {loginVia === "pin" ? (
-          <div>
-            <button
-              onSubmit={handleLoginByPin}
-              type="submit"
-              className={`w-full py-2 mt-3 rounded-lg cursor-pointer font-semibold text-white text-lg ${
-                isPinComplete
-                  ? "bg-[#8b5cf6]"
-                  : "bg-gray-400 cursor-not-allowed"
-              }`}
-              disabled={!isPinComplete}
-            >
-              Login
-            </button>
-            <p className="text-blue-500 text-center mt-2 text-sm hover:underline cursor-pointer">
-              Forgot PIN?
-            </p>
+
+        {/* PIN/OTP input */}
+        <div className="space-y-2">
+          <label className={`text-sm font-semibold flex items-center gap-2 ${
+            theme ? "text-gray-700" : "text-gray-200"
+          }`}>
+            {loginVia === "pin" ? <Lock fontSize="small" /> : <Key fontSize="small" />}
+            {loginVia === "pin" ? "Security PIN" : "OTP Code"}
+          </label>
+          
+          <div className="flex justify-between gap-2">
+            {(loginVia === "pin" ? pin : otp).map((digit, index) => (
+              <input
+                key={index}
+                ref={(loginVia === "pin" ? pinRefs : otpRefs)[index]}
+                maxLength="1"
+                value={digit}
+                onChange={(e) => 
+                  loginVia === "pin" 
+                    ? handlePinChange(index, e.target.value)
+                    : handleOtpChange(index, e.target.value)
+                }
+                onKeyDown={(e) => 
+                  loginVia === "pin" 
+                    ? handlePinKeyDown(e, index)
+                    : handleOtpKeyDown(e, index)
+                }
+                className={`w-11 h-11 text-center border-2 rounded-lg text-lg font-semibold transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                  theme
+                    ? "bg-white border-gray-200 focus:border-violet-500 focus:ring-violet-500/20 text-gray-900"
+                    : "bg-gray-800 border-gray-600 focus:border-violet-400 focus:ring-violet-400/20 text-white"
+                } ${digit ? "border-violet-500 bg-violet-50 dark:bg-violet-900/20" : ""}`}
+                inputMode="numeric"
+                type="text"
+              />
+            ))}
           </div>
-        ) : (
-          <div>
-            <button
-              onSubmit={handleLoginByOtp}
-              type="submit"
-              className={`w-full py-2 mt-3 rounded-lg cursor-pointer font-semibold text-white text-lg ${
-                isOtpComplete
-                  ? "bg-[#8b5cf6]"
-                  : "bg-gray-400 cursor-not-allowed"
-              }`}
-              disabled={!isOtpComplete}
-            >
-              Login
-            </button>
-            <p className="text-blue-500 text-center mt-2 text-sm hover:underline cursor-pointer">
-              Resend OTP
+          
+          {showOtpError && (
+            <p className="text-red-500 text-center text-sm animate-pulse">
+              Please enter all 6 digits
             </p>
+          )}
+        </div>
+
+        {/* Login button */}
+        <div className="space-y-3">
+          <button
+            type="submit"
+            disabled={loginVia === "pin" ? !isPinComplete : !isOtpComplete || isLoading}
+            className={`w-full py-2.5 rounded-xl font-semibold text-white text-lg transition-all duration-300 transform ${
+              (loginVia === "pin" ? isPinComplete : isOtpComplete) && !isLoading
+                ? "bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 shadow-lg hover:shadow-xl hover:scale-[1.02]"
+                : "bg-gray-300 text-gray-500 cursor-not-allowed"
+            } flex items-center justify-center gap-2`}
+          >
+            {isLoading ? (
+              <>
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                Signing in...
+              </>
+            ) : (
+              "Sign In"
+            )}
+          </button>
+
+          {/* Additional actions */}
+          <div className="text-center">
+            <button
+              type="button"
+              className={`text-sm font-medium transition-colors hover:underline ${
+                theme ? "text-violet-600 hover:text-violet-700" : "text-violet-400 hover:text-violet-300"
+              }`}
+            >
+              {loginVia === "pin" ? "Forgot PIN?" : "Resend OTP"}
+            </button>
           </div>
-        )}
+        </div>
       </form>
     </div>
   );

@@ -5,7 +5,7 @@ import AddProductDetails from "../components/modal/AddProductModal";
 import { useMode } from "../contexts/themeModeContext";
 import { handleChangeDebounce } from "../utils/useDebounce";
 import { notifyError } from "../utils/toast";
-import ProductOnboardingServices from "../services/ProductOnboardingServices";
+import MetaDataServices from "../services/MetaDataServices";
 
 function Products() {
   const { theme } = useMode();
@@ -25,7 +25,7 @@ function Products() {
     const getMetadata = async () => {
       try {
         setLoading(true);
-        const result = await ProductOnboardingServices.FetchMetadata(limit, page, debouce);
+        const result = await MetaDataServices.FetchMetadata(limit, page, debouce);
         if (result.success === true) {
           const { total_pages, metadata, total } = result.data;
           let transformedMetadata = [];
