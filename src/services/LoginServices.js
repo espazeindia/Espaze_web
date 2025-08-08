@@ -5,19 +5,19 @@ const LoginServices = {
     return requests.post("/login/operational_guy/login", body);
   },
 
-  GetOtp: async (header) => {
-    return requests.get("/login/seller/getOTP", { headers: header });
+  GetOtp: async (params) => {
+    return requests.get("/login/seller/getOTP", { params : params });
   },
 
-  LoginSellerByOtp: async (header) => {
+  LoginSellerByOtp: async (params) => {
     return requests.get("/login/seller/verifyOTP", {
-      headers: header,
+      params : params,
     });
   },
 
-  LoginSellerByPin: async (header) => {
+  LoginSellerByPin: async (params) => {
     return requests.get("/login/seller/verify/Pin", {
-      headers: header,
+      params : params,
     });
   },
 };
