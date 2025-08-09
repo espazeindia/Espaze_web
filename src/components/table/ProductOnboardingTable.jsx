@@ -4,6 +4,7 @@ import { Edit, Delete } from "@mui/icons-material";
 import EditMetaData from "../modal/EditMetaData";
 import DeleteMetaData from "../modal/DeleteMetaData";
 import BottomPagination from "../pagination/BottomPagination";
+import { useNavigate } from "react-router-dom";
 
 function ProductOnboardingTable({
   onboardingData,
@@ -16,6 +17,7 @@ function ProductOnboardingTable({
   loading,
   setReload,
 }) {
+  const navigate = useNavigate();
   const { theme } = useMode();
   const [editModal, setEditModal] = useState(false);
   const [currentProduct, setCurrentProduct] = useState({});
@@ -84,9 +86,11 @@ function ProductOnboardingTable({
             onboardingData.length > 0 ? (
               onboardingData.map((data, index) => (
                 <div
-                  key={index}
-                  className=" grid grid-cols-8 items-center  text-sm border-b py-4 border-gray-300 border-dotted"
-                >
+  key={index}
+  onClick={() => navigate(`/product-details/${data.id}`)}
+  className="grid grid-cols-8 items-center text-sm border-b py-4 border-gray-300 border-dotted cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-700"
+>
+
                   <div
                     className={`text-center font-medium ${theme ? "text-zinc-800" : "text-white"}`}
                   >
