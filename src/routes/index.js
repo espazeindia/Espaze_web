@@ -19,7 +19,7 @@ const routes = [
   {
   path: "/product-details/:id",
   component: ProductDetails,
-  access: ["operations"]
+  access: ["operations","seller"]
 },
   {
     path: "/inventory",

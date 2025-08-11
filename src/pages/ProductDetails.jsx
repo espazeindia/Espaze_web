@@ -1,32 +1,30 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { FaArrowLeft, FaEdit, FaTrash, FaStar, FaEye } from "react-icons/fa";
-import axios from "axios";
 import { notifyError, notifySuccess } from "../utils/toast";
+import { useMode } from "../contexts/themeModeContext";
+import MetaDataServices from "../services/MetaDataServices";
 
-function ProductDetails(setSelectedProduct) {
+function ProductDetails() {
   const { id } = useParams();
-export default function ProductDetails() {
   const navigate = useNavigate();
   const { theme } = useMode();
-
-
-  const { id } = useParams(); // get product id from URL
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState(false);
 
-  // Fetch product details
   useEffect(() => {
     const fetchProduct = async () => {
       try {
         setLoading(true);
-        const result = await ProductDetailsServices.FetchMetadataById(setSelectedProduct.id);
+        const result = await MetaDataServices.FetchMetadataById(
+          id
+        );
 
         if (result.success) {
           const data = result.data;
-
-          const transformed = {
+          
+          const body = {
             id: data.id,
             hsn_code: data.hsn_code,
             name: data.name,
@@ -43,7 +41,7 @@ export default function ProductDetails() {
             total_reviews: data.total_reviews,
           };
 
-          setProduct(transformed);
+          setProduct(body);
         } else {
           notifyError(result.message || "Failed to fetch product details");
         }
@@ -58,48 +56,8 @@ export default function ProductDetails() {
         setLoading(false);
       }
     };
-
     fetchProduct();
-  }, [id, navigate]);
-  
-
-  // Edit Handler
-  const handleEdit = () => {
-    navigate(`/product-onboarding?id=${id}`);
-  };
-
-  // Delete Handler
-  const handleDelete = async () => {
-    if (!window.confirm("Are you sure you want to delete this product?")) return;
-
-    try {
-      setDeleting(true);
-      // TODO: Add backend API route for deleting product
-      await axios.delete(`/api/products/${id}`);
-      notifySuccess("Product deleted successfully");
-      navigate("/products");
-    } catch (err) {
-      notifyError(err?.response?.data?.message || err.message);
-    } finally {
-      setDeleting(false);
-    }
-  };
-
-  // Helper function to render stars
-  const renderStars = (totalStars) => {
-    const stars = [];
-    const rating = Math.min(5, Math.max(0, totalStars || 0));
-    
-    for (let i = 0; i < 5; i++) {
-      stars.push(
-        <FaStar 
-          key={i} 
-          className={i < rating ? "text-yellow-400" : "text-gray-300"} 
-        />
-      );
-    }
-    return stars;
-  };
+  }, [id]);
 
   return (
     <div
@@ -107,21 +65,20 @@ export default function ProductDetails() {
         theme ? "bg-zinc-100 text-black" : "bg-neutral-950 text-white"
       }`}
     >
-    
       <div className="flex justify-between items-center mb-5">
         <div className="flex items-center gap-3">
-          <IoArrowBackSharp
+          {/* <IoArrowBackSharp
             className="cursor-pointer"
             size={28}
             onClick={() => navigate(-1)}
-          />
+          /> */}
           <div className="font-bold text-2xl">Product Details</div>
         </div>
 
         {/* Action Buttons - keeping original styling and position */}
         <div className="flex space-x-2">
           <button
-            onClick={handleEdit}
+            // onClick={handleEdit}
             className="flex items-center space-x-2 border border-[rgb(0,166,62)] text-[rgb(0,166,62)] hover:bg-[rgb(0,166,62)] hover:text-white rounded py-[4px] px-[28px] transition-colors"
           >
             <FaEdit />
@@ -129,7 +86,7 @@ export default function ProductDetails() {
           </button>
 
           <button
-            onClick={handleDelete}
+            // onClick={handleDelete}
             disabled={deleting}
             className="flex items-center space-x-2 border border-red-500 text-red-500 hover:bg-red-500 hover:text-white rounded py-[4px] px-[28px] transition-colors"
           >
@@ -139,7 +96,6 @@ export default function ProductDetails() {
         </div>
       </div>
 
-      
       <div
         className={`rounded-lg p-5 ${
           theme ? "bg-white text-black" : "bg-zinc-800 text-white"
@@ -151,26 +107,25 @@ export default function ProductDetails() {
           <div>No product found</div>
         ) : (
           <div className="flex gap-8">
-           
-<div className="w-1/3">
-  <div className="mb-4">
-    <p className="font-semibold mb-2">Image</p>
-    {product.image ? (
-      <img
-        src={product.image}
-        alt="Product"
-        className="w-full rounded-md border"
-      />
-    ) : (
-      <div className="w-full h-48 flex items-center justify-center border rounded-md text-gray-400">
-        No Image Available
-      </div>
-    )}
-  </div>
-    <div>
-    <p className="font-semibold mb-1">Description</p>
-   </div>
-</div>
+            <div className="w-1/3">
+              <div className="mb-4">
+                <p className="font-semibold mb-2">Image</p>
+                {product.image ? (
+                  <img
+                    src={product.image}
+                    alt="Product"
+                    className="w-full rounded-md border"
+                  />
+                ) : (
+                  <div className="w-full h-48 flex items-center justify-center border rounded-md text-gray-400">
+                    No Image Available
+                  </div>
+                )}
+              </div>
+              <div>
+                <p className="font-semibold mb-1">Description</p>
+              </div>
+            </div>
 
             <div className="w-2/3">
               <table className="w-full text-left border-collapse">
