@@ -74,7 +74,7 @@ function Login() {
                   onClick={() => setUser("seller")}
                   className={`relative p-4 rounded-xl border-2 transition-all duration-300 transform hover:scale-105 ${
                     user === "seller"
-                      ? "border-violet-500 bg-gradient-to-br from-violet-50 to-purple-50 shadow-lg"
+                      ? "border-violet-700 bg-gradient-to-br from-violet-100 to-purple-100 shadow-lg"
                       : theme
                       ? "border-gray-200 bg-white hover:border-violet-300 hover:shadow-md"
                       : "border-gray-600 bg-gray-800 hover:border-violet-400 hover:shadow-md"
@@ -100,15 +100,6 @@ function Login() {
                       }`}>
                         Seller
                       </h3>
-                      <p className={`text-xs ${
-                        user === "seller"
-                          ? "text-violet-600"
-                          : theme
-                          ? "text-gray-500"
-                          : "text-gray-400"
-                      }`}>
-                        Access store
-                      </p>
                     </div>
                   </div>
                   {user === "seller" && (
@@ -120,7 +111,7 @@ function Login() {
                   onClick={() => setUser("operations")}
                   className={`relative p-4 rounded-xl border-2 transition-all duration-300 transform hover:scale-105 ${
                     user === "operations"
-                      ? "border-violet-500 bg-gradient-to-br from-violet-50 to-purple-50 shadow-lg"
+                      ? "border-violet-700 bg-gradient-to-br from-violet-100 to-purple-100 shadow-lg"
                       : theme
                       ? "border-gray-200 bg-white hover:border-violet-300 hover:shadow-md"
                       : "border-gray-600 bg-gray-800 hover:border-violet-400 hover:shadow-md"
