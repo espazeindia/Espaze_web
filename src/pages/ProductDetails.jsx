@@ -1,19 +1,22 @@
-import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { useMode } from "../contexts/themeModeContext";
-import { notifyError } from "../utils/toast";
-import { IoArrowBackSharp } from "react-icons/io5";
-import ProductDetailsServices from "../services/ProductDetailsServices";
+import React, { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { FaArrowLeft, FaEdit, FaTrash, FaStar, FaEye } from "react-icons/fa";
+import axios from "axios";
+import { notifyError, notifySuccess } from "../utils/toast";
 
 function ProductDetails(setSelectedProduct) {
   const { id } = useParams();
+export default function ProductDetails() {
   const navigate = useNavigate();
   const { theme } = useMode();
 
 
+  const { id } = useParams(); // get product id from URL
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [deleting, setDeleting] = useState(false);
 
+  // Fetch product details
   useEffect(() => {
     const fetchProduct = async () => {
       try {
@@ -58,6 +61,45 @@ function ProductDetails(setSelectedProduct) {
 
     fetchProduct();
   }, [id, navigate]);
+  }, [id]);
+
+  // Edit Handler
+  const handleEdit = () => {
+    navigate(`/product-onboarding?id=${id}`);
+  };
+
+  // Delete Handler
+  const handleDelete = async () => {
+    if (!window.confirm("Are you sure you want to delete this product?")) return;
+
+    try {
+      setDeleting(true);
+      // TODO: Add backend API route for deleting product
+      await axios.delete(`/api/products/${id}`);
+      notifySuccess("Product deleted successfully");
+      navigate("/products");
+    } catch (err) {
+      notifyError(err?.response?.data?.message || err.message);
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  // Helper function to render stars
+  const renderStars = (totalStars) => {
+    const stars = [];
+    const rating = Math.min(5, Math.max(0, totalStars || 0));
+    
+    for (let i = 0; i < 5; i++) {
+      stars.push(
+        <FaStar 
+          key={i} 
+          className={i < rating ? "text-yellow-400" : "text-gray-300"} 
+        />
+      );
+    }
+    return stars;
+  };
 
   return (
     <div
@@ -65,6 +107,7 @@ function ProductDetails(setSelectedProduct) {
         theme ? "bg-zinc-100 text-black" : "bg-neutral-950 text-white"
       }`}
     >
+    
       <div className="flex justify-between items-center mb-5">
         <div className="flex items-center gap-3">
           <IoArrowBackSharp
@@ -75,30 +118,28 @@ function ProductDetails(setSelectedProduct) {
           <div className="font-bold text-2xl">Product Details</div>
         </div>
 
-        <div className="flex gap-2">
+        {/* Action Buttons - keeping original styling and position */}
+        <div className="flex space-x-2">
           <button
-            className={`p-1 px-7 rounded-md font-medium cursor-pointer hover:bg-green-600 hover:text-white 
-            ${
-              theme
-                ? "text-green-600 border border-green-600"
-                : "text-green-500 border border-green-500"
-            }`}
+            onClick={handleEdit}
+            className="flex items-center space-x-2 border border-[rgb(0,166,62)] text-[rgb(0,166,62)] hover:bg-[rgb(0,166,62)] hover:text-white rounded py-[4px] px-[28px] transition-colors"
           >
-            Edit
+            <FaEdit />
+            <span>Edit</span>
           </button>
+
           <button
-            className={`p-1 px-7 rounded-md font-medium cursor-pointer hover:bg-red-600 hover:text-white 
-            ${
-              theme
-                ? "text-red-600 border border-red-600"
-                : "text-red-500 border border-red-500"
-            }`}
+            onClick={handleDelete}
+            disabled={deleting}
+            className="flex items-center space-x-2 border border-red-500 text-red-500 hover:bg-red-500 hover:text-white rounded py-[4px] px-[28px] transition-colors"
           >
-            Delete
+            <FaTrash />
+            <span>{deleting ? "Deleting..." : "Delete"}</span>
           </button>
         </div>
       </div>
 
+      
       <div
         className={`rounded-lg p-5 ${
           theme ? "bg-white text-black" : "bg-zinc-800 text-white"
@@ -110,29 +151,27 @@ function ProductDetails(setSelectedProduct) {
           <div>No product found</div>
         ) : (
           <div className="flex gap-8">
-            
-            <div className="w-1/3">
-              <div className="mb-4">
-                <p className="font-semibold mb-2">Image</p>
-                {product.image ? (
-                  <img
-                    src={product.image}
-                    alt="Product"
-                    className="w-full rounded-md border"
-                  />
-                ) : (
-                  <div className="w-full h-48 flex items-center justify-center border rounded-md text-gray-400">
-                    No Image Available
-                  </div>
-                )}
-              </div>
-              <div>
-                <p className="font-semibold mb-1">Description</p>
-                <p>{product.description || "No description available"}</p>
-              </div>
-            </div>
+           
+<div className="w-1/3">
+  <div className="mb-4">
+    <p className="font-semibold mb-2">Image</p>
+    {product.image ? (
+      <img
+        src={product.image}
+        alt="Product"
+        className="w-full rounded-md border"
+      />
+    ) : (
+      <div className="w-full h-48 flex items-center justify-center border rounded-md text-gray-400">
+        No Image Available
+      </div>
+    )}
+  </div>
+    <div>
+    <p className="font-semibold mb-1">Description</p>
+   </div>
+</div>
 
-            
             <div className="w-2/3">
               <table className="w-full text-left border-collapse">
                 <tbody>
@@ -186,5 +225,4 @@ function ProductDetails(setSelectedProduct) {
   );
 }
 
-export default ProductDetails;
- 
+export default ProductDetailsPage;
