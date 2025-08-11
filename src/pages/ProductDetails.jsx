@@ -61,7 +61,7 @@ export default function ProductDetails() {
 
     fetchProduct();
   }, [id, navigate]);
-  }, [id]);
+  
 
   // Edit Handler
   const handleEdit = () => {
@@ -225,4 +225,4 @@ export default function ProductDetails() {
   );
 }
 
-export default ProductDetailsPage;
+export default ProductDetails;
