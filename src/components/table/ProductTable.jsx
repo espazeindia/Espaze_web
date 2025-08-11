@@ -1,19 +1,64 @@
 import { Checkbox } from "@mui/joy";
 import { Add } from "@mui/icons-material";
-import React, { useState } from "react";
+import { useState, useEffect } from "react";
 import ViewModalComponent from "../modal/ViewProductModal";
 import { Visibility } from "@mui/icons-material";
 import { useMode } from "../../contexts/themeModeContext";
 import BottomPagination from "../pagination/BottomPagination";
 
-function ProductTable({ products, setPage, page, limit, setLimit, totalDetails,loading}) {
+function ProductTable({
+  products,
+  setPage,
+  page,
+  limit,
+  setLimit,
+  totalDetails,
+  loading,
+  checkedIds,
+  setCheckedIds,
+  handleAddToInventory,
+}) {
   const { theme } = useMode();
   const [openViewProduct, setViewProduct] = useState(false);
   const [productDetails, setProductDetails] = useState({});
+  const [checkedBox, setCheckedBox] = useState(false);
+
   const handleProductView = (data) => {
     setProductDetails(data);
     setViewProduct(true);
   };
+
+  const handleMainCheckboxChange = (value) => {
+    if (value) {
+      const allIds = products.map((product) => {
+        return product.id;
+      });
+      setCheckedIds(allIds);
+      setCheckedBox(true);
+    } else {
+      setCheckedIds([]);
+      setCheckedBox(false);
+    }
+  };
+
+  const handleCheckedIdsChange = (id) => {
+    if (checkedIds.includes(id)) {
+      setCheckedIds((prevData) => prevData.filter((checked_id) => checked_id != id));
+    } else {
+      setCheckedIds((prevData) => [...prevData, id]);
+    }
+  };
+
+  useEffect(() => {
+    if (products.length === 0) {
+      setCheckedBox(false);
+      return;
+    }
+
+    const allSelected = products.every((product) => checkedIds.includes(product.id));
+    setCheckedBox(allSelected);
+  }, [products, checkedIds]);
+
   return (
     <>
       <div
@@ -24,6 +69,10 @@ function ProductTable({ products, setPage, page, limit, setLimit, totalDetails,l
         <div className="w-full">
           <div className="grid grid-cols-[1fr_2fr_5fr_3fr_1fr_4fr_3fr_6fr_2fr] border-b py-4 text-sm border-gray-300 border-dotted">
             <Checkbox
+              checked={checkedBox}
+              onChange={(e) => {
+                handleMainCheckboxChange(e.target.checked);
+              }}
               size="sm"
               sx={
                 theme
@@ -106,6 +155,10 @@ function ProductTable({ products, setPage, page, limit, setLimit, totalDetails,l
                   className=" grid grid-cols-[1fr_2fr_5fr_3fr_1fr_4fr_3fr_6fr_2fr] items-center  text-sm border-b py-4 border-gray-300 border-dotted"
                 >
                   <Checkbox
+                    checked={checkedIds.includes(data.id)}
+                    onChange={() => {
+                      handleCheckedIdsChange(data.id);
+                    }}
                     type="checkbox"
                     size="sm"
                     className="relative top-[3px] left-2"
@@ -182,7 +235,7 @@ function ProductTable({ products, setPage, page, limit, setLimit, totalDetails,l
                           : "text-green-400 hover:text-green-700"
                       } `}
                       onClick={() => {
-                        handleProductView(product);
+                        handleAddToInventory([data.id])
                       }}
                     >
                       <Add fontSize="small" />

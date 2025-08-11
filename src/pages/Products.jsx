@@ -6,11 +6,11 @@ import { useMode } from "../contexts/themeModeContext";
 import { handleChangeDebounce } from "../utils/useDebounce";
 import { notifyError } from "../utils/toast";
 import MetaDataServices from "../services/MetaDataServices";
+import AddToInventory from "../components/modal/AddToInventory";
 
 function Products() {
   const { theme } = useMode();
-
-  const [openAddProduct, setOpenAddProduct] = useState(false);
+  const [openAddToInventoryModal, setOpenAddToInventoryModal] = useState(false);
   const [totalDetails, setTotalDetails] = useState({});
   const [page, setPage] = useState(0);
   const [limit, setLimit] = useState(10);
@@ -18,6 +18,8 @@ function Products() {
   const [searchText, setSearchText] = useState("");
   const [loading, setLoading] = useState(true);
   const [reload, setReload] = useState(false);
+  const [checkedIds, setCheckedIds] = useState([]);
+  const [addedIds, setAddedIds] = useState([]);
 
   const debouce = handleChangeDebounce(searchText);
 
@@ -25,7 +27,7 @@ function Products() {
     const getMetadata = async () => {
       try {
         setLoading(true);
-        const result = await MetaDataServices.FetchMetadata(limit, page, debouce);
+        const result = await MetaDataServices.FetchMetadataForSeller(limit, page, debouce);
         if (result.success === true) {
           const { total_pages, metadata, total } = result.data;
           let transformedMetadata = [];
@@ -39,7 +41,7 @@ function Products() {
                 code: data.hsn_code,
                 mrp: data.mrp,
                 image: data.image,
-                id: data.product_id,
+                id: data.id,
                 category_name: data.category_name,
                 subcategory_name: data.subcategory_name,
               };
@@ -64,6 +66,11 @@ function Products() {
     getMetadata();
   }, [debouce, page, limit, reload]);
 
+  const handleAddToInventory = (allIds) => {
+    setAddedIds(allIds);
+    setOpenAddToInventoryModal(true);
+  };
+
   return (
     <div
       className={`${
@@ -72,28 +79,6 @@ function Products() {
     >
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold">Products</h1>
-        {/* <div className="flex">
-          <button
-            className={`${
-              theme
-                ? "border-[#4a2594] shadow-[#4a2594] text-[#4a2594]"
-                : "border-[#b898fa] shadow-[#b898fa] text-[#b898fa]"
-            }  border-1 transition-all duration-500 flex items-center px-6 py-2 font-semibold rounded-s-lg hover:cursor-pointer  hover:shadow-sm`}
-          >
-            <FileDownload /> Import
-          </button>
-          <button
-            className={`border-y-1 border-r-1 ${
-              theme
-                ? "border-zinc-700 text-zinc-700 shadow-zinc-700"
-                : "border-zinc-400 text-zinc-400 shadow-zinc-400"
-            }  transition-all 
-          duration-500 flex items-center px-6 py-2 font-semibold rounded-e-lg hover:cursor-pointer  hover:shadow-sm `}
-          >
-            <FileUpload />
-            Export
-          </button>
-        </div> */}
       </div>
 
       <div className="flex flex-col justify-center gap-5 mt-5">
@@ -113,16 +98,23 @@ function Products() {
 
           <div
             onClick={() => {
-              setOpenAddProduct(true);
+              if (checkedIds.length > 0) {
+                handleAddToInventory(checkedIds);
+              } else {
+              }
             }}
             className={` relative group 
               ${
                 theme
-                  ? "border-green-600 text-green-600 shadow-green-600"
-                  : " border-green-500 text-green-500 shadow-green-500"
+                  ? checkedIds.length > 0
+                    ? "border-green-600 text-green-600 shadow-green-600 cursor-pointer"
+                    : "border-gray-600 text-gray-600 shadow-gray-600 opacity-60 cursor-not-allowed "
+                  : checkedIds.length > 0
+                  ? " border-green-500 text-green-500 shadow-green-500 cursor-pointer"
+                  : "border-gray-400 text-gray-400 shadow-gray-400 opacity-70 cursor-not-allowed"
               } border 
-              transition-all duration-700 flex  justify-center items-center px-5 py-1.5 font-semibold rounded-lg 
-              hover:cursor-pointer hover:shadow-sm`}
+              transition-all duration-700 flex  justify-center items-center px-5 py-1.5 font-semibold rounded-lg  
+               hover:shadow-sm`}
           >
             <Add />
             Add to Inventory
@@ -131,45 +123,6 @@ function Products() {
               ${theme ? "text-zinc-600 bg-white " : "bg-zinc-600 text-white"}`}
             >
               Only works on selecting atleast one product
-            </div>
-          </div>
-          <div
-            className={`border-1 hidden relative group   items-center px-4 transition-all ${
-              theme
-                ? " text-zinc-700 border-zinc-700 shadow-zinc-700"
-                : " text-zinc-400 border-zinc-400 shadow-zinc-400"
-            } 
-            duration-500 rounded-lg ml-5 py-[6px] hover:cursor-pointer hover:shadow-xs`}
-          >
-            <Tune className="mr-2" /> Filters
-            <div
-              className={` absolute hidden group-hover:block top-[100%] right-0 ${
-                theme ? "text-zinc-700 p-3 bg-white" : "bg-zinc-700 p-3 text-white"
-              }  rounded-md w-[200%]`}
-            >
-              <div className=" pb-1 border-b-[1px] border-neutral-300">Filters</div>
-              <button
-                className={`my-1 ${
-                  theme ? "hover:bg-neutral-300" : "hover:bg-neutral-800"
-                } py-1 w-full cursor-pointer rounded-md`}
-                onClick={() => setSortOrder("asc")}
-              >
-                Prices Low To High
-              </button>
-              <button
-                className={`my-1 ${
-                  theme ? "hover:bg-neutral-300" : "hover:bg-neutral-800"
-                } py-1 w-full cursor-pointer rounded-md`}
-                onClick={() => setSortOrder("desc")}
-              >
-                Prices High To Low
-              </button>
-              <button
-                className="my-1 hover:bg-red-700 cursor-pointer bg-red-500 text-white font-semibold py-1 w-full rounded-md"
-                onClick={() => setSortOrder(null)}
-              >
-                Reset Filter
-              </button>
             </div>
           </div>
         </div>
@@ -183,12 +136,16 @@ function Products() {
         setLimit={setLimit}
         totalDetails={totalDetails}
         loading={loading}
+        checkedIds={checkedIds}
+        setCheckedIds={setCheckedIds}
+        handleAddToInventory={handleAddToInventory}
       />
-      <AddProductDetails
-        isOpen={openAddProduct}
-        onClose={() => setOpenAddProduct(false)}
-        products={products}
-        setProducts={setProducts}
+      <AddToInventory
+        isOpen={openAddToInventoryModal}
+        onClose={() => {
+          setOpenAddToInventoryModal(false);
+        }}
+        addedIds={addedIds}
       />
     </div>
   );

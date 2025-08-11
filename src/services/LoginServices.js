@@ -16,7 +16,7 @@ const LoginServices = {
   },
 
   LoginSellerByPin: async (param) => {
-    return requests.get("/login/seller/verify/Pin", {
+    return requests.get("/login/seller/verifyPin", {
       params: param,
     });
   },

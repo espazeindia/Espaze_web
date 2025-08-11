@@ -47,9 +47,9 @@ const MetaDataServices = {
       throw new Error("cookie error");
     }
   },
-
+  
    DeleteMetadata: async (id) => {
-    const token = getValidCookie();
+     const token = getValidCookie();
     if (token != "Cookie not found" || token != "cookie error") {
       return requests.delete(`/metadata/deleteMetadata/${id}`, {
         headers : {Authorization: `Bearer ${token}`}
@@ -58,6 +58,18 @@ const MetaDataServices = {
       throw new Error("cookie error");
     }
   },
+  FetchMetadataForSeller: async (limit, page, search) => {
+    const token = getValidCookie();
+    if (token != "Cookie not found" || token != "cookie error") {
+      return requests.get("/metadata/getMetadataForSeller", {
+        headers: { Authorization: `Bearer ${token}` },
+        params: { limit: limit, offset: page, search: search },
+      });
+    } else {
+      throw new Error("cookie error");
+    }
+  },
 };
+
 
 export default MetaDataServices;

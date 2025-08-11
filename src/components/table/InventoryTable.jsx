@@ -1,229 +1,337 @@
-import { Checkbox, Switch } from "@mui/joy";
-import { TableBody, TableCell, TableRow } from "@mui/material";
-import React, { useState } from "react";
+import { Switch } from "@mui/joy";
+import { useState } from "react";
 import ViewModalComponent from "../modal/ViewInventory";
 import EditModalComponent from "../modal/UpdateInventory";
-import DeleteModalComponent from "../modal/DeleteProductModal";
-import { Visibility, Edit, Delete } from "@mui/icons-material";
 import { useMode } from "../../contexts/themeModeContext";
+import BottomPagination from "../pagination/BottomPagination";
+import { Visibility, Edit } from "@mui/icons-material";
 
-function InventoryTable({ products, setProducts, checkedIds, setCheckedIds }) {
-  const {theme} = useMode();
+function InventoryTable({
+  products,
+  setProducts,
+  setPage,
+  page,
+  limit,
+  setLimit,
+  totalDetails,
+  loading,
+  setReload,
+}) {
+  const { theme } = useMode();
   const [openViewProduct, setViewProduct] = useState(false);
   const [productDetails, setProductDetails] = useState({});
   const [openUpdateProduct, setOpenUpdateProduct] = useState(false);
   const [editProductDetails, setEditProductDetails] = useState({});
-  const [openDeleteModal, setOpenDeleteModal] = useState(false);
-  const [deleteProductDetails, setDeleteProductDetails] = useState({});
+
   const handleProductView = (data) => {
     setProductDetails(data);
     setViewProduct(true);
   };
-  const handleProductEdit = (data) => {
+  const handleEdit = (data) => {
     setEditProductDetails(data);
     setOpenUpdateProduct(true);
   };
-  const handleDelete = (data) => {
-    setDeleteProductDetails(data);
-    setOpenDeleteModal(true);
-  };
-  const handleViewEdit = () => {
-    setViewProduct(false);
-    setEditProductDetails(productDetails);
-    setOpenUpdateProduct(true);
-  };
-  const handleCheckboxChange = (id) => {
-    setCheckedIds((prev) =>
-      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
-    );
-  };
 
-  const handleStatusChange = (id) => {
+  const handleVisibilityChange = (id) => {
     setProducts((prevProducts) =>
       prevProducts.map((product) =>
-        product.id === id
-          ? { ...product, status: product.status === "show" ? "hide" : "show" }
-          : product
+        product.id === id ? { ...product, visible: product.visible ? false : true } : product
       )
     );
+  };
+  const formatDate = (dateString) => {
+    const months = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
+
+    const [year, month, day] = dateString.split("-");
+    const monthName = months[parseInt(month, 10) - 1];
+    const shortYear = year.slice(-2);
+
+    return `${day} ${monthName} ${shortYear}`;
   };
 
   return (
     <>
-      <TableBody className={theme?"bg-white":"bg-zinc-800"}>
-        {products?.map((product, i) => (
-          <TableRow key={i + 1}>
-            <TableCell>
-              <Checkbox
-                type="checkbox"
-                size="sm"
-                className="relative top-[3px] left-2"
-                onChange={() => {
-                  handleCheckboxChange(product.id);
-                }}
-                checked={checkedIds?.includes(product.id)}
-                sx={theme?{
-                  "&.Mui-checked .MuiSvgIcon-root": {
-                    backgroundColor: "#825dcf", // Ensures the icon background changes
-                  },
-                }:{
-                  
-                  "&.Mui-checked .MuiSvgIcon-root": {
-                    backgroundColor: "#b898fa", 
-                  },
-                }}
-              />
-            </TableCell>
-
-            <TableCell>
-              <h2
-                className={`text-sm text-center ${theme?" text-black":"text-white"} font-medium ${
-                  product?.name.length > 30 ? "wrap-long-title" : ""
-                }`}
-              >
-                {product?.name?.substring(0, 28)}
-              </h2>
-            </TableCell>
-
-            <TableCell>
-              <div className={`text-center ${theme?" text-black":"text-white"} text-sm`}>{product?.category_id?.name}</div>
-            </TableCell>
-
-            <TableCell>
-              <div className={`text-center ${theme?" text-black":"text-white"} text-sm`}>{product?.subCategory_id?.name}</div>
-            </TableCell>
-
-            <TableCell>
-              <div className={`text-center ${theme?" text-black":"text-white"} text-sm`}>₹ {product?.mrp}</div>
-            </TableCell>
-
-            <TableCell>
-              <div className={`text-center ${theme?" text-black":"text-white"} text-sm font-semibold`}>{product?.code}</div>
-            </TableCell>
-
-            <TableCell>
-              <div className={`text-center ${theme?" text-black":"text-white"} text-sm`}>
-                {new Date(product?.expiryDate).toLocaleDateString("en-GB", {
-                  day: "2-digit",
-                  month: "long",
-                  year: "numeric",
-                })}
-              </div>
-            </TableCell>
-
-            <TableCell>
-              <div className={`text-center ${theme?" text-black":"text-white"} text-sm`}>{product?.quantity}</div>
-            </TableCell>
-
-            <TableCell>
-              <div className={`text-center ${theme?" text-black":"text-white"} text-sm`}>
-                {new Date(product?.manufacturingDate).toLocaleDateString("en-GB", {
-                  day: "2-digit",
-                  month: "long",
-                  year: "numeric",
-                })}
-              </div>
-            </TableCell>
-
-            <TableCell>
-              <div className={`text-center ${theme?" text-black":"text-white"} text-sm`}>₹ {product?.price}</div>
-            </TableCell>
-
-            <TableCell>
-              {product.quantity > 0 ? (
-                <div className={`border ${theme?" border-green-600 text-green-600": "border-green-400 text-green-400"} mx-auto text-xs  px-2 py-1 rounded-full w-fit`}>
-                  In Stock
-                </div>
-              ) : (
-                <div className={`border ${theme?" border-red-600 text-red-600": " border-red-500 text-red-500"} mx-auto text-xs  px-2 py-1 rounded-full w-fit`}>
-                  Sold Out
-                </div>
-              )}
-            </TableCell>
-
-            <TableCell>
-              <div className="flex justify-center items-center">
-                <Switch
-                  checked={product.status === "show"}
-                  onChange={() => {
-                    handleStatusChange(product.id);
-                  }}
-                  sx={theme? {
-                    "--Switch-trackRadius": "13px",
-                    "--Switch-trackWidth": "40px",
-                    "--Switch-trackHeight": "19px",
-                    "--Switch-thumbSize": "10px",
-                    "&.Mui-checked": {
-                      "--Switch-trackBackground": "#16a34a",
-                    },
-                    "&.Mui-checked:hover": {
-                      "--Switch-trackBackground": "#166534", // Hover effect when checked
-                    },
-                  }:{
-                    "--Switch-trackRadius": "13px",
-                    "--Switch-trackWidth": "40px",
-                    "--Switch-trackHeight": "19px",
-                    "--Switch-thumbSize": "10px",
-                    "&.Mui-checked": {
-                      "--Switch-trackBackground": "#4ade80",
-                    },
-                    "&.Mui-checked:hover": {
-                      "--Switch-trackBackground": "#388E3C", // Hover effect when checked
-                    },
-                  }}
-                />
-              </div>
-            </TableCell>
-            <TableCell>
-              <div className="flex justify-center  text-gray-500">
+      <div className="w-[120vw]">
+        <div className="grid grid-cols-[2fr_5fr_3fr_1fr_4fr_3fr_6fr_3fr_2fr_3fr_2fr_3fr_2fr_2fr] border-b py-4 text-sm border-gray-300 border-dotted">
+          <div
+            className={`text-center ${theme ? "text-[#4110a2]" : "text-[#b898fa]"}  font-semibold`}
+          >
+            Image
+          </div>
+          <div
+            className={`text-center ${theme ? "text-[#4110a2]" : "text-[#b898fa]"}  font-semibold`}
+          >
+            Product Name
+          </div>
+          <div
+            className={`text-center ${theme ? "text-[#4110a2]" : "text-[#b898fa]"}  font-semibold`}
+          >
+            Code
+          </div>
+          <div
+            className={`text-center ${theme ? "text-[#4110a2]" : "text-[#b898fa]"}  font-semibold`}
+          >
+            MRP
+          </div>
+          <div
+            className={`text-center ${theme ? "text-[#4110a2]" : "text-[#b898fa]"}  font-semibold`}
+          >
+            Category
+          </div>
+          <div
+            className={`text-center ${theme ? "text-[#4110a2]" : "text-[#b898fa]"}  font-semibold`}
+          >
+            SubCategory
+          </div>
+          <div
+            className={`text-center ${theme ? "text-[#4110a2]" : "text-[#b898fa]"}  font-semibold`}
+          >
+            Product Description
+          </div>
+          <div
+            className={`text-center ${theme ? "text-[#4110a2]" : "text-[#b898fa]"}  font-semibold`}
+          >
+            Manufacturing Date
+          </div>
+          <div
+            className={`text-center ${theme ? "text-[#4110a2]" : "text-[#b898fa]"}  font-semibold`}
+          >
+            Quantity
+          </div>
+          <div
+            className={`text-center ${theme ? "text-[#4110a2]" : "text-[#b898fa]"}  font-semibold`}
+          >
+            Expiry Date
+          </div>
+          <div
+            className={`text-center ${theme ? "text-[#4110a2]" : "text-[#b898fa]"}  font-semibold`}
+          >
+            Prices
+          </div>
+          <div
+            className={`text-center ${theme ? "text-[#4110a2]" : "text-[#b898fa]"}  font-semibold`}
+          >
+            Status
+          </div>
+          <div
+            className={`text-center ${theme ? "text-[#4110a2]" : "text-[#b898fa]"}  font-semibold`}
+          >
+            Visible
+          </div>
+          <div
+            className={`text-center ${theme ? "text-[#4110a2]" : "text-[#b898fa]"}  font-semibold`}
+          >
+            Actions
+          </div>
+        </div>
+        <div className=" h-[50vh] overflow-scroll sideBarNone">
+          {!loading ? (
+            products.length > 0 ? (
+              products.map((data, index) => (
                 <div
-                  className={`hover:cursor-pointer ${theme?"text-green-600 hover:text-green-700":"text-green-400 hover:text-green-700"} `}
-                  onClick={() => {
-                    handleProductView(product);
-                  }}
+                  key={index}
+                  className=" grid grid-cols-[2fr_5fr_3fr_1fr_4fr_3fr_6fr_3fr_2fr_3fr_2fr_3fr_2fr_2fr] items-center  text-sm border-b py-4 border-gray-300 border-dotted"
                 >
-                  <Visibility fontSize="small" />
+                  <div
+                    className={`text-center font-medium ${theme ? "text-zinc-800" : "text-white"}`}
+                  >
+                    {data.image}
+                  </div>
+                  <div
+                    className={`text-center font-medium ${theme ? "text-zinc-800" : "text-white"}`}
+                  >
+                    {data.productName}
+                  </div>
+                  <div
+                    className={`text-center font-medium ${theme ? "text-zinc-800" : "text-white"}`}
+                  >
+                    {data.code}
+                  </div>
+                  <div
+                    className={`text-center font-medium ${theme ? "text-zinc-800" : "text-white"}`}
+                  >
+                    {data.mrp}
+                  </div>
+                  <div
+                    className={`text-center font-medium ${theme ? "text-zinc-800" : "text-white"}`}
+                  >
+                    {data.category_name}
+                  </div>
+                  <div
+                    className={`text-center font-medium ${theme ? "text-zinc-800" : "text-white"}`}
+                  >
+                    {data.subcategory_name}
+                  </div>
+                  <div
+                    className={`text-center font-medium ${theme ? "text-zinc-800" : "text-white"}`}
+                  >
+                    {data.productDescription}
+                  </div>
+                  <div
+                    className={`text-center font-medium ${theme ? "text-zinc-800" : "text-white"}`}
+                  >
+                    {formatDate(data.m_date.split(" ")[0])}
+                  </div>
+                  <div
+                    className={`text-center font-medium ${theme ? "text-zinc-800" : "text-white"}`}
+                  >
+                    {data.quantity}
+                  </div>
+                  <div
+                    className={`text-center font-medium ${theme ? "text-zinc-800" : "text-white"}`}
+                  >
+                    {formatDate(data.e_date.split(" ")[0])}
+                  </div>
+
+                  <div
+                    className={`text-center font-medium ${theme ? "text-zinc-800" : "text-white"}`}
+                  >
+                    {data.price}
+                  </div>
+                  <div
+                    className={`text-center font-medium ${theme ? "text-zinc-800" : "text-white"}`}
+                  >
+                    {data.quantity > 5 ? (
+                      <div
+                        className={`border ${
+                          theme
+                            ? " border-green-600 text-green-600"
+                            : "border-green-400 text-green-400"
+                        } mx-auto text-xs  px-2 py-1 rounded-full w-fit`}
+                      >
+                        In Stock
+                      </div>
+                    ) : data.quantity > 0 ? (
+                      <div
+                        className={`border ${
+                          theme
+                            ? " border-yellow-500 text-yellow-500"
+                            : " border-yellow-500 text-yellow-500"
+                        } mx-auto text-xs  px-2 py-1 rounded-full w-fit`}
+                      >
+                        Few Left
+                      </div>
+                    ) : (
+                      <div
+                        className={`border ${
+                          theme ? " border-red-600 text-red-600" : " border-red-500 text-red-500"
+                        } mx-auto text-xs  px-2 py-1 rounded-full w-fit`}
+                      >
+                        Sold Out
+                      </div>
+                    )}
+                  </div>
+                  <div className=" flex items-center justify-center">
+                    <Switch
+                      checked={data.visible}
+                      onChange={() => {
+                        handleVisibilityChange(data.id);
+                      }}
+                      sx={
+                        theme
+                          ? {
+                              "--Switch-trackRadius": "13px",
+                              "--Switch-trackWidth": "40px",
+                              "--Switch-trackHeight": "19px",
+                              "--Switch-thumbSize": "10px",
+                              "&.Mui-checked": {
+                                "--Switch-trackBackground": "#16a34a",
+                              },
+                              "&.Mui-checked:hover": {
+                                "--Switch-trackBackground": "#166534", // Hover effect when checked
+                              },
+                            }
+                          : {
+                              "--Switch-trackRadius": "13px",
+                              "--Switch-trackWidth": "40px",
+                              "--Switch-trackHeight": "19px",
+                              "--Switch-thumbSize": "10px",
+                              "&.Mui-checked": {
+                                "--Switch-trackBackground": "#4ade80",
+                              },
+                              "&.Mui-checked:hover": {
+                                "--Switch-trackBackground": "#388E3C", // Hover effect when checked
+                              },
+                            }
+                      }
+                    />
+                  </div>
+                  <div
+                    className={`text-center flex items-center justify-center gap-3 font-medium 
+                    ${theme ? "text-black" : "text-white"}`}
+                  >
+                    <div
+                      className={`hover:cursor-pointer ${
+                        theme
+                          ? "text-green-600 hover:text-green-700"
+                          : "text-green-400 hover:text-green-700"
+                      } `}
+                      onClick={() => {
+                        handleProductView(product);
+                      }}
+                    >
+                      <Visibility fontSize="small" />
+                    </div>
+                    <button
+                      className={`${
+                        theme
+                          ? "text-green-600 hover:text-green-700"
+                          : "text-green-400 hover:text-green-700"
+                      }`}
+                      onClick={() => {
+                        handleEdit(data);
+                      }}
+                    >
+                      <Edit fontSize="small" />
+                    </button>
+                  </div>
                 </div>
-                <div
-                  className={`inline ml-2 hover:cursor-pointer ${theme?"text-gray-600 hover:text-gray-700":"text-gray-500 hover:text-gray-600"} `}
-                  onClick={() => {
-                    handleProductEdit(product);
-                  }}
-                >
-                  <Edit fontSize="small" />
-                </div>
-                <div
-                  className="inline ml-2 text-red-500 hover:cursor-pointer hover:text-red-600"
-                  onClick={() => {
-                    handleDelete(product);
-                  }}
-                >
-                  <Delete fontSize="small" />
-                </div>
+              ))
+            ) : (
+              <div className=" w-full h-[48vh] flex justify-center items-center text-2xl font-semibold">
+                {" "}
+                No Product In Your Inventory, Add Some
               </div>
-            </TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
+            )
+          ) : (
+            Array.from({ length: limit }).map((_, index) => (
+              <div key={index} className="border-b h-14 border-gray-300 border-dotted w-full"></div>
+            ))
+          )}
+        </div>
+        <BottomPagination
+          page={page}
+          setPage={setPage}
+          limit={limit}
+          setLimit={setLimit}
+          totalDetails={totalDetails}
+          loading={loading}
+          textSize="base"
+        />
+      </div>
+
       <ViewModalComponent
         isOpen={openViewProduct}
         onClose={() => setViewProduct(false)}
         data={productDetails}
-        handleEdit={handleViewEdit}
       />
       <EditModalComponent
         isOpen={openUpdateProduct}
         onClose={() => setOpenUpdateProduct(false)}
         data={editProductDetails}
-        products={products}
-        setProducts={setProducts}
-      />
-      <DeleteModalComponent
-        isOpen={openDeleteModal}
-        onClose={() => setOpenDeleteModal(false)}
-        data={deleteProductDetails}
-        products={products}
-        setProducts={setProducts}
       />
     </>
   );
