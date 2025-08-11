@@ -1,14 +1,15 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useMode } from "../contexts/themeModeContext";
-import axios from "axios";
 import { notifyError } from "../utils/toast";
 import { IoArrowBackSharp } from "react-icons/io5";
+import ProductDetailsServices from "../services/ProductDetailsServices";
 
-function ProductDetailsPage() {
+function ProductDetails(setSelectedProduct) {
   const { id } = useParams();
   const navigate = useNavigate();
   const { theme } = useMode();
+
 
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -17,16 +18,46 @@ function ProductDetailsPage() {
     const fetchProduct = async () => {
       try {
         setLoading(true);
-        const res = await axios.get(`/category/getMetadata/${id}`);
-        setProduct(res.data);
+        const result = await ProductDetailsServices.FetchMetadataById(setSelectedProduct.id);
+
+        if (result.success) {
+          const data = result.data;
+
+          const transformed = {
+            id: data.id,
+            hsn_code: data.hsn_code,
+            name: data.name,
+            description: data.description,
+            image: data.image,
+            category_id: data.category_id,
+            subcategory_id: data.subcategory_id,
+            mrp: data.mrp,
+            category_name: data.category_name,
+            subcategory_name: data.subcategory_name,
+            created_at: data.created_at,
+            updated_at: data.updated_at,
+            total_stars: data.total_stars,
+            total_reviews: data.total_reviews,
+          };
+
+          setProduct(transformed);
+        } else {
+          notifyError(result.message || "Failed to fetch product details");
+        }
       } catch (err) {
-        notifyError(err?.response?.data?.message || err.message);
+        if (err === "cookie error") {
+          notifyError("Cookie error, please relogin and try again");
+          navigate("/login");
+        } else {
+          notifyError(err?.response?.data?.message || err.message);
+        }
       } finally {
         setLoading(false);
       }
     };
+
     fetchProduct();
-  }, [id]);
+  }, [id, navigate]);
 
   return (
     <div
@@ -34,7 +65,6 @@ function ProductDetailsPage() {
         theme ? "bg-zinc-100 text-black" : "bg-neutral-950 text-white"
       }`}
     >
-    
       <div className="flex justify-between items-center mb-5">
         <div className="flex items-center gap-3">
           <IoArrowBackSharp
@@ -69,7 +99,6 @@ function ProductDetailsPage() {
         </div>
       </div>
 
-      
       <div
         className={`rounded-lg p-5 ${
           theme ? "bg-white text-black" : "bg-zinc-800 text-white"
@@ -81,27 +110,29 @@ function ProductDetailsPage() {
           <div>No product found</div>
         ) : (
           <div className="flex gap-8">
-           
-<div className="w-1/3">
-  <div className="mb-4">
-    <p className="font-semibold mb-2">Image</p>
-    {product.image ? (
-      <img
-        src={product.image}
-        alt="Product"
-        className="w-full rounded-md border"
-      />
-    ) : (
-      <div className="w-full h-48 flex items-center justify-center border rounded-md text-gray-400">
-        No Image Available
-      </div>
-    )}
-  </div>
-    <div>
-    <p className="font-semibold mb-1">Description</p>
-   </div>
-</div>
+            
+            <div className="w-1/3">
+              <div className="mb-4">
+                <p className="font-semibold mb-2">Image</p>
+                {product.image ? (
+                  <img
+                    src={product.image}
+                    alt="Product"
+                    className="w-full rounded-md border"
+                  />
+                ) : (
+                  <div className="w-full h-48 flex items-center justify-center border rounded-md text-gray-400">
+                    No Image Available
+                  </div>
+                )}
+              </div>
+              <div>
+                <p className="font-semibold mb-1">Description</p>
+                <p>{product.description || "No description available"}</p>
+              </div>
+            </div>
 
+            
             <div className="w-2/3">
               <table className="w-full text-left border-collapse">
                 <tbody>
@@ -155,4 +186,5 @@ function ProductDetailsPage() {
   );
 }
 
-export default ProductDetailsPage;
+export default ProductDetails;
+ 
