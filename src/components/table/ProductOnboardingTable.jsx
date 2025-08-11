@@ -4,6 +4,8 @@ import { Edit, Delete } from "@mui/icons-material";
 import EditMetaData from "../modal/EditMetaData";
 import DeleteMetaData from "../modal/DeleteMetaData";
 import BottomPagination from "../pagination/BottomPagination";
+import { useNavigate } from "react-router-dom";
+import ProductDetails from "../../pages/ProductDetails";
 
 function ProductOnboardingTable({
   onboardingData,
@@ -16,11 +18,19 @@ function ProductOnboardingTable({
   loading,
   setReload,
 }) {
+  const navigate = useNavigate();
   const { theme } = useMode();
   const [editModal, setEditModal] = useState(false);
   const [currentProduct, setCurrentProduct] = useState({});
   const [deleteProduct, setDeleteProduct] = useState(-1);
   const [deleteModal, setDeleteModal] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState("");
+
+  const handleProduct = (data) => {
+    console.log(data)
+    setSelectedProduct(data);
+    navigate(`/product-details/${data.id}`);
+  }
 
   const handleDelete = (id) => {
     setDeleteProduct(id);
@@ -32,9 +42,8 @@ function ProductOnboardingTable({
   };
   return (
     <div
-      className={`mt-10 p-2 rounded-lg w-full  sideBarNone ${theme ? "bg-white" : "bg-zinc-800"} ${
-        loading && "animate-pulse"
-      }`}
+      className={`mt-10 p-2 rounded-lg w-full  sideBarNone ${theme ? "bg-white" : "bg-zinc-800"} ${loading && "animate-pulse"
+        }`}
     >
       <div className="w-full">
         <div className="grid grid-cols-8 border-b py-4 text-sm border-gray-300 border-dotted">
@@ -85,8 +94,12 @@ function ProductOnboardingTable({
               onboardingData.map((data, index) => (
                 <div
                   key={index}
-                  className=" grid grid-cols-8 items-center  text-sm border-b py-4 border-gray-300 border-dotted"
+                  onClick={()=>{
+                    handleProduct(data)
+                  }}
+                  className="grid grid-cols-8 items-center text-sm border-b py-4 border-gray-300 border-dotted cursor-pointer hover:bg-zinc-100"
                 >
+
                   <div
                     className={`text-center font-medium ${theme ? "text-zinc-800" : "text-white"}`}
                   >
@@ -128,21 +141,23 @@ function ProductOnboardingTable({
                     ${theme ? "text-black" : "text-white"}`}
                   >
                     <button
-                      className={`${
-                        theme
+                      className={`cursor-pointer ${theme
                           ? "text-green-600 hover:text-green-700"
                           : "text-green-400 hover:text-green-700"
-                      }`}
-                      onClick={() => {
+                        }`}
+                      onClick={(e) => {
+                        e.stopPropagation()
                         handleEdit(data);
                       }}
                     >
                       <Edit />
                     </button>
                     <button
-                      className={` hover:text-red-600 ${theme ? "text-red-500" : "text-red-500"}`}
-                      onClick={() => {
+                      className={` hover:text-red-600 cursor-pointer ${theme ? "text-red-500" : "text-red-500"}`}
+                      onClick={(e) => {
+                        e.stopPropagation()
                         handleDelete(data.id);
+      
                       }}
                     >
                       <Delete />

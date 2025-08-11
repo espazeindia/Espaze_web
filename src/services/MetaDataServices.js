@@ -69,6 +69,20 @@ const MetaDataServices = {
       throw new Error("cookie error");
     }
   },
+
+  //fetchProductDetails
+  FetchMetadataById: async (id) => {
+    const token = getValidCookie();
+
+    if (token !== "Cookie not found" && token !== "cookie error") {
+      return requests.get(`/metadata/getMetadata/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+    } else {
+      throw new Error("cookie error");
+    }
+  },
+
 };
 
 
