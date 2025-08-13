@@ -100,8 +100,6 @@ function Login() {
                       }`}>
                         Seller
                       </h3>
-<<<<<<< HEAD
-=======
                       {/* <p className={`text-xs ${
                         user === "seller"
                           ? "text-violet-600"
@@ -111,7 +109,6 @@ function Login() {
                       }`}>
                         Access store
                       </p> */}
->>>>>>> 63786d2cce5d67685b86d7c002a640a321cea069
                     </div>
                   </div>
                   {user === "seller" && (
