@@ -35,8 +35,6 @@ function ProductDetails() {
             mrp: data.mrp,
             category_name: data.category_name,
             subcategory_name: data.subcategory_name,
-            created_at: data.created_at,
-            updated_at: data.updated_at,
             total_stars: data.total_stars,
             total_reviews: data.total_reviews,
           };
