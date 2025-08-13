@@ -27,9 +27,8 @@ function ProductOnboardingTable({
   const [selectedProduct, setSelectedProduct] = useState("");
 
   const handleProduct = (data) => {
-    console.log(data)
     setSelectedProduct(data);
-    navigate(`/product-details/${data.id}`);
+    navigate(`/product-details/metadata_${data.id}`);
   }
 
   const handleDelete = (id) => {

@@ -4,6 +4,7 @@ import { FaArrowLeft, FaEdit, FaTrash, FaStar, FaEye } from "react-icons/fa";
 import { notifyError, notifySuccess } from "../utils/toast";
 import { useMode } from "../contexts/themeModeContext";
 import MetaDataServices from "../services/MetaDataServices";
+import InventoryServices from "../services/InventoryServices";
 
 function ProductDetails() {
   const { id } = useParams();
@@ -13,57 +14,105 @@ function ProductDetails() {
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState(false);
 
-  useEffect(() => {
-    const fetchProduct = async () => {
-      try {
-        setLoading(true);
-        const result = await MetaDataServices.FetchMetadataById(
-          id
-        );
+  const fetchProduct = async (id) => {
+    try {
+      setLoading(true);
+      const result = await MetaDataServices.FetchMetadataById(id);
 
-        if (result.success) {
-          const data = result.data;
-          
-          const body = {
-            id: data.id,
-            hsn_code: data.hsn_code,
-            name: data.name,
-            description: data.description,
-            image: data.image,
-            category_id: data.category_id,
-            subcategory_id: data.subcategory_id,
-            mrp: data.mrp,
-            category_name: data.category_name,
-            subcategory_name: data.subcategory_name,
-            created_at: data.created_at,
-            updated_at: data.updated_at,
-            total_stars: data.total_stars,
-            total_reviews: data.total_reviews,
-          };
+      if (result.success) {
+        const data = result.data;
 
-          setProduct(body);
-        } else {
-          notifyError(result.message || "Failed to fetch product details");
-        }
-      } catch (err) {
-        if (err === "cookie error") {
-          notifyError("Cookie error, please relogin and try again");
-          navigate("/login");
-        } else {
-          notifyError(err?.response?.data?.message || err.message);
-        }
-      } finally {
-        setLoading(false);
+        const body = {
+          id: data.id,
+          hsn_code: data.hsn_code,
+          name: data.name,
+          description: data.description,
+          image: data.image,
+          category_id: data.category_id,
+          subcategory_id: data.subcategory_id,
+          mrp: data.mrp,
+          category_name: data.category_name,
+          subcategory_name: data.subcategory_name,
+          created_at: data.created_at,
+          updated_at: data.updated_at,
+          total_stars: data.total_stars,
+          total_reviews: data.total_reviews,
+        };
+
+        setProduct(body);
+      } else {
+        notifyError(result.message || "Failed to fetch product details");
       }
-    };
-    fetchProduct();
+    } catch (err) {
+      if (err === "cookie error") {
+        notifyError("Cookie error, please relogin and try again");
+        navigate("/login");
+      } else {
+        notifyError(err?.response?.data?.message || err.message);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchInventory = async (id) => {
+    try {
+      setLoading(true);
+      const result = await InventoryServices.FetchInventoryById(id);
+
+      if (result.success) {
+        const data = result.data;
+
+        const body = {
+          id: data.inventory_product_id,
+          hsn_code: data.metadata_hsn_code,
+          name: data.metadata_name,
+          description: data.metadata_description,
+          image: data.metadata_image,
+          category_id: data.metadata_category_id,
+          subcategory_id: data.metadata_subcategory_id,
+          mrp: data.metadata_subcategory_id,
+          category_name: data.metadata_category_name,
+          subcategory_name: data.metadata_subcategory_name,
+          created_at: data.created_at,
+          updated_at: data.updated_at,
+          total_stars: data.metadata_total_stars,
+          total_reviews: data.metadata_total_reviews,
+          visible:data.product_visibility,
+          quantity:data.product_quantity,
+          price:data.product_price,
+          e_date:data.product_expiry_date,
+          m_date:data.product_manufacturing_date
+        };
+
+        setProduct(body);
+      } else {
+        notifyError(result.message || "Failed to fetch product details");
+      }
+    } catch (err) {
+      if (err === "cookie error") {
+        notifyError("Cookie error, please relogin and try again");
+        navigate("/login");
+      } else {
+        notifyError(err?.response?.data?.message || err.message);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (id.includes("metadata_")) {
+      fetchProduct(id.split("metadata_")[1]);
+    }
+    if (id.includes("inventory_")) {
+      fetchInventory(id.split("inventory_")[1]);
+    }
   }, [id]);
 
   return (
     <div
-      className={`p-5 min-h-full ${
-        theme ? "bg-zinc-100 text-black" : "bg-neutral-950 text-white"
-      }`}
+      className={`p-5 min-h-full ${theme ? "bg-zinc-100 text-black" : "bg-neutral-950 text-white"}`}
     >
       <div className="flex justify-between items-center mb-5">
         <div className="flex items-center gap-3">
@@ -96,11 +145,7 @@ function ProductDetails() {
         </div>
       </div>
 
-      <div
-        className={`rounded-lg p-5 ${
-          theme ? "bg-white text-black" : "bg-zinc-800 text-white"
-        }`}
-      >
+      <div className={`rounded-lg p-5 ${theme ? "bg-white text-black" : "bg-zinc-800 text-white"}`}>
         {loading ? (
           <div>Loading...</div>
         ) : !product ? (
@@ -111,11 +156,7 @@ function ProductDetails() {
               <div className="mb-4">
                 <p className="font-semibold mb-2">Image</p>
                 {product.image ? (
-                  <img
-                    src={product.image}
-                    alt="Product"
-                    className="w-full rounded-md border"
-                  />
+                  <img src={product.image} alt="Product" className="w-full rounded-md border" />
                 ) : (
                   <div className="w-full h-48 flex items-center justify-center border rounded-md text-gray-400">
                     No Image Available

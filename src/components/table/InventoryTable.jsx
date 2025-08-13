@@ -5,6 +5,9 @@ import EditModalComponent from "../modal/UpdateInventory";
 import { useMode } from "../../contexts/themeModeContext";
 import BottomPagination from "../pagination/BottomPagination";
 import { Visibility, Edit } from "@mui/icons-material";
+import InventoryServices from "../../services/InventoryServices";
+import { notifyError, notifySuccess } from "../../utils/toast";
+import { useNavigate } from "react-router-dom";
 
 function InventoryTable({
   products,
@@ -18,26 +21,48 @@ function InventoryTable({
   setReload,
 }) {
   const { theme } = useMode();
-  const [openViewProduct, setViewProduct] = useState(false);
-  const [productDetails, setProductDetails] = useState({});
+  const navigate = useNavigate();
   const [openUpdateProduct, setOpenUpdateProduct] = useState(false);
   const [editProductDetails, setEditProductDetails] = useState({});
 
-  const handleProductView = (data) => {
-    setProductDetails(data);
-    setViewProduct(true);
+  const handleUpdateInventory = async (data) => {
+    try {
+      console.log(data);
+      const body = {
+        inventory_product_id: data.id,
+        product_visibility: data.visible ? false : true,
+        product_price: data.price,
+        product_manufacturing_date: data.m_date,
+        product_expiry_date: data.e_date,
+      };
+      const res = await InventoryServices.UpdateInventory(body);
+      if (res.success === true) {
+        setProducts((prevProducts) =>
+          prevProducts.map((product) =>
+            product.id === data.id
+              ? { ...product, visible: product.visible ? false : true }
+              : product
+          )
+        );
+        notifySuccess(res.message);
+      }
+    } catch (err) {
+      if (err === "cookie error") {
+        Cookies.remove("EspazeCookie");
+        router("/login");
+        notifyError("Cookie error, please relogin and try again");
+      } else {
+        notifyError(err?.response?.data?.message || err.message);
+      }
+    }
+  };
+
+  const handleProductView = (id) => {
+    navigate(`/product-details/inventory_${id}`);
   };
   const handleEdit = (data) => {
     setEditProductDetails(data);
     setOpenUpdateProduct(true);
-  };
-
-  const handleVisibilityChange = (id) => {
-    setProducts((prevProducts) =>
-      prevProducts.map((product) =>
-        product.id === id ? { ...product, visible: product.visible ? false : true } : product
-      )
-    );
   };
   const formatDate = (dateString) => {
     const months = [
@@ -143,6 +168,9 @@ function InventoryTable({
               products.map((data, index) => (
                 <div
                   key={index}
+                  onClick={() => {
+                    handleProductView(data.id);
+                  }}
                   className=" grid grid-cols-[2fr_5fr_3fr_1fr_4fr_3fr_6fr_3fr_2fr_3fr_2fr_3fr_2fr_2fr] items-center  text-sm border-b py-4 border-gray-300 border-dotted"
                 >
                   <div
@@ -234,11 +262,12 @@ function InventoryTable({
                       </div>
                     )}
                   </div>
-                  <div className=" flex items-center justify-center">
+                  <div className=" flex items-center justify-center" onClick={(e)=>{e.stopPropagation()}}>
                     <Switch
                       checked={data.visible}
-                      onChange={() => {
-                        handleVisibilityChange(data.id);
+                      onChange={(e) => {
+                        e.stopPropagation()
+                        handleUpdateInventory(data);
                       }}
                       sx={
                         theme
@@ -279,8 +308,9 @@ function InventoryTable({
                           ? "text-green-600 hover:text-green-700"
                           : "text-green-400 hover:text-green-700"
                       } `}
-                      onClick={() => {
-                        handleProductView(product);
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleProductView(data.id);
                       }}
                     >
                       <Visibility fontSize="small" />
@@ -291,7 +321,8 @@ function InventoryTable({
                           ? "text-green-600 hover:text-green-700"
                           : "text-green-400 hover:text-green-700"
                       }`}
-                      onClick={() => {
+                      onClick={(e) => {
+                        e.stopPropagation()
                         handleEdit(data);
                       }}
                     >
@@ -323,15 +354,11 @@ function InventoryTable({
         />
       </div>
 
-      <ViewModalComponent
-        isOpen={openViewProduct}
-        onClose={() => setViewProduct(false)}
-        data={productDetails}
-      />
       <EditModalComponent
         isOpen={openUpdateProduct}
         onClose={() => setOpenUpdateProduct(false)}
         data={editProductDetails}
+        setReload={setReload}
       />
     </>
   );

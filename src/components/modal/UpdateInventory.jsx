@@ -11,14 +11,16 @@ import {
 } from "@mui/joy";
 import { useMode } from "../../contexts/themeModeContext";
 import { LoaderCircle } from "lucide-react";
+import InventoryServices from "../../services/InventoryServices";
+import { notifyError, notifySuccess } from "../../utils/toast";
 
-function UpdateInventory({ isOpen, onClose, data, products, setProducts }) {
+function UpdateInventory({ isOpen, onClose, data, setReload }) {
   const { theme } = useMode();
   const [visible, setVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    price: "",
-    quantity: "",
+    price: 0,
+    quantity: 0,
     manufacturingDate: "",
     expiryDate: "",
   });
@@ -26,20 +28,24 @@ function UpdateInventory({ isOpen, onClose, data, products, setProducts }) {
   useEffect(() => {
     if (isOpen && data) {
       setFormData({
-        price: data?.price || 0,
-        quantity: data?.quantity || "",
-        manufacturingDate: data?.manufacturingDate?.split("T")[0] || "",
-        expiryDate: data?.expiryDate?.split("T")[0] || "",
+        price: data.price,
+        quantity: data.quantity,
+        manufacturingDate: data.m_date.split(" ")[0],
+        expiryDate: data.e_date.split(" ")[0],
       });
-      setVisible(data?.visible);
+      setVisible(data.visible);
     }
   }, [isOpen, data]);
+
+  useEffect(() => {
+    console.log(formData);
+  }, [formData]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
 
     // Ensure price cannot be negative
-    const updatedValue = name === "price" ? Math.max(0, value) : value;
+    const updatedValue = name === "price" || "quantity" ? Math.max(0, value) : value;
 
     setFormData((prevData) => ({
       ...prevData,
@@ -47,9 +53,32 @@ function UpdateInventory({ isOpen, onClose, data, products, setProducts }) {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    try {
+      const body = {
+        inventory_product_id: data.id,
+        product_visibility: visible,
+        product_price: formData.price,
+        product_manufacturing_date: formData.manufacturingDate,
+        product_expiry_date: formData.expiryDate,
+        product_quantity:formData.quantity
+      };
+      const res = await InventoryServices.UpdateInventory(body);
+      if (res.success === true) {
+        setReload((prevData) => !prevData);
+        notifySuccess(res.message);
+      }
+    } catch (err) {
+      if (err === "cookie error") {
+        Cookies.remove("EspazeCookie");
+        router("/login");
+        notifyError("Cookie error, please relogin and try again");
+      } else {
+        notifyError(err?.response?.data?.message || err.message);
+      }
+    }
 
     setLoading(false);
     onClose();

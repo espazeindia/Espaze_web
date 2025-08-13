@@ -5,6 +5,7 @@ import ViewModalComponent from "../modal/ViewProductModal";
 import { Visibility } from "@mui/icons-material";
 import { useMode } from "../../contexts/themeModeContext";
 import BottomPagination from "../pagination/BottomPagination";
+import { useNavigate } from "react-router-dom";
 
 function ProductTable({
   products,
@@ -19,13 +20,11 @@ function ProductTable({
   handleAddToInventory,
 }) {
   const { theme } = useMode();
-  const [openViewProduct, setViewProduct] = useState(false);
-  const [productDetails, setProductDetails] = useState({});
+  const navigate =useNavigate()
   const [checkedBox, setCheckedBox] = useState(false);
 
-  const handleProductView = (data) => {
-    setProductDetails(data);
-    setViewProduct(true);
+  const handleProductView = (id) => {
+    navigate(`/product-details/metadata_${id}`);
   };
 
   const handleMainCheckboxChange = (value) => {
@@ -48,6 +47,9 @@ function ProductTable({
       setCheckedIds((prevData) => [...prevData, id]);
     }
   };
+
+
+ 
 
   useEffect(() => {
     if (products.length === 0) {
@@ -151,9 +153,11 @@ function ProductTable({
             products.length > 0 ? (
               products.map((data, index) => (
                 <div
+                onClick={()=>{handleProductView(data.id)}}
                   key={index}
                   className=" grid grid-cols-[1fr_2fr_5fr_3fr_1fr_4fr_3fr_6fr_2fr] items-center  text-sm border-b py-4 border-gray-300 border-dotted"
                 >
+                  <div onClick={(e)=>{e.stopPropagation()}}>
                   <Checkbox
                     checked={checkedIds.includes(data.id)}
                     onChange={() => {
@@ -176,6 +180,7 @@ function ProductTable({
                           }
                     }
                   />
+                  </div>
                   <div
                     className={`text-center font-medium ${theme ? "text-zinc-800" : "text-white"}`}
                   >
@@ -222,8 +227,9 @@ function ProductTable({
                           ? "text-green-600 hover:text-green-700"
                           : "text-green-400 hover:text-green-700"
                       } `}
-                      onClick={() => {
-                        handleProductView(product);
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleProductView(data.id);
                       }}
                     >
                       <Visibility fontSize="small" />
@@ -234,7 +240,8 @@ function ProductTable({
                           ? "text-green-600 hover:text-green-700"
                           : "text-green-400 hover:text-green-700"
                       } `}
-                      onClick={() => {
+                      onClick={(e) => {
+                        e.stopPropagation()
                         handleAddToInventory([data.id])
                       }}
                     >
@@ -266,11 +273,6 @@ function ProductTable({
         />
       </div>
 
-      <ViewModalComponent
-        isOpen={openViewProduct}
-        onClose={() => setViewProduct(false)}
-        data={productDetails}
-      />
     </>
   );
 }
