@@ -64,7 +64,7 @@ const MetaDataServices = {
     const token = getValidCookie();
 
     if (token !== "Cookie not found" && token !== "cookie error") {
-      return requests.get(`/category/getMetadata/${id}`, {
+      return requests.get(`/metadata/getMetadata/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
     } else {
