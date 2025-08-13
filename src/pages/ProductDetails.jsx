@@ -19,25 +19,23 @@ function ProductDetails() {
       setLoading(true);
       const result = await MetaDataServices.FetchMetadataById(id);
 
-      if (result.success) {
-        const data = result.data;
-
-        const body = {
-          id: data.id,
-          hsn_code: data.hsn_code,
-          name: data.name,
-          description: data.description,
-          image: data.image,
-          category_id: data.category_id,
-          subcategory_id: data.subcategory_id,
-          mrp: data.mrp,
-          category_name: data.category_name,
-          subcategory_name: data.subcategory_name,
-          created_at: data.created_at,
-          updated_at: data.updated_at,
-          total_stars: data.total_stars,
-          total_reviews: data.total_reviews,
-        };
+        if (result.success) {
+          const data = result.data;
+          
+          const body = {
+            id: data.id,
+            hsn_code: data.hsn_code,
+            name: data.name,
+            description: data.description,
+            image: data.image,
+            category_id: data.category_id,
+            subcategory_id: data.subcategory_id,
+            mrp: data.mrp,
+            category_name: data.category_name,
+            subcategory_name: data.subcategory_name,
+            total_stars: data.total_stars,
+            total_reviews: data.total_reviews,
+          };
 
         setProduct(body);
       } else {
