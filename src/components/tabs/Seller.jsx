@@ -24,7 +24,7 @@ function Seller() {
       notifyError("Please enter a valid phone number");
       return;
     }
-    
+
     setIsOtpLoading(true);
     try {
       const res = await LoginServices.GetOtp({ phonenumber: phone });
@@ -143,18 +143,14 @@ function Seller() {
       {/* Login method selector - Segmented buttons */}
       <div className="space-y-3">
         <div className="text-center">
-          <h3 className={`text-base font-semibold mb-1 ${
-            theme ? "text-gray-800" : "text-white"
-          }`}>
+          <h3 className={`text-base font-semibold mb-1 ${theme ? "text-gray-800" : "text-white"}`}>
             Choose Login Method
           </h3>
-          <p className={`text-xs ${
-            theme ? "text-gray-600" : "text-gray-300"
-          }`}>
+          <p className={`text-xs ${theme ? "text-gray-600" : "text-gray-300"}`}>
             Select how you'd like to authenticate
           </p>
         </div>
-        
+
         <div className="flex space-x-1 p-1 rounded-lg bg-gray-100 dark:bg-gray-800">
           <button
             className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2 ${
@@ -170,7 +166,7 @@ function Seller() {
             <Lock fontSize="small" />
             PIN
           </button>
-          
+
           <button
             className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2 ${
               loginVia === "otp"
@@ -194,15 +190,17 @@ function Seller() {
       >
         {/* Phone number input */}
         <div className="space-y-1.5">
-          <label className={`text-sm font-semibold flex items-center gap-2 ${
-            theme ? "text-gray-700" : "text-gray-200"
-          }`}>
+          <label
+            className={`text-sm font-semibold flex items-center gap-2 ${
+              theme ? "text-gray-700" : "text-gray-200"
+            }`}
+          >
             <Phone fontSize="small" />
             Phone Number
           </label>
-          <div className={`relative ${
-            loginVia === "otp" ? "grid grid-cols-[1fr,auto] gap-3" : ""
-          }`}>
+          <div
+            className={`relative ${loginVia === "otp" ? "grid grid-cols-[1fr,auto] gap-3" : ""}`}
+          >
             <Input
               name="phone"
               value={phone}
@@ -212,8 +210,8 @@ function Seller() {
               size="lg"
               placeholder="Enter your phone number"
               className={`transition-all duration-300 ${
-                theme 
-                  ? "bg-white border-gray-200 focus:border-violet-500 focus:ring-violet-500/20" 
+                theme
+                  ? "bg-white border-gray-200 focus:border-violet-500 focus:ring-violet-500/20"
                   : "bg-gray-800 border-gray-600 focus:border-violet-400 focus:ring-violet-400/20"
               }`}
             />
@@ -241,13 +239,15 @@ function Seller() {
 
         {/* PIN/OTP input */}
         <div className="space-y-2">
-          <label className={`text-sm font-semibold flex items-center gap-2 ${
-            theme ? "text-gray-700" : "text-gray-200"
-          }`}>
+          <label
+            className={`text-sm font-semibold flex items-center gap-2 ${
+              theme ? "text-gray-700" : "text-gray-200"
+            }`}
+          >
             {loginVia === "pin" ? <Lock fontSize="small" /> : <Key fontSize="small" />}
             {loginVia === "pin" ? "Security PIN" : "OTP Code"}
           </label>
-          
+
           <div className="flex justify-between gap-2">
             {(loginVia === "pin" ? pin : otp).map((digit, index) => (
               <input
@@ -255,15 +255,13 @@ function Seller() {
                 ref={(loginVia === "pin" ? pinRefs : otpRefs)[index]}
                 maxLength="1"
                 value={digit}
-                onChange={(e) => 
-                  loginVia === "pin" 
+                onChange={(e) =>
+                  loginVia === "pin"
                     ? handlePinChange(index, e.target.value)
                     : handleOtpChange(index, e.target.value)
                 }
-                onKeyDown={(e) => 
-                  loginVia === "pin" 
-                    ? handlePinKeyDown(e, index)
-                    : handleOtpKeyDown(e, index)
+                onKeyDown={(e) =>
+                  loginVia === "pin" ? handlePinKeyDown(e, index) : handleOtpKeyDown(e, index)
                 }
                 className={`w-11 h-11 text-center border-2 rounded-lg text-lg font-semibold transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
                   theme
@@ -271,11 +269,11 @@ function Seller() {
                     : "bg-gray-800 border-gray-600 focus:border-violet-400 focus:ring-violet-400/20 text-white"
                 } ${digit ? "border-violet-500 bg-violet-50 dark:bg-violet-900/20" : ""}`}
                 inputMode="numeric"
-                type="text"
+                type={loginVia === "pin" ? "password" : "text"}
               />
             ))}
           </div>
-          
+
           {showOtpError && (
             <p className="text-red-500 text-center text-sm animate-pulse">
               Please enter all 6 digits
@@ -309,7 +307,9 @@ function Seller() {
             <button
               type="button"
               className={`text-sm font-medium transition-colors hover:underline ${
-                theme ? "text-violet-600 hover:text-violet-700" : "text-violet-400 hover:text-violet-300"
+                theme
+                  ? "text-violet-600 hover:text-violet-700"
+                  : "text-violet-400 hover:text-violet-300"
               }`}
             >
               {loginVia === "pin" ? "Forgot PIN?" : "Resend OTP"}

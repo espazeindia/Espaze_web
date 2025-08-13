@@ -15,7 +15,6 @@ const Layout = lazy(() => import("./components/layout/Layout"));
 const Page404 = lazy(() => import("./pages/Page404"));
 
 function App() {
-  const [filteredRoutes, setFilteredRoutes] = useState([]);
 
   function PublicRoute({ children }) {
     const [isAuthenticated, setIsAuthenticated] = useState(null);
@@ -26,6 +25,7 @@ function App() {
         if (cookie) {
           try {
             const isValid = await validate(cookie);
+            console.log(isValid)
             if (isValid && isValid.role) {
               setIsAuthenticated(true);
             } else {
@@ -63,6 +63,7 @@ function App() {
         if (cookie) {
           try {
             const isValid = await validate(cookie);
+            console.log(isValid)
             setIsAuthenticated(isValid && isValid.role ? true : false);
           } catch (error) {
             console.error("Token validation error:", error);

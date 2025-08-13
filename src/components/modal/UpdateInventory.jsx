@@ -7,23 +7,20 @@ import {
   Modal,
   ModalClose,
   ModalDialog,
-  Option,
-  Select,
-  Textarea,
+  Switch,
 } from "@mui/joy";
 import { useMode } from "../../contexts/themeModeContext";
+import { LoaderCircle } from "lucide-react";
+import InventoryServices from "../../services/InventoryServices";
+import { notifyError, notifySuccess } from "../../utils/toast";
 
-function UpdateInventory({ isOpen, onClose, data, products, setProducts }) {
+function UpdateInventory({ isOpen, onClose, data, setReload }) {
   const { theme } = useMode();
+  const [visible, setVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    productName: "",
-    productDescription: "",
-    category: "",
-    subCategory: "",
-    mrp : "",
-    code: "",
-    price: "",
-    quantity: "",
+    price: 0,
+    quantity: 0,
     manufacturingDate: "",
     expiryDate: "",
   });
@@ -31,36 +28,24 @@ function UpdateInventory({ isOpen, onClose, data, products, setProducts }) {
   useEffect(() => {
     if (isOpen && data) {
       setFormData({
-        productName: data?.name || "",
-        productDescription: data?.description || "",
-        category: data?.category_id?.name || "",
-        subCategory: data?.subCategory_id?.name || "",
-        mrp : data?.mrp ||0,
-        code: data?.code || "",
-        price: data?.price || 0,
-        quantity: data?.quantity || "",
-        manufacturingDate: data?.manufacturingDate?.split("T")[0] || "",
-        expiryDate: data?.expiryDate?.split("T")[0] || "",
+        price: data.price,
+        quantity: data.quantity,
+        manufacturingDate: data.m_date.split(" ")[0],
+        expiryDate: data.e_date.split(" ")[0],
       });
+      setVisible(data.visible);
     }
   }, [isOpen, data]);
 
-  const categories = {
-    "fruits-vegetables": ["Fruits", "Vegetables", "Organic Produce"],
-    clothes: ["Men", "Women", "Kids", "Accessories"],
-    electronics: ["Mobiles", "Laptops", "TVs", "Cameras"],
-    "home-appliances": ["Kitchen Appliances", "Furniture", "Decor"],
-    "beauty-personal-care": ["Skincare", "Haircare", "Makeup"],
-    "toys-games": ["Board Games", "Outdoor Toys", "Video Games"],
-    "books-stationery": ["Fiction", "Non-fiction", "Office Supplies"],
-    grocery: ["Dairy", "Snacks", "Beverages"],
-  };
+  useEffect(() => {
+    console.log(formData);
+  }, [formData]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
 
     // Ensure price cannot be negative
-    const updatedValue = name === "price" ? Math.max(0, value) : value;
+    const updatedValue = name === "price" || "quantity" ? Math.max(0, value) : value;
 
     setFormData((prevData) => ({
       ...prevData,
@@ -68,43 +53,34 @@ function UpdateInventory({ isOpen, onClose, data, products, setProducts }) {
     }));
   };
 
-  const handleCategoryChange = (value) => {
-    setFormData((prevData) => ({
-      ...prevData,
-      category: value,
-      subCategory: "", // Reset subCategory when category changes
-    }));
-  };
-
-  const handleSubCategoryChange = (value) => {
-    setFormData((prevData) => ({
-      ...prevData,
-      subCategory: value,
-    }));
-  };
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const updatedProducts = products.map((product) => {
-      if (product.id === data.id) {
-        return {
-          ...product,
-          name: formData.productName,
-          description: formData.productDescription,
-          category_id: { name: formData.category },
-          subCategory_id: { name: formData.subCategory },
-          code: formData.code,
-          price: formData.price,
-          quantity: formData.quantity,
-          manufacturingDate: formData.manufacturingDate,
-          expiryDate: formData.expiryDate,
-        };
+    setLoading(true);
+    try {
+      const body = {
+        inventory_product_id: data.id,
+        product_visibility: visible,
+        product_price: formData.price,
+        product_manufacturing_date: formData.manufacturingDate,
+        product_expiry_date: formData.expiryDate,
+        product_quantity:formData.quantity
+      };
+      const res = await InventoryServices.UpdateInventory(body);
+      if (res.success === true) {
+        setReload((prevData) => !prevData);
+        notifySuccess(res.message);
       }
+    } catch (err) {
+      if (err === "cookie error") {
+        Cookies.remove("EspazeCookie");
+        router("/login");
+        notifyError("Cookie error, please relogin and try again");
+      } else {
+        notifyError(err?.response?.data?.message || err.message);
+      }
+    }
 
-      return product;
-    });
-
-    setProducts(updatedProducts);
+    setLoading(false);
     onClose();
   };
 
@@ -125,168 +101,6 @@ function UpdateInventory({ isOpen, onClose, data, products, setProducts }) {
         <DialogContent className=" w-[70vw] overflow-scroll sideBarNone">
           <form onSubmit={handleSubmit}>
             <div className="grid grid-cols-2 gap-3">
-              {/* Product Name */}
-              <FormControl size="lg" className="space-y-1 cursor-not-allowed">
-                <label className={theme ? "text-zinc-800" : "text-zinc-300"}>Product Name</label>
-                <Input
-                  sx={
-                    theme
-                      ? { backgroundColor: "#f4f4f5", color: "#27272a", border: "none" }
-                      : {
-                          backgroundColor: "#27272a",
-                          color: "#ffffff",
-                          border: "none",
-                        }
-                  }
-                  name="productName"
-                  value={formData.productName}
-                  disabled = {true}
-                  onChange={handleChange}
-                  required
-                  size="lg"
-                  placeholder="Enter Product Name"
-                />
-              </FormControl>
-
-              {/* Product Description */}
-              <FormControl size="lg" className="row-span-2 cursor-not-allowed">
-                <label className={theme ? "text-zinc-800" : "text-zinc-300"}>
-                  Product Description
-                </label>
-                <Textarea
-                  sx={
-                    theme
-                      ? { backgroundColor: "#f4f4f5", color: "#27272a", border: "none" }
-                      : {
-                          backgroundColor: "#27272a",
-                          color: "#ffffff",
-                          border: "none",
-                        }
-                  }
-                  name="productDescription"
-                  value={formData.productDescription}
-                  disabled = {true}
-                  onChange={handleChange}
-                  required
-                  className="mt-1 p-2 h-full sideBarNone"
-                  maxRows={4}
-                  placeholder="Enter Product Description"
-                />
-              </FormControl>
-
-              {/* Category */}
-              <FormControl size="lg" className="space-y-1 cursor-not-allowed">
-                <label className={theme ? "text-zinc-800" : "text-zinc-300"}>Category</label>
-                <Select
-                  sx={
-                    theme
-                      ? { backgroundColor: "#f4f4f5", color: "#27272a", border: "none" }
-                      : {
-                          backgroundColor: "#27272a",
-                          color: "#ffffff",
-                          border: "none",
-                        }
-                  }
-                  placeholder="Select Category"
-                  onChange={(_, value) => handleCategoryChange(value)}
-                  disabled = {true}
-                  required
-                  value={formData.category}
-                  name="category"
-                  slotProps={{
-                    listbox: { sx: { maxHeight: 150, overflowY: "auto" } },
-                  }}
-                >
-                  {Object.keys(categories).map((category) => (
-                    <Option key={category} value={category}>
-                      {category.replace("-", " ").toUpperCase()}
-                    </Option>
-                  ))}
-                </Select>
-              </FormControl>
-
-              {/* Sub Category */}
-              <FormControl
-                size="lg"
-                className={`space-y-1 cursor-not-allowed`}
-              >
-                <label className={theme ? "text-zinc-800" : "text-zinc-300"}>Sub Category</label>
-                <Select
-                  sx={
-                    theme
-                      ? { backgroundColor: "#f4f4f5", color: "#27272a", border: "none" }
-                      : {
-                          backgroundColor: "#27272a",
-                          color: "#ffffff",
-                          border: "none",
-                        }
-                  }
-                  placeholder="Select Sub Category"
-                  onChange={(_, value) => handleSubCategoryChange(value)}
-                  disabled = {true}
-                  required
-                  value={formData.subCategory}
-                  name="subCategory"
-                  slotProps={{
-                    listbox: { sx: { maxHeight: 150, overflowY: "auto" } },
-                  }}
-                >
-                  {formData.category &&
-                    categories[formData.category]?.map((subCategory) => (
-                      <Option key={subCategory} value={subCategory}>
-                        {subCategory}
-                      </Option>
-                    ))}
-                </Select>
-              </FormControl>
-
-              {/* MRP */}
-              <FormControl size="lg" className="space-y-1 cursor-not-allowed">
-                <label className={theme ? "text-zinc-800" : "text-zinc-300"}>MRP</label>
-                <Input
-                  sx={
-                    theme
-                      ? { backgroundColor: "#f4f4f5", color: "#27272a", border: "none" }
-                      : {
-                          backgroundColor: "#27272a",
-                          color: "#ffffff",
-                          border: "none",
-                        }
-                  }
-                  name="mrp"
-                  type="number"
-                  disabled = {true}
-                  value={formData.mrp}
-                  onChange={handleChange}
-                  required
-                  size="lg"
-                  placeholder="Product MRP"
-                />
-              </FormControl>
-
-              {/* Product Code */}
-              <FormControl size="lg" className="space-y-1 cursor-not-allowed">
-                <label className={theme ? "text-zinc-800" : "text-zinc-300"}>Code</label>
-                <Input
-                  sx={
-                    theme
-                      ? { backgroundColor: "#f4f4f5", color: "#27272a", border: "none" }
-                      : {
-                          backgroundColor: "#27272a",
-                          color: "#ffffff",
-                          border: "none",
-                        }
-                  }
-                  name="code"
-                  value={formData.code}
-                  disabled = {true}
-                  onChange={handleChange}
-                  required
-                  size="lg"
-                  placeholder="Enter Product Code"
-                />
-              </FormControl>
-
               {/* Price */}
               <FormControl size="lg" className="space-y-1">
                 <label className={theme ? "text-zinc-800" : "text-zinc-300"}>Price</label>
@@ -378,18 +192,56 @@ function UpdateInventory({ isOpen, onClose, data, products, setProducts }) {
                   min={formData.manufacturingDate}
                 />
               </FormControl>
+              <div size="lg" className="flex gap-10 mt-2">
+                <label className={theme ? "text-zinc-800" : "text-zinc-300"}>Visibility</label>
+                <Switch
+                  checked={visible}
+                  onChange={(e) => {
+                    setVisible(e.target.checked);
+                  }}
+                  sx={
+                    theme
+                      ? {
+                          "--Switch-trackRadius": "13px",
+                          "--Switch-trackWidth": "40px",
+                          "--Switch-trackHeight": "19px",
+                          "--Switch-thumbSize": "10px",
+                          "&.Mui-checked": {
+                            "--Switch-trackBackground": "#16a34a",
+                          },
+                          "&.Mui-checked:hover": {
+                            "--Switch-trackBackground": "#166534", // Hover effect when checked
+                          },
+                        }
+                      : {
+                          "--Switch-trackRadius": "13px",
+                          "--Switch-trackWidth": "40px",
+                          "--Switch-trackHeight": "19px",
+                          "--Switch-thumbSize": "10px",
+                          "&.Mui-checked": {
+                            "--Switch-trackBackground": "#4ade80",
+                          },
+                          "&.Mui-checked:hover": {
+                            "--Switch-trackBackground": "#388E3C", // Hover effect when checked
+                          },
+                        }
+                  }
+                />
+              </div>
             </div>
 
             {/* Submit Button */}
             <div className="mt-4 flex justify-end">
               <button
                 type="submit"
-                className={` ${
-                  theme ? " border-purple-500 border-2 bg-purple-100 text-purple-500 hover:bg-purple-500 hover:text-white" : "bg-purple-500 text-white hover:bg-white hover:text-black "
+                className={`${
+                  theme
+                    ? " border-purple-500 border-2 bg-purple-100 text-purple-500 hover:bg-purple-500 hover:text-white"
+                    : "bg-purple-500 text-white hover:bg-white hover:text-black "
                 } 
                 px-6 py-2  transition-all duration-500  rounded-lg hover:cursor-pointer`}
               >
-                Update
+                {loading ? <LoaderCircle className=" animate-spin" /> : <>Update</>}
               </button>
             </div>
           </form>

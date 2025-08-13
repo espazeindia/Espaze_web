@@ -43,12 +43,13 @@ function ProductOnboarding() {
                 code: data.hsn_code,
                 mrp: data.mrp,
                 image: data.image,
-                id: data.product_id,
+                id: data.id,
                 category_name:data.category_name,
                 subcategory_name:data.subcategory_name
               };
             });
           }
+          console.log(transformedMetadata)
 
           setTotalDetails({ total: total, total_pages: total_pages });
           setOnboardingData(transformedMetadata);

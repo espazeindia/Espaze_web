@@ -7,6 +7,7 @@ const Products = lazy(() => import("../pages/Products"));
 const Customers = lazy(() => import("../pages/Customers"));
 const Orders = lazy(() => import("../pages/Orders"));
 const Inventory= lazy(() => import("../pages/Inventory"));
+const ProductDetails = lazy(() => import("../pages/ProductDetails"));
 
 
 const routes = [
@@ -15,6 +16,11 @@ const routes = [
     component: Dashboard,
     access : ["admin","seller"]
   },
+  {
+  path: "/product-details/:id",
+  component: ProductDetails,
+  access: ["operations","seller"]
+},
   {
     path: "/inventory",
     component : Inventory,
