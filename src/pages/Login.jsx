@@ -41,9 +41,9 @@ function Login() {
         >
           <div className="p-6">
             {/* Logo and header */}
-            <div className="text-center mb-6">
-              <div className="flex justify-center mb-4">
-                <div className={`p-3 rounded-xl ${
+            <div className="text-center mb-4">
+              <div className="flex justify-center mb-2">
+                <div className={`p-2 rounded-xl ${
                   theme ? "bg-violet-100" : "bg-purple-900/50"
                 }`}>
                   {theme ? (
@@ -100,7 +100,7 @@ function Login() {
                       }`}>
                         Seller
                       </h3>
-                      <p className={`text-xs ${
+                      {/* <p className={`text-xs ${
                         user === "seller"
                           ? "text-violet-600"
                           : theme
@@ -108,7 +108,7 @@ function Login() {
                           : "text-gray-400"
                       }`}>
                         Access store
-                      </p>
+                      </p> */}
                     </div>
                   </div>
                   {user === "seller" && (
@@ -146,7 +146,7 @@ function Login() {
                       }`}>
                         Operations
                       </h3>
-                      <p className={`text-xs ${
+                      {/* <p className={`text-xs ${
                         user === "operations"
                           ? "text-violet-600"
                           : theme
@@ -154,7 +154,7 @@ function Login() {
                           : "text-gray-400"
                       }`}>
                         Manage system
-                      </p>
+                      </p> */}
                     </div>
                   </div>
                   {user === "operations" && (
