@@ -172,7 +172,7 @@ function InventoryTable({
                     handleProductView(data.id);
                   }}
                   className=" grid grid-cols-[2fr_5fr_3fr_1fr_4fr_3fr_6fr_3fr_2fr_3fr_2fr_3fr_2fr_2fr] items-center  text-sm border-b py-4 border-gray-300 border-dotted"
-                >
+                > 
                   <div
                     className={`text-center font-medium ${theme ? "text-zinc-800" : "text-white"}`}
                   >
