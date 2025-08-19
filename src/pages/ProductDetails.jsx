@@ -22,21 +22,27 @@ function ProductDetails() {
   const [deleteProduct, setDeleteProduct] = useState(-1);
   const [onboardingData, setOnboardingData] = useState([]);
   const [reload, setReload] = useState(false);
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+  const role = localStorage.getItem("role"); 
+  setUser(role);
+}, []);
 
 
   const handleEdit = (data) => {
-  setCurrentProduct(data);
-  setEditModal(true);
-};
+    setCurrentProduct(data);
+    setEditModal(true);
+  };
 
-const handleDelete = (id) => {
-  setDeleteProduct(id);
-  setDeleteModal(true);
-};
+  const handleDelete = (id) => {
+    setDeleteProduct(id);
+    setDeleteModal(true);
+  };
 
 
 
- const fetchProduct = async (id) => {
+  const fetchProduct = async (id) => {
     try {
       setLoading(true);
       const result = await MetaDataServices.FetchMetadataById(id);
@@ -55,10 +61,11 @@ const handleDelete = (id) => {
           subcategory_name: data.subcategory_name,
           total_stars: data.total_stars,
           total_reviews: data.total_reviews,
-          created_at: data.created_at,        
-          updated_at: data.updated_at,        
-          m_date: data.manufacturing_date,    
-          e_date: data.expiry_date
+          created_at: data.created_at,
+          updated_at: data.updated_at,
+          m_date: data.manufacturing_date,
+          e_date: data.expiry_date,
+          quantity: data.quantity
         };
         setProduct(body);
       } else {
@@ -90,7 +97,7 @@ const handleDelete = (id) => {
           image: data.metadata_image,
           category_id: data.metadata_category_id,
           subcategory_id: data.metadata_subcategory_id,
-          mrp: data.metadata_subcategory_id,
+          mrp: data.metadata_mrp,
           category_name: data.metadata_category_name,
           subcategory_name: data.metadata_subcategory_name,
           created_at: data.created_at,
@@ -102,6 +109,7 @@ const handleDelete = (id) => {
           price: data.product_price,
           e_date: data.product_expiry_date,
           m_date: data.product_manufacturing_date,
+          quantity: data.quantity
         };
         setProduct(body);
       } else {
@@ -130,9 +138,8 @@ const handleDelete = (id) => {
 
   return (
     <div
-      className={`p-5 min-h-full ${
-        theme ? "bg-zinc-100 text-black" : "bg-neutral-950 text-white"
-      }`}
+      className={`p-5 min-h-full ${theme ? "bg-zinc-100 text-black" : "bg-neutral-950 text-white"
+        }`}
     >
       <div className="flex items-center mb-5">
         <FaArrowLeft
@@ -144,9 +151,8 @@ const handleDelete = (id) => {
       </div>
 
       <div
-        className={`rounded-lg p-5 ${
-          theme ? "bg-white text-black" : "bg-zinc-800 text-white"
-        }`}
+        className={`rounded-lg p-5 ${theme ? "bg-white text-black" : "bg-zinc-800 text-white"
+          }`}
       >
         {loading ? (
           <div>Loading...</div>
@@ -160,7 +166,8 @@ const handleDelete = (id) => {
                   <img
                     src={product.image}
                     alt={product.name}
-                    className="w-full h-48 object-cover rounded-md border"
+                    className="w-full h-64 object-cover rounded-lg border shadow-sm"
+
                   />
                 ) : (
                   <div className="w-full h-48 flex items-center justify-center border rounded-md text-gray-400">
@@ -170,7 +177,7 @@ const handleDelete = (id) => {
               </div>
 
               <div className="w-2/3">
-                <h2 className="text-2xl font-bold mb-1">{product.name}</h2>
+                <h2 className="text-2xl font-bold mb-2">{product.name}</h2>
                 <div className="flex items-center mb-2">
                   {[...Array(5)].map((_, i) => (
                     <svg
@@ -194,113 +201,108 @@ const handleDelete = (id) => {
                   </span>
                 </div>
 
-                <div className="flex flex-wrap gap-2 mb-3">
-                  {product.quantity && (
-                    <span className="px-2 py-1 bg-green-100 text-green-600 text-sm rounded">
-                      In Stock
-                    </span>
+                <div className="flex flex-wrap gap-80 mb-3 items-center">
+                 {user === "seller" && (
+                    <>
+                      {product.quantity && (
+                        <span className="px-3 py-1 bg-green-100 text-green-600 text-sm rounded-full">
+                          In Stock
+                        </span>
+                      )}
+                      {product.visible && (
+                        <span className="px-3 py-1 bg-green-100 text-green-600 text-sm rounded-full">
+                          Visible
+                        </span>
+                      )}
+                    </>
                   )}
-                  {product.visible && (
-                    <span className="px-2 py-1 bg-green-100 text-green-600 text-sm rounded">
-                      Visible
-                    </span>
-                  )}
-                  {product.price && (
-                    <span className="font-bold">₹{product.price}</span>
+                  {product.mrp && (
+                    <span className="text-lg font-semibold">₹{product.mrp}</span>
                   )}
                   {product.hsn_code && (
-                    <span className="text-gray-500">
-                      HSN Code {product.hsn_code}
-                    </span>
+                    <span className="text-mb font-semibold">Code {product.hsn_code}</span>
                   )}
                 </div>
-
                 {product.description && (
-                  <p className="text-sm text-gray-600">{product.description}</p>
+                  <p className="text-mb text-black">{product.description}</p>
                 )}
               </div>
             </div>
 
-<div className="mt-6 border rounded-lg p-4">
-  <h3 className="font-bold mb-3">More Details</h3>
-  <div className="grid grid-cols-2 gap-y-2 text-sm">
-    {product.id && (
-      <p><strong>ID:</strong> {product.id}</p>
-    )}
-    {product.category_name && (
-      <p><strong>Category:</strong> {product.category_name}</p>
-    )}
-    {product.subcategory_name && (
-      <p><strong>Sub Category:</strong> {product.subcategory_name}</p>
-    )}
-    {product.category_id && (
-      <p><strong>Category ID:</strong> {product.category_id}</p>
-    )}
-    {product.subcategory_id && (
-      <p><strong>Subcategory ID:</strong> {product.subcategory_id}</p>
-    )}
-    {product.mrp && (
-      <p><strong>MRP:</strong> ₹{product.mrp}</p>
-    )}
-    {product.price && (
-      <p><strong>Price:</strong> ₹{product.price}</p>
-    )}
-    {product.created_at && (
-      <p><strong>Created At:</strong> {new Date(product.created_at).toLocaleDateString()}</p>
-    )}
-    {product.updated_at && (
-      <p><strong>Updated At:</strong> {new Date(product.updated_at).toLocaleDateString()}</p>
-    )}
-    <p><strong>Total Stars:</strong> {product.total_stars || 0}</p>
-    <p><strong>Total Reviews:</strong> {product.total_reviews || 0}</p>
-    {product.m_date && (
-      <p><strong>Manufacturing Date:</strong> {product.m_date}</p>
-    )}
-    {product.e_date && (
-      <p><strong>Expiry Date:</strong> {product.e_date}</p>
-    )}
-    {product.quantity && (
-      <p><strong>Quantity:</strong> {product.quantity}</p>
-    )}
-  </div>
-</div>
+            <div className="mt-11 border border-gray-300 rounded-lg p-4 "> 
+              <h3 className="text-2xl font-semibold mb-6">More Details</h3>
+              <div className="grid grid-cols-2 gap-y-3 text-base leading-relaxed">
+             {product.category_name && (
+                  <p><strong>Category:</strong> {product.category_name}</p>
+                )}
 
-<div className="flex justify-center gap-6 mt-8">
-  <button
-    onClick={() => handleEdit(product)}
-    className="flex items-center space-x-2 px-10 py-3 text-lg rounded-md font-medium cursor-pointer 
+                {product.subcategory_name && (
+                  <p><strong>Sub Category:</strong> {product.subcategory_name}</p>
+                )}
+
+                {user === "seller" && (
+                  <>
+                    {product.m_date && (
+                      <p>
+                        <strong>Manufacturing Date:</strong>{" "}
+                        {new Date(product.m_date).toLocaleDateString("en-GB", {
+                          day: "2-digit",
+                          month: "short",
+                          year: "numeric",
+                        })}
+                      </p>
+                    )}
+                    {product.mrp && (
+                  <p><strong>Price:</strong> ₹{product.mrp}</p>
+                )}
+                    {product.e_date && (
+                      <p><strong>Expiry Date:</strong> {product.e_date}</p>
+                    )}
+
+                    {product.quantity && (
+                      <p><strong>Quantity:</strong> {product.quantity}</p>
+                    )}
+                  </>
+                )}
+              </div>
+            </div>
+
+            <div className="flex justify-center gap-6 mt-8">
+              <button
+                onClick={() => handleEdit(product)}
+                className="flex items-center space-x-2 px-10 py-3 text-lg rounded-md font-medium cursor-pointer 
     border border-green-600 text-green-600 hover:bg-green-600 hover:text-white transition-colors"
-  >
-    <FaEdit />
-    <span>Edit</span>
-  </button>
+              >
+                <FaEdit />
+                <span>Edit</span>
+              </button>
 
-  <button
-    onClick={() => handleDelete(product)}
-    disabled={deleting}
-    className="flex items-center space-x-2 px-10 py-3 text-lg rounded-md font-medium cursor-pointer
+              <button
+                onClick={() => handleDelete(product)}
+                disabled={deleting}
+                className="flex items-center space-x-2 px-10 py-3 text-lg rounded-md font-medium cursor-pointer
     border border-red-500 text-red-500 hover:bg-red-500 hover:text-white transition-colors"
-  >
-    <FaTrash />
-    <span>{deleting ? "Deleting..." : "Delete"}</span>
-  </button>
-</div>
+              >
+                <FaTrash />
+                <span>{deleting ? "Deleting..." : "Delete"}</span>
+              </button>
+            </div>
 
-<EditMetaData
-  isOpen={editModal}
-  onClose={() => setEditModal(false)}
-  currentProduct={currentProduct}
-  setOnboardingData={setOnboardingData}
-/>
+            <EditMetaData
+              isOpen={editModal}
+              onClose={() => setEditModal(false)}
+              currentProduct={currentProduct}
+              setOnboardingData={setOnboardingData}
+            />
 
-<DeleteMetaData
-  isOpen={deleteModal}
-  onClose={() => setDeleteModal(false)}
-  currentProduct={currentProduct}
-  setOnboardingData={setOnboardingData}
-  setReload={setReload}
-/>
-  </>
+            <DeleteMetaData
+              isOpen={deleteModal}
+              onClose={() => setDeleteModal(false)}
+              currentProduct={currentProduct}
+              setOnboardingData={setOnboardingData}
+              setReload={setReload}
+            />
+          </>
         )}
       </div>
     </div>
