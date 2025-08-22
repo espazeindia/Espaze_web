@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
-  colors,
   DialogContent,
   DialogTitle,
   FormControl,
@@ -16,6 +15,7 @@ import { useMode } from "../../contexts/themeModeContext";
 
 function AddProductDetails({ isOpen, onClose, products, setProducts }) {
   const { theme } = useMode();
+
   const [formData, setFormData] = useState({
     productName: "",
     productDescription: "",
@@ -28,6 +28,7 @@ function AddProductDetails({ isOpen, onClose, products, setProducts }) {
     expiryDate: "",
   });
 
+  // Categories & sub-categories
   const categories = {
     "fruits-vegetables": ["Fruits", "Vegetables", "Organic Produce"],
     clothes: ["Men", "Women", "Kids", "Accessories"],
@@ -39,37 +40,49 @@ function AddProductDetails({ isOpen, onClose, products, setProducts }) {
     grocery: ["Dairy", "Snacks", "Beverages"],
   };
 
+  // Handle input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    const updatedValue = name === "price" ? Math.max(0, value) : value;
+    let updatedValue = value;
+    if (name === "price" || name === "quantity") {
+      updatedValue = Math.max(0, Number(value)); // Prevent negatives
+    }
 
-    setFormData((prevData) => ({
-      ...prevData,
+    setFormData((prev) => ({
+      ...prev,
       [name]: updatedValue,
     }));
   };
 
   const handleCategoryChange = (value) => {
-    setFormData((prevData) => ({
-      ...prevData,
+    setFormData((prev) => ({
+      ...prev,
       category: value,
-      subCategory: "", // Reset subCategory when category changes
+      subCategory: "", // reset on change
     }));
   };
 
   const handleSubCategoryChange = (value) => {
-    setFormData((prevData) => ({
-      ...prevData,
+    setFormData((prev) => ({
+      ...prev,
       subCategory: value,
     }));
   };
 
+  // Handle submit
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    if (formData.expiryDate < formData.manufacturingDate) {
+      alert("Expiry date cannot be earlier than Manufacturing date.");
+      return;
+    }
+
     const modifiedData = {
       id: products.length + 1,
       name: formData.productName,
+      description: formData.productDescription,
       category_id: { name: formData.category },
       subCategory_id: { name: formData.subCategory },
       manufacturingDate: formData.manufacturingDate,
@@ -80,7 +93,9 @@ function AddProductDetails({ isOpen, onClose, products, setProducts }) {
       status: "show",
     };
 
-    setProducts((prevData) => [...prevData, modifiedData]);
+    setProducts((prev) => [...prev, modifiedData]);
+
+    // Reset
     setFormData({
       productName: "",
       productDescription: "",
@@ -92,6 +107,7 @@ function AddProductDetails({ isOpen, onClose, products, setProducts }) {
       manufacturingDate: "",
       expiryDate: "",
     });
+
     onClose();
   };
 
@@ -99,87 +115,96 @@ function AddProductDetails({ isOpen, onClose, products, setProducts }) {
     <Modal open={isOpen} onClose={onClose}>
       <ModalDialog
         size="lg"
-        sx={
-          theme
-            ? { backgroundColor: "#ffffff", border: "none" }
-            : { backgroundColor: "#18181b", border: "none" }
-        }
+        sx={{
+          border: "none",
+          borderRadius: "16px",
+          p: 2,
+          backgroundColor: theme ? "#ffffff" : "#18181b",
+        }}
       >
-        <ModalClose style={{ zIndex: "10", color: "#ffffff", fontWeight: "bold" }} />
-        <DialogTitle sx={theme ? { color: "#000000" } : { color: "#ffffff" }}>
+        <ModalClose sx={{ zIndex: 10, color: theme ? "#000000" : "#ffffff" }} />
+        <DialogTitle sx={{ color: theme ? "#000000" : "#ffffff" }}>
           Add Product
         </DialogTitle>
-        <DialogContent className="h-[50vh] w-[70vw] overflow-scroll sideBarNone">
-          <form onSubmit={handleSubmit}>
+
+        <DialogContent className="h-[60vh] w-[70vw] overflow-y-auto">
+          <form onSubmit={handleSubmit} className="space-y-5">
             <div className="grid grid-cols-2 gap-5">
               {/* Product Name */}
-              <FormControl size="lg" className="space-y-1">
-                <label className={theme ? "text-zinc-800" : "text-zinc-300"}>Product Name</label>
+              <FormControl size="lg">
+                <label className={theme ? "text-zinc-800" : "text-zinc-300"}>
+                  Product Name
+                </label>
                 <Input
-                  sx={
-                    theme
-                      ? { backgroundColor: "#f4f4f5", color: "#27272a", border: "none" }
-                      : {
-                          backgroundColor: "#27272a",
-                          color: "#ffffff",
-                          border: "none",
-                        }
-                  }
-                  
                   name="productName"
                   value={formData.productName}
                   onChange={handleChange}
                   required
-                  size="lg"
                   placeholder="Enter Product Name"
+                  sx={{
+                    backgroundColor: theme ? "#f4f4f5" : "#27272a",
+                    color: theme ? "#27272a" : "#ffffff",
+                    border: "none",
+                  }}
+                />
+              </FormControl>
+
+              {/* Code */}
+              <FormControl size="lg">
+                <label className={theme ? "text-zinc-800" : "text-zinc-300"}>
+                  Product Code
+                </label>
+                <Input
+                  name="code"
+                  value={formData.code}
+                  onChange={handleChange}
+                  required
+                  placeholder="Enter Product Code"
+                  sx={{
+                    backgroundColor: theme ? "#f4f4f5" : "#27272a",
+                    color: theme ? "#27272a" : "#ffffff",
+                    border: "none",
+                  }}
                 />
               </FormControl>
 
               {/* Product Description */}
-              <FormControl size="lg" className="row-span-2">
+              <FormControl size="lg" className="col-span-2">
                 <label className={theme ? "text-zinc-800" : "text-zinc-300"}>
                   Product Description
                 </label>
                 <Textarea
-                  sx={
-                    theme
-                      ? { backgroundColor: "#f4f4f5", color: "#27272a", border: "none" }
-                      : {
-                          backgroundColor: "#27272a",
-                          color: "#ffffff",
-                          border: "none",
-                        }
-                  }
                   name="productDescription"
                   value={formData.productDescription}
                   onChange={handleChange}
                   required
-                  className="mt-1 p-2 h-full sideBarNone"
-                  maxRows={4}
                   placeholder="Enter Product Description"
+                  minRows={3}
+                  sx={{
+                    backgroundColor: theme ? "#f4f4f5" : "#27272a",
+                    color: theme ? "#27272a" : "#ffffff",
+                    border: "none",
+                  }}
                 />
               </FormControl>
 
               {/* Category */}
-              <FormControl size="lg" className="space-y-1">
-                <label className={theme ? "text-zinc-800" : "text-zinc-300"}>Category</label>
+              <FormControl size="lg">
+                <label className={theme ? "text-zinc-800" : "text-zinc-300"}>
+                  Category
+                </label>
                 <Select
-                  sx={
-                    theme
-                      ? { backgroundColor: "#f4f4f5", color: "#27272a", border: "none" }
-                      : {
-                          backgroundColor: "#27272a",
-                          color: "#ffffff",
-                          border: "none",
-                        }
-                  }
+                  value={formData.category}
                   placeholder="Select Category"
                   onChange={(_, value) => handleCategoryChange(value)}
                   required
-                  value={formData.category}
-                  name="category"
                   slotProps={{
                     listbox: { sx: { maxHeight: 150, overflowY: "auto" } },
+                  }}
+                  sx={{
+                    backgroundColor: theme ? "#f4f4f5" : "#27272a",
+                    color: theme ? "#27272a" : "#ffffff",
+                    border: "none",
                   }}
                 >
                   {Object.keys(categories).map((category) => (
@@ -191,165 +216,125 @@ function AddProductDetails({ isOpen, onClose, products, setProducts }) {
               </FormControl>
 
               {/* Sub Category */}
-              <FormControl
-                size="lg"
-                className={`space-y-1 ${!formData.category ? "cursor-not-allowed" : ""}`}
-              >
-                <label className={theme ? "text-zinc-800" : "text-zinc-300"}>Sub Category</label>
+              <FormControl size="lg">
+                <label className={theme ? "text-zinc-800" : "text-zinc-300"}>
+                  Sub Category
+                </label>
                 <Select
-                  sx={
-                    theme
-                      ? { backgroundColor: "#f4f4f5", color: "#27272a", border: "none" }
-                      : {
-                          backgroundColor: "#27272a",
-                          color: "#ffffff",
-                          border: "none",
-                        }
-                  }
+                  value={formData.subCategory}
                   placeholder="Select Sub Category"
                   onChange={(_, value) => handleSubCategoryChange(value)}
                   required
-                  value={formData.subCategory}
-                  name="subCategory"
                   disabled={!formData.category}
                   slotProps={{
                     listbox: { sx: { maxHeight: 150, overflowY: "auto" } },
                   }}
+                  sx={{
+                    backgroundColor: theme ? "#f4f4f5" : "#27272a",
+                    color: theme ? "#27272a" : "#ffffff",
+                    border: "none",
+                  }}
                 >
                   {formData.category &&
-                    categories[formData.category]?.map((subCategory) => (
-                      <Option key={subCategory} value={subCategory}>
-                        {subCategory}
+                    categories[formData.category]?.map((sub) => (
+                      <Option key={sub} value={sub}>
+                        {sub}
                       </Option>
                     ))}
                 </Select>
               </FormControl>
 
-              {/* Product Code */}
-              <FormControl size="lg" className="space-y-1">
-                <label className={theme ? "text-zinc-800" : "text-zinc-300"}>Code</label>
-                <Input
-                  sx={
-                    theme
-                      ? { backgroundColor: "#f4f4f5", color: "#27272a", border: "none" }
-                      : {
-                          backgroundColor: "#27272a",
-                          color: "#ffffff",
-                          border: "none",
-                        }
-                  }
-                  name="code"
-                  value={formData.code}
-                  onChange={handleChange}
-                  required
-                  size="lg"
-                  placeholder="Enter Product Code"
-                />
-              </FormControl>
-
               {/* Price */}
-              <FormControl size="lg" className="space-y-1">
-                <label className={theme ? "text-zinc-800" : "text-zinc-300"}>Price</label>
+              <FormControl size="lg">
+                <label className={theme ? "text-zinc-800" : "text-zinc-300"}>
+                  Price
+                </label>
                 <Input
-                  sx={
-                    theme
-                      ? { backgroundColor: "#f4f4f5", color: "#27272a", border: "none" }
-                      : {
-                          backgroundColor: "#27272a",
-                          color: "#ffffff",
-                          border: "none",
-                        }
-                  }
-                  name="price"
                   type="number"
+                  name="price"
                   value={formData.price}
                   onChange={handleChange}
                   required
-                  size="lg"
-                  placeholder="Enter Product Price"
+                  placeholder="Enter Price"
+                  sx={{
+                    backgroundColor: theme ? "#f4f4f5" : "#27272a",
+                    color: theme ? "#27272a" : "#ffffff",
+                    border: "none",
+                  }}
                 />
               </FormControl>
 
-              <FormControl size="lg" className="space-y-1">
-                <label className={theme ? "text-zinc-800" : "text-zinc-300"}>Quantity</label>
+              {/* Quantity */}
+              <FormControl size="lg">
+                <label className={theme ? "text-zinc-800" : "text-zinc-300"}>
+                  Quantity
+                </label>
                 <Input
-                  sx={
-                    theme
-                      ? { backgroundColor: "#f4f4f5", color: "#27272a", border: "none" }
-                      : {
-                          backgroundColor: "#27272a",
-                          color: "#ffffff",
-                          border: "none",
-                        }
-                  }
-                  name="quantity"
                   type="number"
+                  name="quantity"
                   value={formData.quantity}
                   onChange={handleChange}
                   required
-                  size="lg"
-                  placeholder="Enter Product Quantity"
+                  placeholder="Enter Quantity"
+                  sx={{
+                    backgroundColor: theme ? "#f4f4f5" : "#27272a",
+                    color: theme ? "#27272a" : "#ffffff",
+                    border: "none",
+                  }}
                 />
               </FormControl>
 
               {/* Manufacturing Date */}
-              <FormControl size="lg" className={`space-y-1  ${theme ? "" : "darkMode"}`}>
+              <FormControl size="lg">
                 <label className={theme ? "text-zinc-800" : "text-zinc-300"}>
                   Manufacturing Date
                 </label>
                 <Input
-                  sx={
-                    theme
-                      ? { backgroundColor: "#f4f4f5", color: "#27272a", border: "none" }
-                      : {
-                          backgroundColor: "#27272a",
-                          color: "#ffffff",
-                          border: "none",
-                        }
-                  }
+                  type="date"
                   name="manufacturingDate"
                   value={formData.manufacturingDate}
                   onChange={handleChange}
-                  type="date"
                   required
-                  size="lg"
+                  sx={{
+                    backgroundColor: theme ? "#f4f4f5" : "#27272a",
+                    color: theme ? "#27272a" : "#ffffff",
+                    border: "none",
+                  }}
                 />
               </FormControl>
 
-              {/* Expiry Date (Cannot be earlier than Manufacturing Date) */}
-              <FormControl size="lg" className={`space-y-1  ${theme ? "" : "darkMode"}`}>
-                <label className={theme ? "text-zinc-800" : "text-zinc-300"}>Expiry Date</label>
+              {/* Expiry Date */}
+              <FormControl size="lg">
+                <label className={theme ? "text-zinc-800" : "text-zinc-300"}>
+                  Expiry Date
+                </label>
                 <Input
-                  sx={
-                    theme
-                      ? { backgroundColor: "#f4f4f5", color: "#27272a", border: "none" }
-                      : {
-                          backgroundColor: "#27272a",
-                          color: "#ffffff",
-                          border: "none",
-                        }
-                  }
+                  type="date"
                   name="expiryDate"
                   value={formData.expiryDate}
                   onChange={handleChange}
-                  type="date"
                   required
-                  size="lg"
                   min={formData.manufacturingDate}
+                  sx={{
+                    backgroundColor: theme ? "#f4f4f5" : "#27272a",
+                    color: theme ? "#27272a" : "#ffffff",
+                    border: "none",
+                  }}
                 />
               </FormControl>
             </div>
 
             {/* Submit Button */}
-            <div className="mt-4 flex justify-end">
+            <div className="flex justify-end">
               <button
                 type="submit"
-                className={` ${
-                  theme ? " border-purple-500 border-2 bg-purple-100 text-purple-500 hover:bg-purple-500 hover:text-white" : "bg-purple-500 text-white hover:bg-white hover:text-black "
-                } 
-                px-6 py-2  transition-all duration-500  rounded-lg hover:cursor-pointer`}
+                className={`px-6 py-2 rounded-lg font-medium transition-all duration-300 ${
+                  theme
+                    ? "border-2 border-purple-500 bg-purple-100 text-purple-600 hover:bg-purple-500 hover:text-white"
+                    : "bg-purple-600 text-white hover:bg-white hover:text-black border-2 border-purple-500"
+                }`}
               >
-                Add
+                Add Product
               </button>
             </div>
           </form>
