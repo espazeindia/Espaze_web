@@ -25,7 +25,6 @@ function ProductDetails() {
   const [onboardingData, setOnboardingData] = useState([]);
   const [reload, setReload] = useState(false);
 
-  // ===== Actions =====
   const handleEdit = (data) => {
     setCurrentProduct(data);
     setEditModal(true);
@@ -37,7 +36,6 @@ function ProductDetails() {
     setDeleteModal(true);
   };
 
-  // ===== API: Metadata =====
   const fetchProduct = async (pid) => {
     try {
       setLoading(true);
@@ -78,7 +76,6 @@ function ProductDetails() {
     }
   };
 
-  // ===== API: Inventory =====
   const fetchInventory = async (pid) => {
     try {
       setLoading(true);
@@ -122,7 +119,6 @@ function ProductDetails() {
     }
   };
 
-  // ===== Effect =====
   useEffect(() => {
     if (!id) return;
     if (id.includes("metadata_")) {
@@ -132,25 +128,12 @@ function ProductDetails() {
     }
   }, [id, reload]);
 
-  // ===== UI Helpers =====
   const containerBG = theme ? "bg-zinc-100 text-black" : "bg-neutral-950 text-white";
   const cardBG = theme ? "bg-white text-black" : "bg-zinc-800 text-white";
   const subText = theme ? "text-zinc-600" : "text-zinc-300";
   const muted = theme ? "text-zinc-500" : "text-zinc-400";
   const borderClr = theme ? "border-zinc-200" : "border-zinc-700";
 
-  const Badge = ({ children, color = "indigo" }) => (
-    <span
-      className={`px-2.5 py-1 rounded-full text-xs font-semibold bg-${color}-100 text-${color}-700 border border-${color}-200`}
-    >
-      {children}
-    </span>
-  );
-
-  // Tailwind doesn't allow dynamic color tokens in class string at build-time.
-  // For safety, we’ll use fixed badge styles below where needed instead of Badge() with dynamic color.
-
-  // ===== Skeleton =====
   const Skeleton = () => (
     <div className={`rounded-2xl p-5 ${cardBG} border ${borderClr} animate-pulse`}>
       <div className="flex gap-6">
@@ -162,11 +145,6 @@ function ProductDetails() {
           <div className="h-4 w-1/3 rounded bg-zinc-200/60 dark:bg-zinc-700/60" />
           <div className="h-20 w-full rounded bg-zinc-200/60 dark:bg-zinc-700/60" />
         </div>
-      </div>
-      <div className="mt-6 grid grid-cols-2 gap-3">
-        {Array.from({ length: 6 }).map((_, i) => (
-          <div key={i} className="h-4 w-3/4 rounded bg-zinc-200/60 dark:bg-zinc-700/60" />
-        ))}
       </div>
     </div>
   );
@@ -295,62 +273,45 @@ function ProductDetails() {
             {/* Divider */}
             <div className={`my-6 border-t ${borderClr}`} />
 
-            {/* Details Grid */}
-            <div className="grid md:grid-cols-2 gap-4">
-              <div className={`rounded-xl border ${borderClr} p-4`}>
-                <h3 className="font-semibold mb-3">Identifiers</h3>
-                <div className={`grid grid-cols-2 gap-y-2 text-sm ${subText}`}>
-                  {product.id && <p><span className="font-medium text-current">ID:</span> {product.id}</p>}
-                  {product.hsn_code && (
-                    <p><span className="font-medium text-current">HSN Code:</span> {product.hsn_code}</p>
-                  )}
-                  {product.category_id && (
-                    <p><span className="font-medium text-current">Category ID:</span> {product.category_id}</p>
-                  )}
-                  {product.subcategory_id && (
-                    <p><span className="font-medium text-current">Subcategory ID:</span> {product.subcategory_id}</p>
-                  )}
-                </div>
-              </div>
+            {/* === More Details Box === */}
+            <div className={`rounded-xl border ${borderClr} p-5`}>
+              <h3 className="font-semibold mb-4 text-lg">More Details</h3>
+              <div className={`grid md:grid-cols-2 gap-6 text-sm ${subText}`}>
 
-              <div className={`rounded-xl border ${borderClr} p-4`}>
-                <h3 className="font-semibold mb-3">Pricing & Stock</h3>
-                <div className={`grid grid-cols-2 gap-y-2 text-sm ${subText}`}>
-                  {product.mrp && <p><span className="font-medium text-current">MRP:</span> ₹{product.mrp}</p>}
-                  {product.price && <p><span className="font-medium text-current">Price:</span> ₹{product.price}</p>}
-                  {product.quantity !== undefined && (
-                    <p><span className="font-medium text-current">Quantity:</span> {product.quantity}</p>
-                  )}
-                  {product.visible !== undefined && (
-                    <p><span className="font-medium text-current">Visibility:</span> {product.visible ? "Visible" : "Hidden"}</p>
-                  )}
+                {/* Identifiers */}
+                <div>
+                  <h4 className="font-medium text-current mb-2">Identifiers</h4>
+                  {product.id && <p>ID: {product.id}</p>}
+                  {product.hsn_code && <p>HSN Code: {product.hsn_code}</p>}
+                  {product.category_id && <p>Category ID: {product.category_id}</p>}
+                  {product.subcategory_id && <p>Subcategory ID: {product.subcategory_id}</p>}
                 </div>
-              </div>
 
-              <div className={`rounded-xl border ${borderClr} p-4`}>
-                <h3 className="font-semibold mb-3">Dates</h3>
-                <div className={`grid grid-cols-2 gap-y-2 text-sm ${subText}`}>
-                  {product.m_date && (
-                    <p><span className="font-medium text-current">Manufacturing:</span> {product.m_date}</p>
-                  )}
-                  {product.e_date && (
-                    <p><span className="font-medium text-current">Expiry:</span> {product.e_date}</p>
-                  )}
-                  {product.created_at && (
-                    <p><span className="font-medium text-current">Created:</span> {new Date(product.created_at).toLocaleDateString()}</p>
-                  )}
-                  {product.updated_at && (
-                    <p><span className="font-medium text-current">Updated:</span> {new Date(product.updated_at).toLocaleDateString()}</p>
-                  )}
+                {/* Pricing & Stock */}
+                <div>
+                  <h4 className="font-medium text-current mb-2">Pricing & Stock</h4>
+                  {product.mrp && <p>MRP: ₹{product.mrp}</p>}
+                  {product.price && <p>Price: ₹{product.price}</p>}
+                  {product.quantity !== undefined && <p>Quantity: {product.quantity}</p>}
+                  {product.visible !== undefined && <p>Visibility: {product.visible ? "Visible" : "Hidden"}</p>}
                 </div>
-              </div>
 
-              <div className={`rounded-xl border ${borderClr} p-4`}>
-                <h3 className="font-semibold mb-3">Reviews</h3>
-                <div className={`grid grid-cols-2 gap-y-2 text-sm ${subText}`}>
-                  <p><span className="font-medium text-current">Total Stars:</span> {product.total_stars || 0}</p>
-                  <p><span className="font-medium text-current">Total Reviews:</span> {product.total_reviews || 0}</p>
+                {/* Dates */}
+                <div>
+                  <h4 className="font-medium text-current mb-2">Dates</h4>
+                  {product.m_date && <p>Manufacturing: {product.m_date}</p>}
+                  {product.e_date && <p>Expiry: {product.e_date}</p>}
+                  {product.created_at && <p>Created: {new Date(product.created_at).toLocaleDateString()}</p>}
+                  {product.updated_at && <p>Updated: {new Date(product.updated_at).toLocaleDateString()}</p>}
                 </div>
+
+                {/* Reviews */}
+                <div>
+                  <h4 className="font-medium text-current mb-2">Reviews</h4>
+                  <p>Total Stars: {product.total_stars || 0}</p>
+                  <p>Total Reviews: {product.total_reviews || 0}</p>
+                </div>
+
               </div>
             </div>
 
