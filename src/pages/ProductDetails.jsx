@@ -8,7 +8,6 @@ import InventoryServices from "../services/InventoryServices";
 import EditMetaData from "../components/modal/EditMetaData";
 import DeleteMetaData from "../components/modal/DeleteMetaData";
 
-
 function ProductDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -23,20 +22,17 @@ function ProductDetails() {
   const [onboardingData, setOnboardingData] = useState([]);
   const [reload, setReload] = useState(false);
 
-
   const handleEdit = (data) => {
-  setCurrentProduct(data);
-  setEditModal(true);
-};
+    setCurrentProduct(data);
+    setEditModal(true);
+  };
 
-const handleDelete = (id) => {
-  setDeleteProduct(id);
-  setDeleteModal(true);
-};
+  const handleDelete = (id) => {
+    setDeleteProduct(id);
+    setDeleteModal(true);
+  };
 
-
-
- const fetchProduct = async (id) => {
+  const fetchProduct = async (id) => {
     try {
       setLoading(true);
       const result = await MetaDataServices.FetchMetadataById(id);
@@ -55,10 +51,10 @@ const handleDelete = (id) => {
           subcategory_name: data.subcategory_name,
           total_stars: data.total_stars,
           total_reviews: data.total_reviews,
-          created_at: data.created_at,        
-          updated_at: data.updated_at,        
-          m_date: data.manufacturing_date,    
-          e_date: data.expiry_date
+          created_at: data.created_at,
+          updated_at: data.updated_at,
+          m_date: data.manufacturing_date,
+          e_date: data.expiry_date,
         };
         setProduct(body);
       } else {
@@ -130,48 +126,55 @@ const handleDelete = (id) => {
 
   return (
     <div
-      className={`p-5 min-h-full ${
-        theme ? "bg-zinc-100 text-black" : "bg-neutral-950 text-white"
+      className={`p-6 min-h-screen ${
+        theme ? "bg-gray-100 text-black" : "bg-neutral-900 text-white"
       }`}
     >
-      <div className="flex items-center mb-5">
+      {/* Header */}
+      <div className="flex items-center mb-6">
         <FaArrowLeft
-          className="cursor-pointer mr-3"
-          size={20}
+          className="cursor-pointer mr-3 hover:scale-110 transition"
+          size={22}
           onClick={() => navigate("/product-onboarding")}
         />
-        <h1 className="font-bold text-xl">Product Details</h1>
+        <h1 className="font-bold text-2xl">Product Details</h1>
       </div>
 
+      {/* Main Card */}
       <div
-        className={`rounded-lg p-5 ${
-          theme ? "bg-white text-black" : "bg-zinc-800 text-white"
+        className={`rounded-2xl shadow-xl p-6 transition ${
+          theme ? "bg-white" : "bg-neutral-800"
         }`}
       >
         {loading ? (
-          <div>Loading...</div>
+          <div className="text-center py-10">⏳ Loading...</div>
         ) : !product ? (
-          <div>No product found</div>
+          <div className="text-center py-10 text-gray-400">No product found</div>
         ) : (
           <>
-            <div className="flex gap-6">
-              <div className="w-1/3">
+            {/* Top Section: Image + Info */}
+            <div className="flex flex-col md:flex-row gap-8">
+              {/* Product Image */}
+              <div className="md:w-1/3">
                 {product.image ? (
                   <img
                     src={product.image}
                     alt={product.name}
-                    className="w-full h-48 object-cover rounded-md border"
+                    className="w-full h-64 object-cover rounded-xl shadow-md border"
                   />
                 ) : (
-                  <div className="w-full h-48 flex items-center justify-center border rounded-md text-gray-400">
+                  <div className="w-full h-64 flex items-center justify-center border rounded-xl text-gray-400">
                     No Image Available
                   </div>
                 )}
               </div>
 
-              <div className="w-2/3">
-                <h2 className="text-2xl font-bold mb-1">{product.name}</h2>
-                <div className="flex items-center mb-2">
+              {/* Product Info */}
+              <div className="flex-1">
+                <h2 className="text-3xl font-bold mb-2">{product.name}</h2>
+
+                {/* Ratings */}
+                <div className="flex items-center mb-3">
                   {[...Array(5)].map((_, i) => (
                     <svg
                       key={i}
@@ -190,120 +193,100 @@ const handleDelete = (id) => {
                     </svg>
                   ))}
                   <span className="ml-2 text-gray-500">
-                    ({product.total_reviews || 0})
+                    ({product.total_reviews || 0} Reviews)
                   </span>
                 </div>
 
-                <div className="flex flex-wrap gap-2 mb-3">
+                {/* Badges */}
+                <div className="flex flex-wrap gap-3 mb-4">
                   {product.quantity && (
-                    <span className="px-2 py-1 bg-green-100 text-green-600 text-sm rounded">
+                    <span className="px-3 py-1 bg-green-100 text-green-700 text-sm rounded-full">
                       In Stock
                     </span>
                   )}
                   {product.visible && (
-                    <span className="px-2 py-1 bg-green-100 text-green-600 text-sm rounded">
+                    <span className="px-3 py-1 bg-blue-100 text-blue-700 text-sm rounded-full">
                       Visible
                     </span>
                   )}
                   {product.price && (
-                    <span className="font-bold">₹{product.price}</span>
+                    <span className="px-3 py-1 bg-pink-100 text-pink-700 font-semibold text-sm rounded-full">
+                      ₹{product.price}
+                    </span>
                   )}
                   {product.hsn_code && (
-                    <span className="text-gray-500">
-                      HSN Code {product.hsn_code}
+                    <span className="px-3 py-1 bg-gray-200 text-gray-700 text-sm rounded-full">
+                      HSN: {product.hsn_code}
                     </span>
                   )}
                 </div>
 
+                {/* Description */}
                 {product.description && (
-                  <p className="text-sm text-gray-600">{product.description}</p>
+                  <p className="text-gray-600 text-sm leading-relaxed">
+                    {product.description}
+                  </p>
                 )}
               </div>
             </div>
 
-<div className="mt-6 border rounded-lg p-4">
-  <h3 className="font-bold mb-3">More Details</h3>
-  <div className="grid grid-cols-2 gap-y-2 text-sm">
-    {product.id && (
-      <p><strong>ID:</strong> {product.id}</p>
-    )}
-    {product.category_name && (
-      <p><strong>Category:</strong> {product.category_name}</p>
-    )}
-    {product.subcategory_name && (
-      <p><strong>Sub Category:</strong> {product.subcategory_name}</p>
-    )}
-    {product.category_id && (
-      <p><strong>Category ID:</strong> {product.category_id}</p>
-    )}
-    {product.subcategory_id && (
-      <p><strong>Subcategory ID:</strong> {product.subcategory_id}</p>
-    )}
-    {product.mrp && (
-      <p><strong>MRP:</strong> ₹{product.mrp}</p>
-    )}
-    {product.price && (
-      <p><strong>Price:</strong> ₹{product.price}</p>
-    )}
-    {product.created_at && (
-      <p><strong>Created At:</strong> {new Date(product.created_at).toLocaleDateString()}</p>
-    )}
-    {product.updated_at && (
-      <p><strong>Updated At:</strong> {new Date(product.updated_at).toLocaleDateString()}</p>
-    )}
-    <p><strong>Total Stars:</strong> {product.total_stars || 0}</p>
-    <p><strong>Total Reviews:</strong> {product.total_reviews || 0}</p>
-    {product.m_date && (
-      <p><strong>Manufacturing Date:</strong> {product.m_date}</p>
-    )}
-    {product.e_date && (
-      <p><strong>Expiry Date:</strong> {product.e_date}</p>
-    )}
-    {product.quantity && (
-      <p><strong>Quantity:</strong> {product.quantity}</p>
-    )}
-  </div>
-</div>
+            {/* More Details */}
+            <div className="mt-8 border-t pt-6">
+              <h3 className="font-semibold text-lg mb-4">📌 More Details</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-y-2 text-sm">
+                {product.id && <p><strong>ID:</strong> {product.id}</p>}
+                {product.category_name && <p><strong>Category:</strong> {product.category_name}</p>}
+                {product.subcategory_name && <p><strong>Sub Category:</strong> {product.subcategory_name}</p>}
+                {product.mrp && <p><strong>MRP:</strong> ₹{product.mrp}</p>}
+                {product.price && <p><strong>Price:</strong> ₹{product.price}</p>}
+                {product.created_at && <p><strong>Created:</strong> {new Date(product.created_at).toLocaleDateString()}</p>}
+                {product.updated_at && <p><strong>Updated:</strong> {new Date(product.updated_at).toLocaleDateString()}</p>}
+                <p><strong>Total Stars:</strong> {product.total_stars || 0}</p>
+                <p><strong>Total Reviews:</strong> {product.total_reviews || 0}</p>
+                {product.m_date && <p><strong>MFG:</strong> {product.m_date}</p>}
+                {product.e_date && <p><strong>Expiry:</strong> {product.e_date}</p>}
+                {product.quantity && <p><strong>Quantity:</strong> {product.quantity}</p>}
+              </div>
+            </div>
 
-<div className="flex justify-center gap-6 mt-8">
-  <button
-    onClick={() => handleEdit(product)}
-    className="flex items-center space-x-2 px-10 py-3 text-lg rounded-md font-medium cursor-pointer 
-    border border-green-600 text-green-600 hover:bg-green-600 hover:text-white transition-colors"
-  >
-    <FaEdit />
-    <span>Edit</span>
-  </button>
+            {/* Action Buttons */}
+            <div className="flex justify-center gap-8 mt-8">
+              <button
+                onClick={() => handleEdit(product)}
+                className="flex items-center gap-2 px-8 py-3 rounded-lg text-white font-medium 
+                bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 shadow-md transition"
+              >
+                <FaEdit /> Edit
+              </button>
+              <button
+                onClick={() => handleDelete(product)}
+                disabled={deleting}
+                className="flex items-center gap-2 px-8 py-3 rounded-lg text-white font-medium 
+                bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 shadow-md transition"
+              >
+                <FaTrash /> {deleting ? "Deleting..." : "Delete"}
+              </button>
+            </div>
 
-  <button
-    onClick={() => handleDelete(product)}
-    disabled={deleting}
-    className="flex items-center space-x-2 px-10 py-3 text-lg rounded-md font-medium cursor-pointer
-    border border-red-500 text-red-500 hover:bg-red-500 hover:text-white transition-colors"
-  >
-    <FaTrash />
-    <span>{deleting ? "Deleting..." : "Delete"}</span>
-  </button>
-</div>
-
-<EditMetaData
-  isOpen={editModal}
-  onClose={() => setEditModal(false)}
-  currentProduct={currentProduct}
-  setOnboardingData={setOnboardingData}
-/>
-
-<DeleteMetaData
-  isOpen={deleteModal}
-  onClose={() => setDeleteModal(false)}
-  currentProduct={currentProduct}
-  setOnboardingData={setOnboardingData}
-  setReload={setReload}
-/>
-  </>
+            {/* Modals */}
+            <EditMetaData
+              isOpen={editModal}
+              onClose={() => setEditModal(false)}
+              currentProduct={currentProduct}
+              setOnboardingData={setOnboardingData}
+            />
+            <DeleteMetaData
+              isOpen={deleteModal}
+              onClose={() => setDeleteModal(false)}
+              currentProduct={currentProduct}
+              setOnboardingData={setOnboardingData}
+              setReload={setReload}
+            />
+          </>
         )}
       </div>
     </div>
   );
 }
+
 export default ProductDetails;
