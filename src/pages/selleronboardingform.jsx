@@ -172,4 +172,4 @@ function selleronboardingform() {
   );
 }
 
-export default SellerOnboardingForm;
+export default selleronboardingform;
