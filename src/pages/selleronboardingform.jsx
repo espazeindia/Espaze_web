@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-function SellerOnboardingForm() {
+function selleronboardingform() {
   const [formData, setFormData] = useState({
     sellerName: "",
     phone: "",
