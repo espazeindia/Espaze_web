@@ -1,6 +1,6 @@
 import React from "react";
 
-export default function SellerOnboarding() {
+export default function selleronboarding() {
   return (
     <div className="min-h-screen flex justify-center items-center bg-gray-100 p-6">
       <div className="w-full max-w-4xl shadow-xl border rounded-2xl bg-white">
