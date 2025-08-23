@@ -8,7 +8,7 @@ const Customers = lazy(() => import("../pages/Customers"));
 const Orders = lazy(() => import("../pages/Orders"));
 const Inventory= lazy(() => import("../pages/Inventory"));
 const ProductDetails = lazy(() => import("../pages/ProductDetails"));
-
+const selleronboardingform = lazy(() => import("../pages/selleronboardingform "));
 
 const routes = [
   {
@@ -50,6 +50,11 @@ const routes = [
     path: "/categories",
     component: CategoriesPage,
     access: ["operations"]
+  },
+   {
+    path: "/selleronboardingform",
+    component: selleronboardingform,
+    access: ["seller"]
   },
 
 ];
@@ -96,6 +101,12 @@ const sidebarRoutes = [
   icon: ShoppingCart,
   name : "Category",
   access: ["operations"]  
+},
+ {
+  path: "/selleronboardingform",
+  icon: ShoppingCart,
+  name : "selleronboardingform",
+  access: ["seller"]  
 },
 ];
 
