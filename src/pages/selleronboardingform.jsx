@@ -1,175 +1,128 @@
 import React, { useState } from "react";
 
-function selleronboardingform() {
+function SellerOnboardingForm() {
   const [formData, setFormData] = useState({
     sellerName: "",
-    phone: "",
+    phoneNumber: "",
     shopAddress: "",
+    panNumber: "",
     gstin: "",
     companyName: "",
     shopName: "",
     securityPin: "",
   });
 
-  const [submitted, setSubmitted] = useState(false);
+  const [profileImage, setProfileImage] = useState(null);
+  const [preview, setPreview] = useState(null);
 
-  // Handle input changes
+  // handle text inputs
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
-  // Handle form submit
+  // handle image upload
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setProfileImage(file);
+      setPreview(URL.createObjectURL(file));
+    }
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    // Basic validation
-    if (
-      !formData.sellerName ||
-      !formData.phone ||
-      !formData.shopAddress ||
-      !formData.gstin ||
-      !formData.companyName ||
-      !formData.shopName ||
-      !formData.securityPin
-    ) {
-      alert("⚠️ Please fill all the fields before submitting!");
-      return;
-    }
-
-    console.log("Seller Onboarding Data:", formData);
-    setSubmitted(true);
+    console.log("Form Data:", formData);
+    console.log("Uploaded Image:", profileImage);
+    alert("Seller Profile Saved!");
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100 p-6">
-      <div className="w-full max-w-2xl bg-white rounded-2xl shadow-lg p-8">
-        <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
-          🛒 Seller Onboarding Form
-        </h2>
-
-        {submitted ? (
-          <div className="text-center text-green-600 font-semibold">
-            ✅ Form Submitted Successfully!
+    <div style={{ display: "flex", minHeight: "100vh", fontFamily: "sans-serif" }}>
+      {/* Sidebar */}
+      <div style={{ width: "220px", background: "#f7f7f7", padding: "20px", borderRight: "1px solid #ddd" }}>
+        <div style={{ textAlign: "center", marginBottom: "30px" }}>
+          <div style={{ position: "relative", display: "inline-block" }}>
+            <div
+              style={{
+                width: "120px",
+                height: "120px",
+                borderRadius: "50%",
+                background: "#c5c5f7",
+                overflow: "hidden",
+                margin: "auto",
+              }}
+            >
+              {preview ? (
+                <img src={preview} alt="Profile Preview" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+              ) : (
+                <span style={{ lineHeight: "120px", color: "#fff" }}>Upload</span>
+              )}
+            </div>
+            <input type="file" accept="image/*" onChange={handleImageChange} style={{ marginTop: "10px" }} />
           </div>
-        ) : (
-          <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Seller Name */}
-            <div>
-              <label className="block text-gray-700 font-medium mb-1">
-                Seller Name
-              </label>
-              <input
-                type="text"
-                name="sellerName"
-                value={formData.sellerName}
-                onChange={handleChange}
-                className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400"
-                placeholder="Enter seller full name"
-              />
-            </div>
+        </div>
+        <div>
+          <p style={{ padding: "10px 0", cursor: "pointer" }}>👤 User Profile</p>
+          <p style={{ padding: "10px 0", cursor: "pointer" }}>📊 Dashboard</p>
+        </div>
+      </div>
 
-            {/* Phone Number */}
+      {/* Main Content */}
+      <div style={{ flex: 1, padding: "30px" }}>
+        <h2 style={{ fontSize: "22px", marginBottom: "20px" }}>User Profile</h2>
+        <form onSubmit={handleSubmit}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px" }}>
             <div>
-              <label className="block text-gray-700 font-medium mb-1">
-                Phone Number
-              </label>
-              <input
-                type="tel"
-                name="phone"
-                value={formData.phone}
-                onChange={handleChange}
-                className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400"
-                placeholder="Enter phone number"
-              />
+              <label>Seller Name:</label>
+              <input type="text" name="sellerName" value={formData.sellerName} onChange={handleChange} required />
             </div>
-
-            {/* Shop Address */}
             <div>
-              <label className="block text-gray-700 font-medium mb-1">
-                Shop Address
-              </label>
-              <textarea
-                name="shopAddress"
-                value={formData.shopAddress}
-                onChange={handleChange}
-                className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400"
-                placeholder="Enter full shop address"
-              ></textarea>
+              <label>Phone Number:</label>
+              <input type="text" name="phoneNumber" value={formData.phoneNumber} onChange={handleChange} required />
             </div>
-
-            {/* PAN / GSTIN */}
             <div>
-              <label className="block text-gray-700 font-medium mb-1">
-                PAN / GSTIN
-              </label>
-              <input
-                type="text"
-                name="gstin"
-                value={formData.gstin}
-                onChange={handleChange}
-                className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400"
-                placeholder="Enter PAN or GSTIN"
-              />
+              <label>PAN Number:</label>
+              <input type="text" name="panNumber" value={formData.panNumber} onChange={handleChange} required />
             </div>
-
-            {/* Company Registered Name */}
             <div>
-              <label className="block text-gray-700 font-medium mb-1">
-                Company Registered Name
-              </label>
-              <input
-                type="text"
-                name="companyName"
-                value={formData.companyName}
-                onChange={handleChange}
-                className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400"
-                placeholder="Enter company registered name"
-              />
+              <label>GSTIN:</label>
+              <input type="text" name="gstin" value={formData.gstin} onChange={handleChange} required />
             </div>
-
-            {/* Shop Name */}
             <div>
-              <label className="block text-gray-700 font-medium mb-1">
-                Shop Name
-              </label>
-              <input
-                type="text"
-                name="shopName"
-                value={formData.shopName}
-                onChange={handleChange}
-                className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400"
-                placeholder="Enter shop name"
-              />
+              <label>Company Registered Name:</label>
+              <input type="text" name="companyName" value={formData.companyName} onChange={handleChange} required />
             </div>
-
-            {/* Security Pin */}
             <div>
-              <label className="block text-gray-700 font-medium mb-1">
-                Security Pin
-              </label>
-              <input
-                type="password"
-                name="securityPin"
-                value={formData.securityPin}
-                onChange={handleChange}
-                className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400"
-                placeholder="Enter security pin"
-              />
+              <label>Shop Name:</label>
+              <input type="text" name="shopName" value={formData.shopName} onChange={handleChange} required />
             </div>
+          </div>
 
-            {/* Submit Button */}
+          <div style={{ marginTop: "20px" }}>
+            <label>Shop Address:</label>
+            <input type="text" name="shopAddress" value={formData.shopAddress} onChange={handleChange} required style={{ width: "100%" }} />
+          </div>
+
+          <div style={{ textAlign: "center", marginTop: "30px" }}>
             <button
               type="submit"
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition"
+              style={{
+                padding: "10px 20px",
+                border: "none",
+                background: "#4CAF50",
+                color: "white",
+                borderRadius: "6px",
+                cursor: "pointer",
+              }}
             >
-              Submit Onboarding Form
+              Save Changes
             </button>
-          </form>
-        )}
+          </div>
+        </form>
       </div>
     </div>
   );
 }
 
-export default selleronboardingform;
+export default SellerOnboardingForm;
