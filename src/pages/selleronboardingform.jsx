@@ -1,99 +1,175 @@
-import React from "react";
+import React, { useState } from "react";
 
-export default function selleronboarding() {
+function SellerOnboardingForm() {
+  const [formData, setFormData] = useState({
+    sellerName: "",
+    phone: "",
+    shopAddress: "",
+    gstin: "",
+    companyName: "",
+    shopName: "",
+    securityPin: "",
+  });
+
+  const [submitted, setSubmitted] = useState(false);
+
+  // Handle input changes
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
+  // Handle form submit
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    // Basic validation
+    if (
+      !formData.sellerName ||
+      !formData.phone ||
+      !formData.shopAddress ||
+      !formData.gstin ||
+      !formData.companyName ||
+      !formData.shopName ||
+      !formData.securityPin
+    ) {
+      alert("⚠️ Please fill all the fields before submitting!");
+      return;
+    }
+
+    console.log("Seller Onboarding Data:", formData);
+    setSubmitted(true);
+  };
+
   return (
-    <div className="min-h-screen flex justify-center items-center bg-gray-100 p-6">
-      <div className="w-full max-w-4xl shadow-xl border rounded-2xl bg-white">
-        <div className="p-8">
-          <h2 className="text-2xl font-bold mb-6 text-gray-800 text-center">
-            Seller Onboarding – Basic Details
-          </h2>
+    <div className="flex items-center justify-center min-h-screen bg-gray-100 p-6">
+      <div className="w-full max-w-2xl bg-white rounded-2xl shadow-lg p-8">
+        <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
+          🛒 Seller Onboarding Form
+        </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {submitted ? (
+          <div className="text-center text-green-600 font-semibold">
+            ✅ Form Submitted Successfully!
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="space-y-5">
             {/* Seller Name */}
             <div>
-              <label className="block mb-2 text-gray-700">Seller Name</label>
+              <label className="block text-gray-700 font-medium mb-1">
+                Seller Name
+              </label>
               <input
-                className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-                placeholder="Enter seller name"
+                type="text"
+                name="sellerName"
+                value={formData.sellerName}
+                onChange={handleChange}
+                className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400"
+                placeholder="Enter seller full name"
               />
             </div>
 
             {/* Phone Number */}
             <div>
-              <label className="block mb-2 text-gray-700">Phone Number</label>
+              <label className="block text-gray-700 font-medium mb-1">
+                Phone Number
+              </label>
               <input
                 type="tel"
-                className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                name="phone"
+                value={formData.phone}
+                onChange={handleChange}
+                className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400"
                 placeholder="Enter phone number"
               />
             </div>
 
             {/* Shop Address */}
-            <div className="md:col-span-2">
-              <label className="block mb-2 text-gray-700">Shop Address</label>
-              <input
-                className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-                placeholder="Enter shop address"
-              />
+            <div>
+              <label className="block text-gray-700 font-medium mb-1">
+                Shop Address
+              </label>
+              <textarea
+                name="shopAddress"
+                value={formData.shopAddress}
+                onChange={handleChange}
+                className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400"
+                placeholder="Enter full shop address"
+              ></textarea>
             </div>
 
-            {/* PAN */}
+            {/* PAN / GSTIN */}
             <div>
-              <label className="block mb-2 text-gray-700">PAN</label>
+              <label className="block text-gray-700 font-medium mb-1">
+                PAN / GSTIN
+              </label>
               <input
-                className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-                placeholder="Enter PAN"
-              />
-            </div>
-
-            {/* GSTIN */}
-            <div>
-              <label className="block mb-2 text-gray-700">GSTIN</label>
-              <input
-                className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-                placeholder="Enter GSTIN"
+                type="text"
+                name="gstin"
+                value={formData.gstin}
+                onChange={handleChange}
+                className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400"
+                placeholder="Enter PAN or GSTIN"
               />
             </div>
 
             {/* Company Registered Name */}
             <div>
-              <label className="block mb-2 text-gray-700">
+              <label className="block text-gray-700 font-medium mb-1">
                 Company Registered Name
               </label>
               <input
-                className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                type="text"
+                name="companyName"
+                value={formData.companyName}
+                onChange={handleChange}
+                className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400"
                 placeholder="Enter company registered name"
               />
             </div>
 
             {/* Shop Name */}
             <div>
-              <label className="block mb-2 text-gray-700">Shop Name</label>
+              <label className="block text-gray-700 font-medium mb-1">
+                Shop Name
+              </label>
               <input
-                className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                type="text"
+                name="shopName"
+                value={formData.shopName}
+                onChange={handleChange}
+                className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400"
                 placeholder="Enter shop name"
               />
             </div>
 
             {/* Security Pin */}
             <div>
-              <label className="block mb-2 text-gray-700">Security PIN</label>
+              <label className="block text-gray-700 font-medium mb-1">
+                Security Pin
+              </label>
               <input
                 type="password"
-                className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-                placeholder="Enter 6-digit pin"
+                name="securityPin"
+                value={formData.securityPin}
+                onChange={handleChange}
+                className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400"
+                placeholder="Enter security pin"
               />
             </div>
-          </div>
 
-          <div className="mt-8 flex justify-center">
-            <button className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-2 rounded-lg transition">
-              Save & Continue
+            {/* Submit Button */}
+            <button
+              type="submit"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition"
+            >
+              Submit Onboarding Form
             </button>
-          </div>
-        </div>
+          </form>
+        )}
       </div>
     </div>
   );
 }
+
+export default SellerOnboardingForm;
