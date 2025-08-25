@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { FaArrowLeft, FaEdit, FaTrash } from "react-icons/fa";
+import { FaArrowLeft } from "react-icons/fa";
 import { notifyError } from "../utils/toast";
 import { useMode } from "../contexts/themeModeContext";
 import MetaDataServices from "../services/MetaDataServices";
@@ -15,26 +15,13 @@ function ProductDetails() {
 
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [deleting, setDeleting] = useState(false);
 
   const [editModal, setEditModal] = useState(false);
   const [currentProduct, setCurrentProduct] = useState({});
   const [deleteModal, setDeleteModal] = useState(false);
-  const [deleteProduct, setDeleteProduct] = useState(-1);
 
   const [onboardingData, setOnboardingData] = useState([]);
   const [reload, setReload] = useState(false);
-
-  const handleEdit = (data) => {
-    setCurrentProduct(data);
-    setEditModal(true);
-  };
-
-  const handleDelete = (data) => {
-    setDeleteProduct(data?.id || -1);
-    setCurrentProduct(data);
-    setDeleteModal(true);
-  };
 
   const fetchProduct = async (pid) => {
     try {
@@ -59,6 +46,7 @@ function ProductDetails() {
           updated_at: data.updated_at,
           m_date: data.manufacturing_date,
           e_date: data.expiry_date,
+          visible: data.visible,
         };
         setProduct(body);
       } else {
@@ -90,11 +78,9 @@ function ProductDetails() {
           image: data.metadata_image,
           category_id: data.metadata_category_id,
           subcategory_id: data.metadata_subcategory_id,
-          mrp: data.metadata_subcategory_id,
+          mrp: data.metadata_mrp,
           category_name: data.metadata_category_name,
           subcategory_name: data.metadata_subcategory_name,
-          created_at: data.created_at,
-          updated_at: data.updated_at,
           total_stars: data.metadata_total_stars,
           total_reviews: data.metadata_total_reviews,
           visible: data.product_visibility,
@@ -206,9 +192,9 @@ function ProductDetails() {
                         Out of Stock
                       </span>
                     )}
-                    {product.visible && (
+                    {product.visible !== undefined && (
                       <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-sky-100 text-sky-700 border border-sky-200">
-                        Visible
+                        {product.visible ? "Visible" : "Hidden"}
                       </span>
                     )}
                     {product.hsn_code && (
@@ -283,8 +269,8 @@ function ProductDetails() {
                   <h4 className="font-medium text-current mb-2">Identifiers</h4>
                   {product.id && <p>ID: {product.id}</p>}
                   {product.hsn_code && <p>HSN Code: {product.hsn_code}</p>}
-                  {product.category_id && <p>Category ID: {product.category_id}</p>}
-                  {product.subcategory_id && <p>Subcategory ID: {product.subcategory_id}</p>}
+                  {product.category_name && <p>Category: {product.category_name}</p>}
+                  {product.subcategory_name && <p>Subcategory: {product.subcategory_name}</p>}
                 </div>
 
                 {/* Pricing & Stock */}
@@ -301,8 +287,6 @@ function ProductDetails() {
                   <h4 className="font-medium text-current mb-2">Dates</h4>
                   {product.m_date && <p>Manufacturing: {product.m_date}</p>}
                   {product.e_date && <p>Expiry: {product.e_date}</p>}
-                  {product.created_at && <p>Created: {new Date(product.created_at).toLocaleDateString()}</p>}
-                  {product.updated_at && <p>Updated: {new Date(product.updated_at).toLocaleDateString()}</p>}
                 </div>
 
                 {/* Reviews */}
@@ -314,44 +298,6 @@ function ProductDetails() {
 
               </div>
             </div>
-
-            {/* Footer Actions */}
-            <div className="flex justify-center md:justify-end gap-4 mt-8">
-              <button
-                onClick={() => handleEdit(product)}
-                className="flex items-center gap-2 px-6 py-2.5 text-sm md:text-base rounded-lg font-medium cursor-pointer
-                  border border-green-600 text-green-700 hover:bg-green-600 hover:text-white transition-colors"
-              >
-                <FaEdit />
-                <span>Edit</span>
-              </button>
-
-              <button
-                onClick={() => handleDelete(product)}
-                disabled={deleting}
-                className="flex items-center gap-2 px-6 py-2.5 text-sm md:text-base rounded-lg font-medium cursor-pointer
-                  border border-red-500 text-red-600 hover:bg-red-500 hover:text-white transition-colors disabled:opacity-60"
-              >
-                <FaTrash />
-                <span>{deleting ? "Deleting..." : "Delete"}</span>
-              </button>
-            </div>
-
-            {/* Modals */}
-            <EditMetaData
-              isOpen={editModal}
-              onClose={() => setEditModal(false)}
-              currentProduct={currentProduct}
-              setOnboardingData={setOnboardingData}
-            />
-
-            <DeleteMetaData
-              isOpen={deleteModal}
-              onClose={() => setDeleteModal(false)}
-              currentProduct={currentProduct}
-              setOnboardingData={setOnboardingData}
-              setReload={setReload}
-            />
           </>
         )}
       </div>
