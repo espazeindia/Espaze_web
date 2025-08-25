@@ -253,20 +253,39 @@ function ProductDetails() {
                 </div>
 
                 {/* Pricing & Stock */}
-                <div>
-                  <h4 className="font-medium text-current mb-2">Pricing & Stock</h4>
-                  {product.mrp && <p>Seller&apos;s Price: ₹{product.mrp}</p>}
-                  {product.price && <p>Price: ₹{product.price}</p>}
-                  {product.quantity !== undefined && <p>Quantity: {product.quantity}</p>}
-                  {product.visible !== undefined && (
-                    <p>
-                      Visibility:{" "}
-                      <span className={product.visible ? "text-emerald-600" : "text-red-600"}>
-                        {product.visible ? "Visible" : "Hidden"}
-                      </span>
-                    </p>
-                  )}
+                <div className="bg-white/70 backdrop-blur-lg rounded-2xl shadow-md p-4 border border-gray-200">
+                  <h4 className="text-lg font-semibold text-gray-800 mb-3">Pricing & Stock</h4>
+                  <div className="space-y-2 text-gray-700">
+                    {product.mrp && (
+                      <p>
+                        <span className="font-medium">Seller&apos;s Price:</span>{" "}
+                        <span className="line-through text-red-500">₹{product.mrp}</span>
+                      </p>
+                    )}
+                    {product.price && (
+                      <p>
+                        <span className="font-medium">Current Price:</span>{" "}
+                        <span className="text-green-600 font-semibold">₹{product.price}</span>
+                      </p>
+                    )}
+                    {product.quantity !== undefined && (
+                      <p>
+                        <span className="font-medium">Quantity Available:</span> {product.quantity}
+                      </p>
+                    )}
+                    {product.visible !== undefined && (
+                      <p>
+                        <span className="font-medium">Visibility:</span>{" "}
+                        {product.visible ? (
+                          <span className="text-green-600 font-semibold">Visible</span>
+                        ) : (
+                          <span className="text-red-500 font-semibold">Hidden</span>
+                        )}
+                      </p>
+                    )}
+                  </div>
                 </div>
+
 
                 {/* Dates (heading removed intentionally) */}
                 <div>
