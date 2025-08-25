@@ -8,6 +8,7 @@ import MetaDataServices from "../services/MetaDataServices";
 import InventoryServices from "../services/InventoryServices";
 import EditMetaData from "../components/modal/EditMetaData";
 import DeleteMetaData from "../components/modal/DeleteMetaData";
+import { FaRegImage } from "react-icons/fa";
 
 function ProductDetails() {
   const { id } = useParams();
@@ -147,8 +148,9 @@ function ProductDetails() {
                     className="w-full h-60 object-cover rounded-xl border"
                   />
                 ) : (
-                  <div className="w-full h-60 flex items-center justify-center rounded-xl border border-dashed">
-                    <span>No Image</span>
+                  <div className="w-full h-60 flex flex-col items-center justify-center rounded-xl border border-dashed text-gray-500">
+                    <FaRegImage className="text-4xl mb-2" />
+                    <span>No Image Available</span>
                   </div>
                 )}
               </div>
@@ -156,88 +158,92 @@ function ProductDetails() {
               <div className="lg:w-2/3 w-full">
                 <div className="flex items-start justify-between gap-3">
                   <h2 className="text-2xl font-bold">{product.name}</h2>
-
-                  {/* Visibility toggle button */}
-                  <button
-                    onClick={toggleVisibility}
-                    className="flex items-center gap-2 px-3 py-1 rounded-md border text-sm hover:bg-zinc-100 dark:hover:bg-zinc-700 transition"
-                  >
-                    {product.visible ? (
-                      <>
-                        <Eye size={16} /> Visible
-                      </>
-                    ) : (
-                      <>
-                        <EyeOff size={16} /> Hidden
-                      </>
-                    )}
-                  </button>
-                </div>
-
-                {/* Price Section */}
-                <div className="flex flex-wrap items-center gap-3 mt-3">
-                  {product.price && (
-                    <span className="text-2xl font-semibold text-emerald-600">
-                      ₹{product.price}
-                    </span>
-                  )}
-                  {product.mrp && (
-                    <span className={`${muted}`}>
-                      Seller's Price: ₹{product.mrp}
-                    </span>
-                  )}
-                </div>
-
-                {/* Description */}
-                {product.description && (
-                  <p className={`mt-4 leading-relaxed ${subText}`}>{product.description}</p>
-                )}
-              </div>
-            </div>
-
-            {/* Divider */}
-            <div className={`my-6 border-t ${borderClr}`} />
-
-            {/* More Details */}
-            <div className={`rounded-xl border ${borderClr} p-5`}>
-              <h3 className="font-semibold mb-4 text-lg">More Details</h3>
-              <div className={`grid md:grid-cols-2 gap-6 text-sm ${subText}`}>
-                {/* Identifiers */}
-                <div>
-                  <h4 className="font-medium text-current mb-2">Identifiers</h4>
-                  {product.id && <p>ID: {product.id}</p>}
-                  {product.hsn_code && <p>HSN Code: {product.hsn_code}</p>}
-                  {product.category_name && <p>Category: {product.category_name}</p>}
-                  {product.subcategory_name && <p>Subcategory: {product.subcategory_name}</p>}
-                </div>
-
-                {/* Pricing & Stock */}
-                <div>
-                  <h4 className="font-medium text-current mb-2">Pricing & Stock</h4>
-                  {product.mrp && <p>Seller's Price: ₹{product.mrp}</p>}
-                  {product.price && <p>Price: ₹{product.price}</p>}
-                  {product.quantity !== undefined && <p>Quantity: {product.quantity}</p>}
-                  {product.visible !== undefined && <p>Visibility: {product.visible ? "Visible" : "Hidden"}</p>}
-                </div>
-
-                {/* Dates Removed Heading ✅ */}
-                <div>
-                  {product.m_date && <p>Manufacturing: {product.m_date}</p>}
-                  {product.e_date && <p>Expiry: {product.e_date}</p>}
-                </div>
-
-                {/* Reviews */}
-                <div>
-                  <h4 className="font-medium text-current mb-2">Reviews</h4>
-                  <p>Total Stars: {product.total_stars || 0}</p>
-                  <p>Total Reviews: {product.total_reviews || 0}</p>
                 </div>
               </div>
             </div>
-          </>
+
+            {/* Visibility toggle button */}
+            <button
+              onClick={toggleVisibility}
+              className="flex items-center gap-2 px-3 py-1 rounded-md border text-sm hover:bg-zinc-100 dark:hover:bg-zinc-700 transition"
+            >
+              {product.visible ? (
+                <>
+                  <Eye size={16} /> Visible
+                </>
+              ) : (
+                <>
+                  <EyeOff size={16} /> Hidden
+                </>
+              )}
+            </button>
+          </div>
+
+        {/* Price Section */}
+        <div className="flex flex-wrap items-center gap-3 mt-3">
+          {product.price && (
+            <span className="text-2xl font-semibold text-emerald-600">
+              ₹{product.price}
+            </span>
+          )}
+          {product.mrp && (
+            <span className={`${muted}`}>
+              Seller's Price: ₹{product.mrp}
+            </span>
+          )}
+        </div>
+
+        {/* Description */}
+        {product.description && (
+          <p className={`mt-4 leading-relaxed ${subText}`}>{product.description}</p>
         )}
       </div>
     </div>
+
+            {/* Divider */ }
+  <div className={`my-6 border-t ${borderClr}`} />
+
+  {/* More Details */ }
+  <div className={`rounded-xl border ${borderClr} p-5`}>
+    <h3 className="font-semibold mb-4 text-lg">More Details</h3>
+    <div className={`grid md:grid-cols-2 gap-6 text-sm ${subText}`}>
+      {/* Identifiers */}
+      <div>
+        <h4 className="font-medium text-current mb-2">Identifiers</h4>
+        {product.id && <p>ID: {product.id}</p>}
+        {product.hsn_code && <p>HSN Code: {product.hsn_code}</p>}
+        {product.category_name && <p>Category: {product.category_name}</p>}
+        {product.subcategory_name && <p>Subcategory: {product.subcategory_name}</p>}
+      </div>
+
+      {/* Pricing & Stock */}
+      <div>
+        <h4 className="font-medium text-current mb-2">Pricing & Stock</h4>
+        {product.mrp && <p>Seller's Price: ₹{product.mrp}</p>}
+        {product.price && <p>Price: ₹{product.price}</p>}
+        {product.quantity !== undefined && <p>Quantity: {product.quantity}</p>}
+        {product.visible !== undefined && <p>Visibility: {product.visible ? "Visible" : "Hidden"}</p>}
+      </div>
+
+      {/* Dates Removed Heading ✅ */}
+      <div>
+        {product.m_date && <p>Manufacturing: {product.m_date}</p>}
+        {product.e_date && <p>Expiry: {product.e_date}</p>}
+      </div>
+
+      {/* Reviews */}
+      <div>
+        <h4 className="font-medium text-current mb-2">Reviews</h4>
+        <p>Total Stars: {product.total_stars || 0}</p>
+        <p>Total Reviews: {product.total_reviews || 0}</p>
+      </div>
+    </div>
+  </div>
+          </>
+        )
+}
+      </div >
+    </div >
   );
 }
 
