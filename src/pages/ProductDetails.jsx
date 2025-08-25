@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa";
-import { Eye, EyeOff } from "lucide-react"; // 👁️ icons
+import { Eye, EyeOff } from "lucide-react";  // 👁️ icons
 import { notifyError, notifySuccess } from "../utils/toast";
 import { useMode } from "../contexts/themeModeContext";
 import MetaDataServices from "../services/MetaDataServices";
 import InventoryServices from "../services/InventoryServices";
+import EditMetaData from "../components/modal/EditMetaData";
+import DeleteMetaData from "../components/modal/DeleteMetaData";
 
 function ProductDetails() {
   const { id } = useParams();
@@ -116,82 +118,90 @@ function ProductDetails() {
   const borderClr = theme ? "border-zinc-200" : "border-zinc-700";
 
   return (
-    <div className={`p-5 min-h-screen flex justify-center items-start ${containerBG}`}>
-      <div className={`w-full max-w-5xl rounded-2xl overflow-hidden shadow-lg border ${borderClr} ${cardBG}`}>
-        {/* Header */}
-        <div className="flex items-center gap-3 p-5 border-b">
-          <button
-            onClick={() => navigate("/product-onboarding")}
-            className={`p-2 rounded-lg border ${borderClr} hover:bg-zinc-100 dark:hover:bg-zinc-700 transition`}
-            aria-label="Back"
-          >
-            <FaArrowLeft size={18} />
-          </button>
-          <h1 className="font-bold text-xl">Product Details</h1>
-        </div>
+    <div className={`p-5 min-h-full ${containerBG}`}>
+      {/* Header */}
+      <div className="flex items-center mb-5">
+        <button
+          onClick={() => navigate("/product-onboarding")}
+          className={`mr-3 p-2 rounded-lg border ${borderClr} hover:bg-zinc-100 dark:hover:bg-zinc-700 transition`}
+          aria-label="Back"
+        >
+          <FaArrowLeft size={18} />
+        </button>
+        <h1 className="font-bold text-xl">Product Details</h1>
+      </div>
 
+      {/* Card */}
+      <div className={`rounded-2xl p-5 ${cardBG} border ${borderClr} shadow-sm`}>
         {!product ? (
           <div className={`text-center py-16 ${muted}`}>No product found</div>
         ) : (
-          <div className="flex flex-col lg:flex-row">
-            {/* Left Side - Product Image */}
-            <div className="lg:w-1/3 w-full p-6 flex justify-center items-center border-r">
-              {product.image ? (
-                <img
-                  src={product.image}
-                  alt={product.name}
-                  className="w-64 h-64 object-cover rounded-xl border shadow-md"
-                />
-              ) : (
-                <div className="w-64 h-64 flex items-center justify-center rounded-xl border border-dashed">
-                  <span>No Image</span>
+          <>
+            {/* Image + Info */}
+            <div className="flex flex-col lg:flex-row gap-6">
+              <div className="lg:w-1/3 w-full">
+                {product.image ? (
+                  <img
+                    src={product.image}
+                    alt={product.name}
+                    className="w-full h-60 object-cover rounded-xl border"
+                  />
+                ) : (
+                  <div className="w-full h-60 flex items-center justify-center rounded-xl border border-dashed">
+                    <span>No Image</span>
+                  </div>
+                )}
+              </div>
+
+              <div className="lg:w-2/3 w-full">
+                <div className="flex items-start justify-between gap-3">
+                  <h2 className="text-2xl font-bold">{product.name}</h2>
+
+                  {/* Visibility toggle button */}
+                  <button
+                    onClick={toggleVisibility}
+                    className="flex items-center gap-2 px-3 py-1 rounded-md border text-sm hover:bg-zinc-100 dark:hover:bg-zinc-700 transition"
+                  >
+                    {product.visible ? (
+                      <>
+                        <Eye size={16} /> Visible
+                      </>
+                    ) : (
+                      <>
+                        <EyeOff size={16} /> Hidden
+                      </>
+                    )}
+                  </button>
                 </div>
-              )}
+
+                {/* Price Section */}
+                <div className="flex flex-wrap items-center gap-3 mt-3">
+                  {product.price && (
+                    <span className="text-2xl font-semibold text-emerald-600">
+                      ₹{product.price}
+                    </span>
+                  )}
+                  {product.mrp && (
+                    <span className={`${muted}`}>
+                      Seller's Price: ₹{product.mrp}
+                    </span>
+                  )}
+                </div>
+
+                {/* Description */}
+                {product.description && (
+                  <p className={`mt-4 leading-relaxed ${subText}`}>{product.description}</p>
+                )}
+              </div>
             </div>
 
-            {/* Right Side - Product Info */}
-            <div className="lg:w-2/3 w-full p-6">
-              {/* Name + Visibility Toggle */}
-              <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold">{product.name}</h2>
-                <button
-                  onClick={toggleVisibility}
-                  className="flex items-center gap-2 px-3 py-1 rounded-md border text-sm hover:bg-zinc-100 dark:hover:bg-zinc-700 transition"
-                >
-                  {product.visible ? (
-                    <>
-                      <Eye size={16} /> Visible
-                    </>
-                  ) : (
-                    <>
-                      <EyeOff size={16} /> Hidden
-                    </>
-                  )}
-                </button>
-              </div>
+            {/* Divider */}
+            <div className={`my-6 border-t ${borderClr}`} />
 
-              {/* Price Section */}
-              <div className="flex flex-wrap items-center gap-3 mt-3">
-                {product.price && (
-                  <span className="text-2xl font-semibold text-emerald-600">
-                    ₹{product.price}
-                  </span>
-                )}
-                {product.mrp && (
-                  <span className={`${muted}`}>Seller's Price: ₹{product.mrp}</span>
-                )}
-              </div>
-
-              {/* Description */}
-              {product.description && (
-                <p className={`mt-4 leading-relaxed ${subText}`}>{product.description}</p>
-              )}
-
-              {/* Divider */}
-              <div className={`my-6 border-t ${borderClr}`} />
-
-              {/* More Details */}
-              <div className="grid md:grid-cols-2 gap-6 text-sm">
+            {/* More Details */}
+            <div className={`rounded-xl border ${borderClr} p-5`}>
+              <h3 className="font-semibold mb-4 text-lg">More Details</h3>
+              <div className={`grid md:grid-cols-2 gap-6 text-sm ${subText}`}>
                 {/* Identifiers */}
                 <div>
                   <h4 className="font-medium text-current mb-2">Identifiers</h4>
@@ -210,7 +220,7 @@ function ProductDetails() {
                   {product.visible !== undefined && <p>Visibility: {product.visible ? "Visible" : "Hidden"}</p>}
                 </div>
 
-                {/* Dates (without heading ✅) */}
+                {/* Dates Removed Heading ✅ */}
                 <div>
                   {product.m_date && <p>Manufacturing: {product.m_date}</p>}
                   {product.e_date && <p>Expiry: {product.e_date}</p>}
@@ -224,7 +234,7 @@ function ProductDetails() {
                 </div>
               </div>
             </div>
-          </div>
+          </>
         )}
       </div>
     </div>
@@ -232,4 +242,3 @@ function ProductDetails() {
 }
 
 export default ProductDetails;
-
