@@ -224,7 +224,7 @@ function ProductDetails() {
                     </span>
                   )}
                   {product.mrp && (
-                    <span className={`${muted}`}>Seller&apos;s Price: ₹{product.mrp}</span>
+                    <span className={`${muted}`}>Seller&apos;s Price: ₹0</span>
                   )}
                 </div>
 
@@ -255,7 +255,7 @@ function ProductDetails() {
                 {/* Pricing & Stock */}
                 <div>
                   <h4 className="font-medium text-current mb-2">Pricing & Stock</h4>
-                  {product.mrp && <p>Seller&apos;s Price: ₹{product.mrp}</p>}
+                  {product.mrp && <p> MRP: ₹{product.mrp}</p>}
                   {product.price && <p>Price: ₹{product.price}</p>}
                   {product.quantity !== undefined && <p>Quantity: {product.quantity}</p>}
                   {product.visible !== undefined && (
