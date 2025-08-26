@@ -15,7 +15,6 @@ function ProductDetails() {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // ---------- Transform Helper ----------
   const transformProduct = (d, isInventory = false) => ({
     id: isInventory ? d.inventory_product_id : d.id,
     hsn_code: isInventory ? d.metadata_hsn_code : d.hsn_code,
@@ -34,7 +33,6 @@ function ProductDetails() {
     m_date: isInventory ? d.product_manufacturing_date : d.manufacturing_date,
   });
 
-  // ---------- API ----------
   const fetchProduct = async (pid) => {
     try {
       setLoading(true);
@@ -71,20 +69,17 @@ function ProductDetails() {
     else if (id.includes("inventory_")) fetchInventory(id.split("inventory_")[1]);
   }, [id]);
 
-  // ---------- Visibility Toggle (UI only) ----------
   const toggleVisibility = () => {
     setProduct((p) => ({ ...p, visible: !p.visible }));
     notifySuccess(`Product is now ${!product.visible ? "Visible" : "Hidden"}`);
   };
 
-  // ---------- Theme helpers ----------
   const containerBG = theme ? "bg-zinc-100 text-black" : "bg-neutral-950 text-white";
   const cardBG = theme ? "bg-white text-black" : "bg-zinc-800 text-white";
   const subText = theme ? "text-zinc-600" : "text-zinc-300";
   const muted = theme ? "text-zinc-500" : "text-zinc-400";
   const borderClr = theme ? "border-zinc-200" : "border-zinc-700";
 
-  // ---------- Small UI helpers ----------
   const Badge = ({ children, className = "" }) => (
     <span
       className={`px-2.5 py-1 rounded-full text-xs font-semibold border ${className}`}
@@ -107,7 +102,6 @@ function ProductDetails() {
 
   return (
     <div className={`p-5 min-h-full ${containerBG}`}>
-      {/* Header */}
       <div className="flex items-center mb-5">
         <button
           onClick={() => navigate("/product-onboarding")}
@@ -119,15 +113,12 @@ function ProductDetails() {
         <h1 className="font-bold text-xl">Product Details</h1>
       </div>
 
-      {/* Card */}
       <div className={`rounded-2xl p-6 ${cardBG} border ${borderClr} shadow-md`}>
         {!product ? (
           <div className={`text-center py-16 ${muted}`}>No product found</div>
         ) : (
           <>
-            {/* === Top: Image + Info === */}
             <div className="flex flex-col lg:flex-row gap-6">
-              {/* Image Box */}
               <div className="lg:w-1/3 w-full">
                 <div className="rounded-2xl border border-zinc-200 dark:border-zinc-700 p-3 bg-zinc-50 dark:bg-zinc-900 h-60 flex items-center justify-center">
                   {product.image ? (
@@ -145,12 +136,9 @@ function ProductDetails() {
                 </div>
               </div>
 
-              {/* Right Content */}
               <div className="lg:w-2/3 w-full">
                 <div className="flex items-start justify-between">
                   <h2 className="text-2xl font-bold">{product.name}</h2>
-
-                  {/* Right-side badges */}
                   <div className="flex flex-wrap gap-2">
                     <Badge
                       className={
@@ -183,13 +171,11 @@ function ProductDetails() {
                   </div>
                 </div>
 
-                {/* Stars + count */}
                 <div className="flex items-center gap-2 mt-2">
                   <Stars count={product.total_stars || 0} />
                   <span className={`text-xs ${muted}`}>({product.total_reviews || 0})</span>
                 </div>
 
-                {/* Category chips */}
                 <div className="flex items-center gap-2 mt-2">
                   {product.category_name && (
                     <Badge className="bg-amber-100 text-amber-700 border-amber-200">
@@ -203,7 +189,6 @@ function ProductDetails() {
                   )}
                 </div>
 
-                {/* Price */}
                 <div className="flex flex-wrap items-center gap-3 mt-3">
                   {product.price && (
                     <span className="text-2xl font-semibold text-emerald-600">
@@ -211,37 +196,32 @@ function ProductDetails() {
                     </span>
                   )}
                   {product.mrp && (
-                    <span className={`${muted}`}>Seller&apos;s Price: ₹0</span>
+                    <span className={`${muted}`}>Price: ₹0</span>
                   )}
                 </div>
 
-                {/* Description */}
                 {product.description && (
                   <p className={`mt-4 leading-relaxed ${subText}`}>{product.description}</p>
                 )}
               </div>
             </div>
 
-            {/* Divider */}
             <div className={`my-6 border-t ${borderClr}`} />
 
-            {/* === More Details === */}
             <div className={`rounded-xl border ${borderClr} p-5`}>
-              <h3 className="font-semibold mb-4 text-lg">More Details</h3>
+              <h3 className="font-bold mb-4 text-xl">More Details</h3>
 
               <div className={`grid md:grid-cols-2 gap-6 text-sm ${subText}`}>
-                {/* Identifiers */}
                 <div>
-                  <h4 className="font-medium text-current mb-2">Identifiers</h4>
-                  {product.id && <p>ID: {product.id}</p>}
+                  <h4 className="font-bold text-lg text-current mb-2">Identifiers</h4>
+                  {product.id && <p>Product ID: {product.id}</p>}
                   {product.hsn_code && <p>HSN Code: {product.hsn_code}</p>}
                   {product.category_name && <p>Category: {product.category_name}</p>}
                   {product.subcategory_name && <p>Subcategory: {product.subcategory_name}</p>}
                 </div>
 
-                {/* Pricing & Stock */}
                 <div>
-                  <h4 className="font-medium text-current mb-2">Pricing & Stock</h4>
+                  <h4 className="font-bold text-lg text-current mb-2">Pricing & Stock</h4>
                   {product.mrp && <p> MRP: ₹{product.mrp}</p>}
                   {product.price && <p>Price: ₹{product.price}</p>}
                   {product.quantity !== undefined && <p>Quantity: {product.quantity}</p>}
@@ -255,15 +235,13 @@ function ProductDetails() {
                   )}
                 </div>
 
-                {/* Dates */}
                 <div>
                   {product.m_date && <p>Manufacturing: {product.m_date}</p>}
                   {product.e_date && <p>Expiry: {product.e_date}</p>}
                 </div>
 
-                {/* Reviews */}
                 <div>
-                  <h4 className="font-medium text-current mb-2">Reviews</h4>
+                  <h4 className="font-bold text-lg text-current mb-2">Reviews</h4>
                   <p>Total Stars: {product.total_stars || 0}</p>
                   <p>Total Reviews: {product.total_reviews || 0}</p>
                 </div>
