@@ -15,28 +15,32 @@ function ProductDetails() {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // ---------- Transform Helper ----------
+  const transformProduct = (d, isInventory = false) => ({
+    id: isInventory ? d.inventory_product_id : d.id,
+    hsn_code: isInventory ? d.metadata_hsn_code : d.hsn_code,
+    name: isInventory ? d.metadata_name : d.name,
+    description: isInventory ? d.metadata_description : d.description,
+    image: isInventory ? d.metadata_image : d.image,
+    category_name: isInventory ? d.metadata_category_name : d.category_name,
+    subcategory_name: isInventory ? d.metadata_subcategory_name : d.subcategory_name,
+    mrp: isInventory ? d.metadata_mrp : d.mrp,
+    total_stars: isInventory ? d.metadata_total_stars : d.total_stars,
+    total_reviews: isInventory ? d.metadata_total_reviews : d.total_reviews,
+    visible: isInventory ? d.product_visibility : d.visible,
+    quantity: isInventory ? d.product_quantity : undefined,
+    price: isInventory ? d.product_price : undefined,
+    e_date: isInventory ? d.product_expiry_date : d.expiry_date,
+    m_date: isInventory ? d.product_manufacturing_date : d.manufacturing_date,
+  });
+
   // ---------- API ----------
   const fetchProduct = async (pid) => {
     try {
       setLoading(true);
       const result = await MetaDataServices.FetchMetadataById(pid);
       if (result.success) {
-        const d = result.data;
-        setProduct({
-          id: d.id,
-          hsn_code: d.hsn_code,
-          name: d.name,
-          description: d.description,
-          image: d.image,
-          category_name: d.category_name,
-          subcategory_name: d.subcategory_name,
-          mrp: d.mrp,
-          total_stars: d.total_stars,
-          total_reviews: d.total_reviews,
-          m_date: d.manufacturing_date,
-          e_date: d.expiry_date,
-          visible: d.visible,
-        });
+        setProduct(transformProduct(result.data));
       } else notifyError(result.message || "Failed to fetch product details");
     } catch (err) {
       if (err === "cookie error") navigate("/login");
@@ -51,24 +55,7 @@ function ProductDetails() {
       setLoading(true);
       const result = await InventoryServices.FetchInventoryById(pid);
       if (result.success) {
-        const d = result.data;
-        setProduct({
-          id: d.inventory_product_id,
-          hsn_code: d.metadata_hsn_code,
-          name: d.metadata_name,
-          description: d.metadata_description,
-          image: d.metadata_image,
-          category_name: d.metadata_category_name,
-          subcategory_name: d.metadata_subcategory_name,
-          mrp: d.metadata_mrp,
-          total_stars: d.metadata_total_stars,
-          total_reviews: d.metadata_total_reviews,
-          visible: d.product_visibility,
-          quantity: d.product_quantity,
-          price: d.product_price,
-          e_date: d.product_expiry_date,
-          m_date: d.product_manufacturing_date,
-        });
+        setProduct(transformProduct(result.data, true));
       } else notifyError(result.message || "Failed to fetch product details");
     } catch (err) {
       if (err === "cookie error") navigate("/login");
@@ -106,7 +93,7 @@ function ProductDetails() {
     </span>
   );
 
-  const Stars = ({ count = 0 }) => (
+  const Stars = React.memo(({ count = 0 }) => (
     <div className="flex items-center gap-1">
       {[...Array(5)].map((_, i) => (
         <Star
@@ -116,7 +103,7 @@ function ProductDetails() {
         />
       ))}
     </div>
-  );
+  ));
 
   return (
     <div className={`p-5 min-h-full ${containerBG}`}>
@@ -138,7 +125,7 @@ function ProductDetails() {
           <div className={`text-center py-16 ${muted}`}>No product found</div>
         ) : (
           <>
-            {/* === Top: Image + Info (ditto layout) === */}
+            {/* === Top: Image + Info === */}
             <div className="flex flex-col lg:flex-row gap-6">
               {/* Image Box */}
               <div className="lg:w-1/3 w-full">
@@ -146,7 +133,7 @@ function ProductDetails() {
                   {product.image ? (
                     <img
                       src={product.image}
-                      alt={product.name}
+                      alt={product.name || "Product image"}
                       className="w-full h-full object-cover rounded-xl"
                     />
                   ) : (
@@ -163,7 +150,7 @@ function ProductDetails() {
                 <div className="flex items-start justify-between">
                   <h2 className="text-2xl font-bold">{product.name}</h2>
 
-                  {/* Right-side badges: Visibility, Stock, HSN */}
+                  {/* Right-side badges */}
                   <div className="flex flex-wrap gap-2">
                     <Badge
                       className={
@@ -268,7 +255,7 @@ function ProductDetails() {
                   )}
                 </div>
 
-                {/* Dates (heading removed intentionally) */}
+                {/* Dates */}
                 <div>
                   {product.m_date && <p>Manufacturing: {product.m_date}</p>}
                   {product.e_date && <p>Expiry: {product.e_date}</p>}
