@@ -81,9 +81,7 @@ function ProductDetails() {
   const borderClr = theme ? "border-zinc-200" : "border-zinc-700";
 
   const Badge = ({ children, className = "" }) => (
-    <span
-      className={`px-2.5 py-1 rounded-full text-xs font-semibold border ${className}`}
-    >
+    <span className={`px-2.5 py-1 rounded-full text-xs font-semibold border ${className}`}>
       {children}
     </span>
   );
@@ -119,6 +117,7 @@ function ProductDetails() {
         ) : (
           <>
             <div className="flex flex-col lg:flex-row gap-6">
+              {/* Image */}
               <div className="lg:w-1/3 w-full">
                 <div className="rounded-2xl border border-zinc-200 dark:border-zinc-700 p-3 bg-zinc-50 dark:bg-zinc-900 h-60 flex items-center justify-center">
                   {product.image ? (
@@ -136,6 +135,7 @@ function ProductDetails() {
                 </div>
               </div>
 
+              {/* Info */}
               <div className="lg:w-2/3 w-full">
                 <div className="flex items-start justify-between">
                   <h2 className="text-2xl font-bold">{product.name}</h2>
@@ -176,28 +176,30 @@ function ProductDetails() {
                   <span className={`text-xs ${muted}`}>({product.total_reviews || 0})</span>
                 </div>
 
-                <div className="flex items-center gap-2 mt-2">
+                {/* Category & Subcategory in separate headings */}
+                <div className="mt-4">
                   {product.category_name && (
-                    <Badge className="bg-amber-100 text-amber-700 border-amber-200">
-                      {product.category_name}
-                    </Badge>
+                    <div className="mb-2">
+                      <h4 className="text-lg font-bold">Category</h4>
+                      <p className={`${subText}`}>{product.category_name}</p>
+                    </div>
                   )}
                   {product.subcategory_name && (
-                    <Badge className="bg-purple-100 text-purple-700 border-purple-200">
-                      {product.subcategory_name}
-                    </Badge>
+                    <div>
+                      <h4 className="text-lg font-bold">Subcategory</h4>
+                      <p className={`${subText}`}>{product.subcategory_name}</p>
+                    </div>
                   )}
                 </div>
 
+                {/* Price */}
                 <div className="flex flex-wrap items-center gap-3 mt-3">
                   {product.price && (
                     <span className="text-2xl font-semibold text-emerald-600">
                       ₹{product.price}
                     </span>
                   )}
-                  {product.mrp && (
-                    <span className={`${muted}`}>Price: ₹0</span>
-                  )}
+                  {product.mrp && <span className={`${muted}`}>Price: ₹0</span>}
                 </div>
 
                 {product.description && (
@@ -208,16 +210,15 @@ function ProductDetails() {
 
             <div className={`my-6 border-t ${borderClr}`} />
 
+            {/* More Details Section */}
             <div className={`rounded-xl border ${borderClr} p-5`}>
-              <h3 className="font-bold mb-4 text-xl">More Details</h3>
+              <h3 className="font-bold mb-4 text-2xl">More Details</h3>
 
               <div className={`grid md:grid-cols-2 gap-6 text-sm ${subText}`}>
                 <div>
                   <h4 className="font-bold text-lg text-current mb-2">Identifiers</h4>
                   {product.id && <p>Product ID: {product.id}</p>}
                   {product.hsn_code && <p>HSN Code: {product.hsn_code}</p>}
-                  {product.category_name && <p>Category: {product.category_name}</p>}
-                  {product.subcategory_name && <p>Subcategory: {product.subcategory_name}</p>}
                 </div>
 
                 <div>
