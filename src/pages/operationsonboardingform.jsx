@@ -1,187 +1,174 @@
 import React, { useState } from "react";
 
-const OperationsOnboardingForm = () => {
-  const [profilePic, setProfilePic] = useState(null);
+export default function OperationsOnboarding() {
+  const [formData, setFormData] = useState({
+    name: "",
+    phone: "",
+    email: "",
+    address1: "",
+    address2: "",
+    address3: "",
+    pan: "",
+    password: "",
+    warehouse: "",
+    profilePic: null,
+  });
 
-  const handleImageChange = (e) => {
-    if (e.target.files && e.target.files[0]) {
-      setProfilePic(URL.createObjectURL(e.target.files[0]));
+  const warehouses = ["Warehouse A", "Warehouse B", "Warehouse C"];
+
+  const handleChange = (e) => {
+    const { name, value, files } = e.target;
+    if (name === "profilePic") {
+      setFormData({ ...formData, profilePic: files[0] });
+    } else {
+      setFormData({ ...formData, [name]: value });
     }
   };
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log("Form Submitted:", formData);
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-100 via-white to-purple-50 p-6">
-      <div className="bg-white shadow-xl rounded-2xl p-8 w-full max-w-3xl border border-purple-200">
+    <div className="flex justify-center items-center min-h-screen bg-gradient-to-r from-purple-700 via-purple-500 to-indigo-500 p-6">
+      <div className="w-full max-w-3xl bg-white/20 backdrop-blur-md rounded-3xl shadow-2xl p-10 border border-white/30">
         
-        {/* Title */}
-        <h2 className="text-3xl font-bold text-purple-700 text-center mb-6">
-          Operations Onboarding
+        {/* Header */}
+        <h2 className="text-3xl font-bold text-white text-center mb-6 drop-shadow-md">
+          🚀 Operations Onboarding
         </h2>
 
         {/* Profile Image Upload */}
-        <div className="flex flex-col items-center mb-8">
-          <label className="cursor-pointer relative">
-            <div className="w-28 h-28 rounded-full border-4 border-purple-400 bg-purple-50 flex items-center justify-center overflow-hidden shadow-md hover:scale-105 transition">
-              {profilePic ? (
+        <div className="flex flex-col items-center mb-6">
+          <label className="relative cursor-pointer">
+            <div className="w-28 h-28 rounded-full bg-white/30 flex items-center justify-center border-4 border-purple-300 shadow-lg overflow-hidden">
+              {formData.profilePic ? (
                 <img
-                  src={profilePic}
+                  src={URL.createObjectURL(formData.profilePic)}
                   alt="Profile"
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <span className="text-purple-500 text-sm font-medium">Upload</span>
+                <span className="text-white font-semibold">Upload</span>
               )}
             </div>
             <input
               type="file"
-              className="hidden"
+              name="profilePic"
               accept="image/*"
-              onChange={handleImageChange}
+              className="hidden"
+              onChange={handleChange}
             />
           </label>
-          <p className="text-xs text-gray-500 mt-2">Upload Profile Picture</p>
+          <p className="text-white/80 text-sm mt-2">Profile Picture</p>
         </div>
 
         {/* Form */}
-        <form className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Name */}
-          <div>
-            <label className="block text-sm font-semibold text-gray-600">
-              Full Name
-            </label>
-            <input
-              type="text"
-              placeholder="Enter full name"
-              className="mt-1 w-full border border-purple-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-purple-500 focus:outline-none"
-              required
-            />
-          </div>
+        <form
+          onSubmit={handleSubmit}
+          className="grid grid-cols-1 md:grid-cols-2 gap-6 text-white"
+        >
+          <input
+            type="text"
+            name="name"
+            placeholder="Full Name"
+            value={formData.name}
+            onChange={handleChange}
+            className="p-3 rounded-xl bg-white/20 border border-white/30 placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-purple-300"
+            required
+          />
 
-          {/* Phone Number */}
-          <div>
-            <label className="block text-sm font-semibold text-gray-600">
-              Phone Number
-            </label>
-            <input
-              type="number"
-              placeholder="Enter phone number"
-              className="mt-1 w-full border border-purple-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-purple-500 focus:outline-none"
-              required
-              onInput={(e) => {
-                if (e.target.value.length > 10)
-                  e.target.value = e.target.value.slice(0, 10);
-              }}
-            />
-          </div>
+          <input
+            type="number"
+            name="phone"
+            placeholder="Phone Number"
+            value={formData.phone}
+            onChange={handleChange}
+            className="p-3 rounded-xl bg-white/20 border border-white/30 placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-purple-300"
+            required
+          />
 
-          {/* Email */}
-          <div>
-            <label className="block text-sm font-semibold text-gray-600">
-              Email ID
-            </label>
-            <input
-              type="email"
-              placeholder="Enter email"
-              className="mt-1 w-full border border-purple-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-purple-500 focus:outline-none"
-              required
-            />
-          </div>
+          <input
+            type="email"
+            name="email"
+            placeholder="Email Address"
+            value={formData.email}
+            onChange={handleChange}
+            className="p-3 rounded-xl bg-white/20 border border-white/30 placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-purple-300"
+            required
+          />
 
-          {/* PAN */}
-          <div>
-            <label className="block text-sm font-semibold text-gray-600">
-              PAN Number
-            </label>
-            <input
-              type="text"
-              placeholder="Enter PAN number"
-              className="mt-1 w-full border border-purple-300 rounded-xl px-4 py-2 uppercase focus:ring-2 focus:ring-purple-500 focus:outline-none"
-              maxLength={10}
-              required
-            />
-          </div>
+          <input
+            type="text"
+            name="pan"
+            placeholder="PAN Number"
+            value={formData.pan}
+            onChange={handleChange}
+            className="p-3 rounded-xl bg-white/20 border border-white/30 placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-purple-300"
+            required
+          />
 
-          {/* Address Line 1 */}
-          <div>
-            <label className="block text-sm font-semibold text-gray-600">
-              Address Line 1
-            </label>
-            <input
-              type="text"
-              placeholder="Street / Locality"
-              className="mt-1 w-full border border-purple-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-purple-500 focus:outline-none"
-              required
-            />
-          </div>
+          <input
+            type="password"
+            name="password"
+            placeholder="Password"
+            value={formData.password}
+            onChange={handleChange}
+            className="p-3 rounded-xl bg-white/20 border border-white/30 placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-purple-300"
+            required
+          />
 
-          {/* Address Line 2 */}
-          <div>
-            <label className="block text-sm font-semibold text-gray-600">
-              Address Line 2
-            </label>
-            <input
-              type="text"
-              placeholder="City / District"
-              className="mt-1 w-full border border-purple-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-purple-500 focus:outline-none"
-              required
-            />
-          </div>
+          <select
+            name="warehouse"
+            value={formData.warehouse}
+            onChange={handleChange}
+            className="p-3 rounded-xl bg-white/20 border border-white/30 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-purple-300"
+            required
+          >
+            <option value="">Select Warehouse</option>
+            {warehouses.map((w, index) => (
+              <option key={index} value={w} className="text-black">
+                {w}
+              </option>
+            ))}
+          </select>
 
-          {/* Address Line 3 */}
-          <div>
-            <label className="block text-sm font-semibold text-gray-600">
-              Address Line 3
-            </label>
-            <input
-              type="text"
-              placeholder="State / Pin Code"
-              className="mt-1 w-full border border-purple-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-purple-500 focus:outline-none"
-              required
-            />
-          </div>
+          <input
+            type="text"
+            name="address1"
+            placeholder="Address Line 1"
+            value={formData.address1}
+            onChange={handleChange}
+            className="p-3 rounded-xl bg-white/20 border border-white/30 placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-purple-300 col-span-2"
+            required
+          />
+          <input
+            type="text"
+            name="address2"
+            placeholder="Address Line 2"
+            value={formData.address2}
+            onChange={handleChange}
+            className="p-3 rounded-xl bg-white/20 border border-white/30 placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-purple-300 col-span-2"
+          />
+          <input
+            type="text"
+            name="address3"
+            placeholder="Address Line 3"
+            value={formData.address3}
+            onChange={handleChange}
+            className="p-3 rounded-xl bg-white/20 border border-white/30 placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-purple-300 col-span-2"
+          />
 
-          {/* Password */}
-          <div>
-            <label className="block text-sm font-semibold text-gray-600">
-              Password
-            </label>
-            <input
-              type="password"
-              placeholder="Enter password"
-              className="mt-1 w-full border border-purple-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-purple-500 focus:outline-none"
-              required
-            />
-          </div>
-
-          {/* Warehouse Dropdown */}
-          <div>
-            <label className="block text-sm font-semibold text-gray-600">
-              Warehouse
-            </label>
-            <select
-              className="mt-1 w-full border border-purple-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-purple-500 focus:outline-none"
-              required
-            >
-              <option value="">Select Warehouse</option>
-              <option value="warehouse1">Warehouse 1</option>
-              <option value="warehouse2">Warehouse 2</option>
-              <option value="warehouse3">Warehouse 3</option>
-            </select>
-          </div>
-        </form>
-
-        {/* Submit Button */}
-        <div className="mt-8 flex justify-center">
+          {/* Submit Button */}
           <button
             type="submit"
-            className="bg-purple-600 text-white px-8 py-3 rounded-xl shadow-md hover:bg-purple-700 transition"
+            className="col-span-2 py-3 rounded-xl bg-purple-600 hover:bg-purple-700 transition-all text-lg font-semibold shadow-xl"
           >
-            Submit
+            Submit 🚀
           </button>
-        </div>
+        </form>
       </div>
     </div>
   );
-};
-
-export default OperationsOnboardingForm;
+}
