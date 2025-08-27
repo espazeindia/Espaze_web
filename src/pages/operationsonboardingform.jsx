@@ -1,10 +1,6 @@
 import React, { useState } from "react";
 
-const OperationsOnboardingForm = ({ role }) => {
-  if (role !== "operations") {
-    return null; // form visible only for operations login
-  }
-
+const OperationsOnboardingForm = () => {
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
@@ -17,115 +13,144 @@ const OperationsOnboardingForm = ({ role }) => {
     warehouse: "",
   });
 
+  const warehouses = ["Warehouse A", "Warehouse B", "Warehouse C"]; // dummy data
+
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Operations Onboarding Data: ", formData);
-    alert("Operations Onboarding Submitted ✅");
+    console.log("Operations Form Data:", formData);
+    alert("Operations Onboarding Submitted!");
   };
 
   return (
-    <div className="max-w-xl mx-auto mt-8 p-6 bg-white shadow-md rounded-lg">
-      <h2 className="text-2xl font-bold mb-4 text-center">Operations Onboarding</h2>
+    <div className="max-w-2xl mx-auto bg-white shadow-md rounded-lg p-6">
+      <h2 className="text-2xl font-bold mb-4">Operations Onboarding</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
-        
-        <input
-          type="text"
-          name="name"
-          placeholder="Full Name"
-          value={formData.name}
-          onChange={handleChange}
-          className="w-full border p-2 rounded"
-          required
-        />
 
-        <input
-          type="text"
-          name="phone"
-          placeholder="Phone Number"
-          value={formData.phone}
-          onChange={handleChange}
-          className="w-full border p-2 rounded"
-          required
-        />
+        {/* Name */}
+        <div>
+          <label className="block text-sm font-medium">Name</label>
+          <input
+            type="text"
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            className="w-full border rounded p-2"
+            required
+          />
+        </div>
 
-        <input
-          type="email"
-          name="email"
-          placeholder="Email ID"
-          value={formData.email}
-          onChange={handleChange}
-          className="w-full border p-2 rounded"
-          required
-        />
+        {/* Phone */}
+        <div>
+          <label className="block text-sm font-medium">Phone No</label>
+          <input
+            type="text"
+            name="phone"
+            value={formData.phone}
+            onChange={handleChange}
+            className="w-full border rounded p-2"
+            required
+          />
+        </div>
 
-        {/* Address divided into 3 parts */}
-        <input
-          type="text"
-          name="address1"
-          placeholder="Address Line 1"
-          value={formData.address1}
-          onChange={handleChange}
-          className="w-full border p-2 rounded"
-        />
-        <input
-          type="text"
-          name="address2"
-          placeholder="Address Line 2"
-          value={formData.address2}
-          onChange={handleChange}
-          className="w-full border p-2 rounded"
-        />
-        <input
-          type="text"
-          name="address3"
-          placeholder="Address Line 3"
-          value={formData.address3}
-          onChange={handleChange}
-          className="w-full border p-2 rounded"
-        />
+        {/* Email */}
+        <div>
+          <label className="block text-sm font-medium">Email ID</label>
+          <input
+            type="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            className="w-full border rounded p-2"
+            required
+          />
+        </div>
 
-        <input
-          type="text"
-          name="pan"
-          placeholder="PAN Number"
-          value={formData.pan}
-          onChange={handleChange}
-          className="w-full border p-2 rounded"
-          required
-        />
+        {/* Address */}
+        <div>
+          <label className="block text-sm font-medium">Address Line 1</label>
+          <input
+            type="text"
+            name="address1"
+            value={formData.address1}
+            onChange={handleChange}
+            className="w-full border rounded p-2"
+            required
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium">Address Line 2</label>
+          <input
+            type="text"
+            name="address2"
+            value={formData.address2}
+            onChange={handleChange}
+            className="w-full border rounded p-2"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium">Address Line 3</label>
+          <input
+            type="text"
+            name="address3"
+            value={formData.address3}
+            onChange={handleChange}
+            className="w-full border rounded p-2"
+          />
+        </div>
 
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          value={formData.password}
-          onChange={handleChange}
-          className="w-full border p-2 rounded"
-          required
-        />
+        {/* PAN */}
+        <div>
+          <label className="block text-sm font-medium">PAN</label>
+          <input
+            type="text"
+            name="pan"
+            value={formData.pan}
+            onChange={handleChange}
+            className="w-full border rounded p-2"
+            required
+          />
+        </div>
 
-        {/* Dropdown for Warehouse */}
-        <select
-          name="warehouse"
-          value={formData.warehouse}
-          onChange={handleChange}
-          className="w-full border p-2 rounded"
-          required
-        >
-          <option value="">Select Warehouse</option>
-          <option value="Delhi">Delhi</option>
-          <option value="Mumbai">Mumbai</option>
-          <option value="Bangalore">Bangalore</option>
-        </select>
+        {/* Password */}
+        <div>
+          <label className="block text-sm font-medium">Password</label>
+          <input
+            type="password"
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
+            className="w-full border rounded p-2"
+            required
+          />
+        </div>
 
+        {/* Warehouse Dropdown */}
+        <div>
+          <label className="block text-sm font-medium">Select Warehouse</label>
+          <select
+            name="warehouse"
+            value={formData.warehouse}
+            onChange={handleChange}
+            className="w-full border rounded p-2"
+            required
+          >
+            <option value="">-- Select --</option>
+            {warehouses.map((w, idx) => (
+              <option key={idx} value={w}>
+                {w}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Submit */}
         <button
           type="submit"
-          className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
         >
           Submit
         </button>
