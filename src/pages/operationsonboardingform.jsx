@@ -1,19 +1,19 @@
 import React, { useState } from "react";
 
-const operationsonboardingform = () => {
+const OperationsOnboardingForm = () => {
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
     email: "",
-    address1: "",
-    address2: "",
-    address3: "",
+    addressLine1: "",
+    addressLine2: "",
+    city: "",
     pan: "",
     password: "",
     warehouse: "",
   });
 
-  const warehouses = ["Warehouse A", "Warehouse B", "Warehouse C"]; // dummy data
+  const warehouses = ["Warehouse A", "Warehouse B", "Warehouse C"]; // Dummy data
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -21,136 +21,129 @@ const operationsonboardingform = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Operations Form Data:", formData);
-    alert("Operations Onboarding Submitted!");
+    console.log("Operations Onboarding Data:", formData);
+    alert("Operations Onboarding form submitted!");
   };
 
   return (
-    <div className="max-w-2xl mx-auto bg-white shadow-md rounded-lg p-6">
-      <h2 className="text-2xl font-bold mb-4">Operations Onboarding</h2>
+    <div className="max-w-2xl mx-auto p-6 bg-white shadow-md rounded-lg">
+      <h2 className="text-2xl font-bold mb-6">Operations Onboarding Form</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
 
-        {/* Name */}
         <div>
           <label className="block text-sm font-medium">Name</label>
           <input
             type="text"
             name="name"
+            className="w-full border rounded-md p-2"
             value={formData.name}
             onChange={handleChange}
-            className="w-full border rounded p-2"
             required
           />
         </div>
 
-        {/* Phone */}
         <div>
-          <label className="block text-sm font-medium">Phone No</label>
+          <label className="block text-sm font-medium">Phone Number</label>
           <input
             type="text"
             name="phone"
+            className="w-full border rounded-md p-2"
             value={formData.phone}
             onChange={handleChange}
-            className="w-full border rounded p-2"
             required
           />
         </div>
 
-        {/* Email */}
         <div>
           <label className="block text-sm font-medium">Email ID</label>
           <input
             type="email"
             name="email"
+            className="w-full border rounded-md p-2"
             value={formData.email}
             onChange={handleChange}
-            className="w-full border rounded p-2"
             required
           />
         </div>
 
-        {/* Address */}
+        {/* Address Fields */}
         <div>
           <label className="block text-sm font-medium">Address Line 1</label>
           <input
             type="text"
-            name="address1"
-            value={formData.address1}
+            name="addressLine1"
+            className="w-full border rounded-md p-2"
+            value={formData.addressLine1}
             onChange={handleChange}
-            className="w-full border rounded p-2"
-            required
           />
         </div>
         <div>
           <label className="block text-sm font-medium">Address Line 2</label>
           <input
             type="text"
-            name="address2"
-            value={formData.address2}
+            name="addressLine2"
+            className="w-full border rounded-md p-2"
+            value={formData.addressLine2}
             onChange={handleChange}
-            className="w-full border rounded p-2"
           />
         </div>
         <div>
-          <label className="block text-sm font-medium">Address Line 3</label>
+          <label className="block text-sm font-medium">City / State</label>
           <input
             type="text"
-            name="address3"
-            value={formData.address3}
+            name="city"
+            className="w-full border rounded-md p-2"
+            value={formData.city}
             onChange={handleChange}
-            className="w-full border rounded p-2"
           />
         </div>
 
-        {/* PAN */}
         <div>
           <label className="block text-sm font-medium">PAN</label>
           <input
             type="text"
             name="pan"
+            className="w-full border rounded-md p-2"
             value={formData.pan}
             onChange={handleChange}
-            className="w-full border rounded p-2"
             required
           />
         </div>
 
-        {/* Password */}
         <div>
           <label className="block text-sm font-medium">Password</label>
           <input
             type="password"
             name="password"
+            className="w-full border rounded-md p-2"
             value={formData.password}
             onChange={handleChange}
-            className="w-full border rounded p-2"
             required
           />
         </div>
 
-        {/* Warehouse Dropdown */}
+        {/* Dropdown */}
         <div>
           <label className="block text-sm font-medium">Select Warehouse</label>
           <select
             name="warehouse"
+            className="w-full border rounded-md p-2"
             value={formData.warehouse}
             onChange={handleChange}
-            className="w-full border rounded p-2"
             required
           >
             <option value="">-- Select --</option>
-            {warehouses.map((w, idx) => (
-              <option key={idx} value={w}>
-                {w}
+            {warehouses.map((wh, idx) => (
+              <option key={idx} value={wh}>
+                {wh}
               </option>
             ))}
           </select>
         </div>
 
-        {/* Submit */}
         <button
           type="submit"
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
         >
           Submit
         </button>
@@ -159,4 +152,4 @@ const operationsonboardingform = () => {
   );
 };
 
-export default operationsonboardingform;
+export default OperationsOnboardingForm;

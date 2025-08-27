@@ -7,8 +7,7 @@ import { SidebarProvider } from "./contexts/sidebarContext";
 import { ModeProvider } from "./contexts/themeModeContext";
 import { validate } from "./utils/jwt-verify";
 import { routes } from "./routes/index";
-import OperationsOnboardingForm from "./pages/operationsonboardingform";
-
+import OperationsOnboardingForm from "./pages/operationsonboardingform";  // ✅ Correct import (uppercase)
 
 
 
@@ -19,7 +18,6 @@ const Layout = lazy(() => import("./components/layout/Layout"));
 const Page404 = lazy(() => import("./pages/Page404"));
 
 function App() {
-
   function PublicRoute({ children }) {
     const [isAuthenticated, setIsAuthenticated] = useState(null);
 
@@ -29,7 +27,7 @@ function App() {
         if (cookie) {
           try {
             const isValid = await validate(cookie);
-            console.log(isValid)
+            console.log(isValid);
             if (isValid && isValid.role) {
               setIsAuthenticated(true);
             } else {
@@ -67,7 +65,7 @@ function App() {
         if (cookie) {
           try {
             const isValid = await validate(cookie);
-            console.log(isValid)
+            console.log(isValid);
             setIsAuthenticated(isValid && isValid.role ? true : false);
           } catch (error) {
             console.error("Token validation error:", error);
@@ -100,7 +98,15 @@ function App() {
           <Router>
             <Suspense fallback={<div>Loading...</div>}>
               <Routes>
-                <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
+                {/* Public routes */}
+                <Route
+                  path="/login"
+                  element={
+                    <PublicRoute>
+                      <Login />
+                    </PublicRoute>
+                  }
+                />
                 {/* <Route path="/signup" element={<PublicRoute><SignUp /></PublicRoute>} /> */}
                 <Route
                   path="/forgot-password"
@@ -111,10 +117,16 @@ function App() {
                   }
                 />
 
-                <Route path="/operationsonboardingform" element={<operationsonboardingform />} />
+                {/* ✅ Operations Onboarding Form route */}
+                <Route
+                  path="/operationsonboardingform"
+                  element={<OperationsOnboardingForm />}
+                />
 
                 {/* Redirect "/" to "/dashboard" explicitly */}
                 <Route path="/" element={<Navigate to="/dashboard" replace />} />
+
+                {/* Protected routes */}
                 <Route
                   path="/*"
                   element={
@@ -124,7 +136,7 @@ function App() {
                   }
                 />
 
-                {/* Catch-all route for unknown paths */}
+                {/* Catch-all route */}
                 <Route path="*" element={<Page404 />} />
               </Routes>
             </Suspense>
