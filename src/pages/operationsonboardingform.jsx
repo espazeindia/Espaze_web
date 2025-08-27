@@ -1,186 +1,187 @@
 import React, { useState } from "react";
 
-const OperationsOnboarding = () => {
-  const [formData, setFormData] = useState({
-    name: "",
-    phone: "",
-    email: "",
-    addressLine1: "",
-    addressLine2: "",
-    addressLine3: "",
-    pan: "",
-    password: "",
-    warehouse: "",
-  });
+const OperationsOnboardingForm = () => {
+  const [profilePic, setProfilePic] = useState(null);
 
-  const warehouses = ["Warehouse A", "Warehouse B", "Warehouse C"];
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-
-    // Prevent text in phone number field
-    if (name === "phone" && !/^\d*$/.test(value)) {
-      return;
+  const handleImageChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      setProfilePic(URL.createObjectURL(e.target.files[0]));
     }
-
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("Operations Onboarding Submitted: ", formData);
-    alert("Form Submitted Successfully!");
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-purple-100 via-purple-200 to-purple-300 p-6">
-      <div className="bg-white shadow-2xl rounded-2xl w-full max-w-3xl p-10">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-100 via-white to-purple-50 p-6">
+      <div className="bg-white shadow-xl rounded-2xl p-8 w-full max-w-3xl border border-purple-200">
         
-        {/* Image Holder */}
-        <div className="flex flex-col items-center mb-6">
-          <div className="w-28 h-28 bg-purple-200 rounded-full flex items-center justify-center shadow-lg">
-            <span className="text-purple-700 font-bold text-xl">Logo</span>
-          </div>
-          <h2 className="mt-4 text-3xl font-bold text-purple-800">
-            Operations Onboarding
-          </h2>
-          <p className="text-gray-500 mt-1">Register your details below</p>
+        {/* Title */}
+        <h2 className="text-3xl font-bold text-purple-700 text-center mb-6">
+          Operations Onboarding
+        </h2>
+
+        {/* Profile Image Upload */}
+        <div className="flex flex-col items-center mb-8">
+          <label className="cursor-pointer relative">
+            <div className="w-28 h-28 rounded-full border-4 border-purple-400 bg-purple-50 flex items-center justify-center overflow-hidden shadow-md hover:scale-105 transition">
+              {profilePic ? (
+                <img
+                  src={profilePic}
+                  alt="Profile"
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <span className="text-purple-500 text-sm font-medium">Upload</span>
+              )}
+            </div>
+            <input
+              type="file"
+              className="hidden"
+              accept="image/*"
+              onChange={handleImageChange}
+            />
+          </label>
+          <p className="text-xs text-gray-500 mt-2">Upload Profile Picture</p>
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Name */}
           <div>
-            <label className="block text-gray-700 font-medium">Name</label>
+            <label className="block text-sm font-semibold text-gray-600">
+              Full Name
+            </label>
             <input
               type="text"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
+              placeholder="Enter full name"
+              className="mt-1 w-full border border-purple-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-purple-500 focus:outline-none"
               required
-              className="w-full mt-2 px-4 py-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-purple-400 focus:outline-none"
             />
           </div>
 
-          {/* Phone */}
+          {/* Phone Number */}
           <div>
-            <label className="block text-gray-700 font-medium">Phone Number</label>
+            <label className="block text-sm font-semibold text-gray-600">
+              Phone Number
+            </label>
             <input
-              type="text"
-              name="phone"
-              maxLength="10"
-              value={formData.phone}
-              onChange={handleChange}
+              type="number"
+              placeholder="Enter phone number"
+              className="mt-1 w-full border border-purple-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-purple-500 focus:outline-none"
               required
-              className="w-full mt-2 px-4 py-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-purple-400 focus:outline-none"
-              placeholder="Enter 10-digit number"
+              onInput={(e) => {
+                if (e.target.value.length > 10)
+                  e.target.value = e.target.value.slice(0, 10);
+              }}
             />
           </div>
 
           {/* Email */}
           <div>
-            <label className="block text-gray-700 font-medium">Email ID</label>
+            <label className="block text-sm font-semibold text-gray-600">
+              Email ID
+            </label>
             <input
               type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
+              placeholder="Enter email"
+              className="mt-1 w-full border border-purple-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-purple-500 focus:outline-none"
               required
-              className="w-full mt-2 px-4 py-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-purple-400 focus:outline-none"
-            />
-          </div>
-
-          {/* Address */}
-          <div>
-            <label className="block text-gray-700 font-medium">Address</label>
-            <input
-              type="text"
-              name="addressLine1"
-              value={formData.addressLine1}
-              onChange={handleChange}
-              placeholder="Address Line 1"
-              required
-              className="w-full mt-2 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-400 focus:outline-none"
-            />
-            <input
-              type="text"
-              name="addressLine2"
-              value={formData.addressLine2}
-              onChange={handleChange}
-              placeholder="Address Line 2"
-              className="w-full mt-2 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-400 focus:outline-none"
-            />
-            <input
-              type="text"
-              name="addressLine3"
-              value={formData.addressLine3}
-              onChange={handleChange}
-              placeholder="Address Line 3"
-              className="w-full mt-2 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-400 focus:outline-none"
             />
           </div>
 
           {/* PAN */}
           <div>
-            <label className="block text-gray-700 font-medium">PAN</label>
+            <label className="block text-sm font-semibold text-gray-600">
+              PAN Number
+            </label>
             <input
               type="text"
-              name="pan"
-              value={formData.pan}
-              onChange={handleChange}
+              placeholder="Enter PAN number"
+              className="mt-1 w-full border border-purple-300 rounded-xl px-4 py-2 uppercase focus:ring-2 focus:ring-purple-500 focus:outline-none"
+              maxLength={10}
               required
-              className="w-full mt-2 px-4 py-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-purple-400 focus:outline-none"
+            />
+          </div>
+
+          {/* Address Line 1 */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-600">
+              Address Line 1
+            </label>
+            <input
+              type="text"
+              placeholder="Street / Locality"
+              className="mt-1 w-full border border-purple-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-purple-500 focus:outline-none"
+              required
+            />
+          </div>
+
+          {/* Address Line 2 */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-600">
+              Address Line 2
+            </label>
+            <input
+              type="text"
+              placeholder="City / District"
+              className="mt-1 w-full border border-purple-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-purple-500 focus:outline-none"
+              required
+            />
+          </div>
+
+          {/* Address Line 3 */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-600">
+              Address Line 3
+            </label>
+            <input
+              type="text"
+              placeholder="State / Pin Code"
+              className="mt-1 w-full border border-purple-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-purple-500 focus:outline-none"
+              required
             />
           </div>
 
           {/* Password */}
           <div>
-            <label className="block text-gray-700 font-medium">Password</label>
+            <label className="block text-sm font-semibold text-gray-600">
+              Password
+            </label>
             <input
               type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
+              placeholder="Enter password"
+              className="mt-1 w-full border border-purple-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-purple-500 focus:outline-none"
               required
-              className="w-full mt-2 px-4 py-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-purple-400 focus:outline-none"
             />
           </div>
 
           {/* Warehouse Dropdown */}
           <div>
-            <label className="block text-gray-700 font-medium">Select Warehouse</label>
+            <label className="block text-sm font-semibold text-gray-600">
+              Warehouse
+            </label>
             <select
-              name="warehouse"
-              value={formData.warehouse}
-              onChange={handleChange}
+              className="mt-1 w-full border border-purple-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-purple-500 focus:outline-none"
               required
-              className="w-full mt-2 px-4 py-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-purple-400 focus:outline-none"
             >
-              <option value="">-- Select Warehouse --</option>
-              {warehouses.map((wh, idx) => (
-                <option key={idx} value={wh}>
-                  {wh}
-                </option>
-              ))}
+              <option value="">Select Warehouse</option>
+              <option value="warehouse1">Warehouse 1</option>
+              <option value="warehouse2">Warehouse 2</option>
+              <option value="warehouse3">Warehouse 3</option>
             </select>
           </div>
-
-          {/* Submit */}
-          <div className="flex justify-center">
-            <button
-              type="submit"
-              className="w-full bg-purple-600 text-white font-semibold py-3 rounded-lg shadow-md hover:bg-purple-700 transition"
-            >
-              Submit Onboarding
-            </button>
-          </div>
         </form>
+
+        {/* Submit Button */}
+        <div className="mt-8 flex justify-center">
+          <button
+            type="submit"
+            className="bg-purple-600 text-white px-8 py-3 rounded-xl shadow-md hover:bg-purple-700 transition"
+          >
+            Submit
+          </button>
+        </div>
       </div>
     </div>
   );
 };
 
-export default OperationsOnboarding;
+export default OperationsOnboardingForm;
