@@ -1,20 +1,18 @@
 import React, { useState } from "react";
 
-export default function OperationsOnboarding() {
+const OperationsOnboardingForm = () => {
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
     email: "",
-    address1: "",
-    address2: "",
-    address3: "",
+    addressLine1: "",
+    addressLine2: "",
+    addressLine3: "",
     pan: "",
     password: "",
     warehouse: "",
     profilePic: null,
   });
-
-  const warehouses = ["Warehouse A", "Warehouse B", "Warehouse C"];
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
@@ -27,148 +25,154 @@ export default function OperationsOnboarding() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Form Submitted:", formData);
+    console.log("Form Submitted: ", formData);
+    alert("Operations Onboarding Successful!");
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gradient-to-r from-purple-700 via-purple-500 to-indigo-500 p-6">
-      <div className="w-full max-w-3xl bg-white/20 backdrop-blur-md rounded-3xl shadow-2xl p-10 border border-white/30">
+    <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-purple-600 via-indigo-500 to-blue-500 p-6">
+      <div className="bg-white shadow-2xl rounded-2xl w-full max-w-4xl p-10 flex flex-col md:flex-row gap-10">
         
-        {/* Header */}
-        <h2 className="text-3xl font-bold text-white text-center mb-6 drop-shadow-md">
-          🚀 Operations Onboarding
-        </h2>
-
-        {/* Profile Image Upload */}
-        <div className="flex flex-col items-center mb-6">
-          <label className="relative cursor-pointer">
-            <div className="w-28 h-28 rounded-full bg-white/30 flex items-center justify-center border-4 border-purple-300 shadow-lg overflow-hidden">
-              {formData.profilePic ? (
-                <img
-                  src={URL.createObjectURL(formData.profilePic)}
-                  alt="Profile"
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <span className="text-white font-semibold">Upload</span>
-              )}
-            </div>
+        {/* Left Side - Profile Pic Upload */}
+        <div className="flex flex-col items-center justify-center w-full md:w-1/3">
+          <label className="w-32 h-32 rounded-full bg-purple-100 flex items-center justify-center border-4 border-purple-400 shadow-md cursor-pointer overflow-hidden hover:scale-105 transition">
+            {formData.profilePic ? (
+              <img
+                src={URL.createObjectURL(formData.profilePic)}
+                alt="Profile"
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <span className="text-purple-600 font-semibold">Upload Pic</span>
+            )}
             <input
               type="file"
               name="profilePic"
               accept="image/*"
-              className="hidden"
               onChange={handleChange}
+              className="hidden"
             />
           </label>
-          <p className="text-white/80 text-sm mt-2">Profile Picture</p>
+          <p className="mt-3 text-sm text-gray-600">Profile Picture</p>
         </div>
 
-        {/* Form */}
-        <form
-          onSubmit={handleSubmit}
-          className="grid grid-cols-1 md:grid-cols-2 gap-6 text-white"
-        >
+        {/* Right Side - Form */}
+        <form onSubmit={handleSubmit} className="w-full md:w-2/3 space-y-5">
+          <h2 className="text-2xl font-bold text-purple-700 mb-6">
+            Operations Onboarding
+          </h2>
+
+          {/* Name */}
           <input
             type="text"
             name="name"
             placeholder="Full Name"
             value={formData.name}
             onChange={handleChange}
-            className="p-3 rounded-xl bg-white/20 border border-white/30 placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-purple-300"
             required
+            className="w-full p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-purple-400"
           />
 
+          {/* Phone */}
           <input
-            type="number"
+            type="tel"
             name="phone"
             placeholder="Phone Number"
             value={formData.phone}
             onChange={handleChange}
-            className="p-3 rounded-xl bg-white/20 border border-white/30 placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-purple-300"
+            pattern="[0-9]{10}"
             required
+            className="w-full p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-purple-400"
           />
 
+          {/* Email */}
           <input
             type="email"
             name="email"
-            placeholder="Email Address"
+            placeholder="Email ID"
             value={formData.email}
             onChange={handleChange}
-            className="p-3 rounded-xl bg-white/20 border border-white/30 placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-purple-300"
             required
+            className="w-full p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-purple-400"
           />
 
+          {/* Address */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <input
+              type="text"
+              name="addressLine1"
+              placeholder="Address Line 1"
+              value={formData.addressLine1}
+              onChange={handleChange}
+              required
+              className="w-full p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-purple-400"
+            />
+            <input
+              type="text"
+              name="addressLine2"
+              placeholder="Address Line 2"
+              value={formData.addressLine2}
+              onChange={handleChange}
+              className="w-full p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-purple-400"
+            />
+            <input
+              type="text"
+              name="addressLine3"
+              placeholder="Address Line 3"
+              value={formData.addressLine3}
+              onChange={handleChange}
+              className="w-full p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-purple-400"
+            />
+          </div>
+
+          {/* PAN */}
           <input
             type="text"
             name="pan"
             placeholder="PAN Number"
             value={formData.pan}
             onChange={handleChange}
-            className="p-3 rounded-xl bg-white/20 border border-white/30 placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-purple-300"
             required
+            maxLength={10}
+            className="w-full p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-purple-400"
           />
 
+          {/* Password */}
           <input
             type="password"
             name="password"
             placeholder="Password"
             value={formData.password}
             onChange={handleChange}
-            className="p-3 rounded-xl bg-white/20 border border-white/30 placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-purple-300"
             required
+            className="w-full p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-purple-400"
           />
 
+          {/* Warehouse Dropdown */}
           <select
             name="warehouse"
             value={formData.warehouse}
             onChange={handleChange}
-            className="p-3 rounded-xl bg-white/20 border border-white/30 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-purple-300"
             required
+            className="w-full p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-purple-400"
           >
             <option value="">Select Warehouse</option>
-            {warehouses.map((w, index) => (
-              <option key={index} value={w} className="text-black">
-                {w}
-              </option>
-            ))}
+            <option value="Warehouse A">Warehouse A</option>
+            <option value="Warehouse B">Warehouse B</option>
+            <option value="Warehouse C">Warehouse C</option>
           </select>
-
-          <input
-            type="text"
-            name="address1"
-            placeholder="Address Line 1"
-            value={formData.address1}
-            onChange={handleChange}
-            className="p-3 rounded-xl bg-white/20 border border-white/30 placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-purple-300 col-span-2"
-            required
-          />
-          <input
-            type="text"
-            name="address2"
-            placeholder="Address Line 2"
-            value={formData.address2}
-            onChange={handleChange}
-            className="p-3 rounded-xl bg-white/20 border border-white/30 placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-purple-300 col-span-2"
-          />
-          <input
-            type="text"
-            name="address3"
-            placeholder="Address Line 3"
-            value={formData.address3}
-            onChange={handleChange}
-            className="p-3 rounded-xl bg-white/20 border border-white/30 placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-purple-300 col-span-2"
-          />
 
           {/* Submit Button */}
           <button
             type="submit"
-            className="col-span-2 py-3 rounded-xl bg-purple-600 hover:bg-purple-700 transition-all text-lg font-semibold shadow-xl"
+            className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 rounded-xl shadow-md transition transform hover:scale-105"
           >
-            Submit 🚀
+            Submit
           </button>
         </form>
       </div>
     </div>
   );
-}
+};
+
+export default OperationsOnboardingForm;
