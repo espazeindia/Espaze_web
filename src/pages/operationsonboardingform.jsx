@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-const OperationsOnboardingForm = () => {
+const operationsonboardingform = () => {
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
@@ -159,4 +159,4 @@ const OperationsOnboardingForm = () => {
   );
 };
 
-export default OperationsOnboardingForm;
+export default operationsonboardingform;
