@@ -57,6 +57,11 @@ const routes = [
     component: selleronboardingform,
     access: ["seller"]
   },
+  {
+    path: "/operationsonboardingform",
+    component: operationsonboardingform,
+    access: ["operations"]
+  },
 
 ];
 
