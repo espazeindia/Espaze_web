@@ -116,7 +116,7 @@ const sidebarRoutes = [
   },
   {
     path: "/operationsonboardingform",
-    icon: ShoppingCart,
+    icon: Form,
     name: "operationsonboardingform",
     access: ["operations"]
   },
