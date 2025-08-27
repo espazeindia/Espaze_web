@@ -7,13 +7,11 @@ const OperationsOnboardingForm = () => {
     email: "",
     addressLine1: "",
     addressLine2: "",
-    city: "",
+    addressLine3: "",
     pan: "",
     password: "",
     warehouse: "",
   });
-
-  const warehouses = ["Warehouse A", "Warehouse B", "Warehouse C"]; // Dummy data
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -26,128 +24,157 @@ const OperationsOnboardingForm = () => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto p-6 bg-white shadow-md rounded-lg">
-      <h2 className="text-2xl font-bold mb-6">Operations Onboarding Form</h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
+    <div className="flex items-center justify-center min-h-screen bg-gray-50">
+      <div className="bg-white shadow-lg rounded-2xl p-8 w-full max-w-2xl">
+        <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
+          🚀 Operations Onboarding
+        </h2>
 
-        <div>
-          <label className="block text-sm font-medium">Name</label>
-          <input
-            type="text"
-            name="name"
-            className="w-full border rounded-md p-2"
-            value={formData.name}
-            onChange={handleChange}
-            required
-          />
-        </div>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Name */}
+          <div>
+            <label className="block text-sm font-medium text-gray-600 mb-1">
+              Full Name
+            </label>
+            <input
+              type="text"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              placeholder="Enter full name"
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-400 focus:outline-none"
+              required
+            />
+          </div>
 
-        <div>
-          <label className="block text-sm font-medium">Phone Number</label>
-          <input
-            type="text"
-            name="phone"
-            className="w-full border rounded-md p-2"
-            value={formData.phone}
-            onChange={handleChange}
-            required
-          />
-        </div>
+          {/* Phone */}
+          <div>
+            <label className="block text-sm font-medium text-gray-600 mb-1">
+              Phone Number
+            </label>
+            <input
+              type="text"
+              name="phone"
+              value={formData.phone}
+              onChange={handleChange}
+              placeholder="Enter phone number"
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-400 focus:outline-none"
+              required
+            />
+          </div>
 
-        <div>
-          <label className="block text-sm font-medium">Email ID</label>
-          <input
-            type="email"
-            name="email"
-            className="w-full border rounded-md p-2"
-            value={formData.email}
-            onChange={handleChange}
-            required
-          />
-        </div>
+          {/* Email */}
+          <div>
+            <label className="block text-sm font-medium text-gray-600 mb-1">
+              Email ID
+            </label>
+            <input
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              placeholder="Enter email"
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-400 focus:outline-none"
+              required
+            />
+          </div>
 
-        {/* Address Fields */}
-        <div>
-          <label className="block text-sm font-medium">Address Line 1</label>
-          <input
-            type="text"
-            name="addressLine1"
-            className="w-full border rounded-md p-2"
-            value={formData.addressLine1}
-            onChange={handleChange}
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium">Address Line 2</label>
-          <input
-            type="text"
-            name="addressLine2"
-            className="w-full border rounded-md p-2"
-            value={formData.addressLine2}
-            onChange={handleChange}
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium">City / State</label>
-          <input
-            type="text"
-            name="city"
-            className="w-full border rounded-md p-2"
-            value={formData.city}
-            onChange={handleChange}
-          />
-        </div>
+          {/* Address */}
+          <div>
+            <label className="block text-sm font-medium text-gray-600 mb-1">
+              Address
+            </label>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <input
+                type="text"
+                name="addressLine1"
+                value={formData.addressLine1}
+                onChange={handleChange}
+                placeholder="Line 1"
+                className="px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-400 focus:outline-none"
+              />
+              <input
+                type="text"
+                name="addressLine2"
+                value={formData.addressLine2}
+                onChange={handleChange}
+                placeholder="Line 2"
+                className="px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-400 focus:outline-none"
+              />
+              <input
+                type="text"
+                name="addressLine3"
+                value={formData.addressLine3}
+                onChange={handleChange}
+                placeholder="Line 3"
+                className="px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-400 focus:outline-none"
+              />
+            </div>
+          </div>
 
-        <div>
-          <label className="block text-sm font-medium">PAN</label>
-          <input
-            type="text"
-            name="pan"
-            className="w-full border rounded-md p-2"
-            value={formData.pan}
-            onChange={handleChange}
-            required
-          />
-        </div>
+          {/* PAN */}
+          <div>
+            <label className="block text-sm font-medium text-gray-600 mb-1">
+              PAN Number
+            </label>
+            <input
+              type="text"
+              name="pan"
+              value={formData.pan}
+              onChange={handleChange}
+              placeholder="Enter PAN"
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-400 focus:outline-none"
+              required
+            />
+          </div>
 
-        <div>
-          <label className="block text-sm font-medium">Password</label>
-          <input
-            type="password"
-            name="password"
-            className="w-full border rounded-md p-2"
-            value={formData.password}
-            onChange={handleChange}
-            required
-          />
-        </div>
+          {/* Password */}
+          <div>
+            <label className="block text-sm font-medium text-gray-600 mb-1">
+              Password
+            </label>
+            <input
+              type="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              placeholder="Enter password"
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-400 focus:outline-none"
+              required
+            />
+          </div>
 
-        {/* Dropdown */}
-        <div>
-          <label className="block text-sm font-medium">Select Warehouse</label>
-          <select
-            name="warehouse"
-            className="w-full border rounded-md p-2"
-            value={formData.warehouse}
-            onChange={handleChange}
-            required
-          >
-            <option value="">-- Select --</option>
-            {warehouses.map((wh, idx) => (
-              <option key={idx} value={wh}>
-                {wh}
-              </option>
-            ))}
-          </select>
-        </div>
+          {/* Warehouse Dropdown */}
+          <div>
+            <label className="block text-sm font-medium text-gray-600 mb-1">
+              Select Warehouse
+            </label>
+            <select
+              name="warehouse"
+              value={formData.warehouse}
+              onChange={handleChange}
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-400 focus:outline-none"
+              required
+            >
+              <option value="">-- Select Warehouse --</option>
+              <option value="Delhi">Delhi Warehouse</option>
+              <option value="Mumbai">Mumbai Warehouse</option>
+              <option value="Bangalore">Bangalore Warehouse</option>
+              <option value="Kolkata">Kolkata Warehouse</option>
+            </select>
+          </div>
 
-        <button
-          type="submit"
-          className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
-        >
-          Submit
-        </button>
-      </form>
+          {/* Submit Button */}
+          <div className="flex justify-center">
+            <button
+              type="submit"
+              className="px-6 py-2 bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700 transition duration-200"
+            >
+              Submit Onboarding
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 };
