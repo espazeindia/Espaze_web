@@ -1,3 +1,4 @@
+// src/pages/OperationsOnboardingForm.jsx
 import React, { useState } from "react";
 
 const OperationsOnboardingForm = () => {
@@ -7,159 +8,145 @@ const OperationsOnboardingForm = () => {
     email: "",
     addressLine1: "",
     addressLine2: "",
-    cityStatePin: "",
+    addressLine3: "",
     pan: "",
     password: "",
     warehouse: "",
   });
 
-  const warehouses = ["Warehouse A", "Warehouse B", "Warehouse C"]; // dummy data
-
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Operations Onboarding Data:", formData);
-    alert("Operations Onboarding Successful!");
+    console.log("Operations Form Submitted:", formData);
+    alert("Operations onboarding submitted!");
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-blue-50 to-indigo-100">
-      <form
-        onSubmit={handleSubmit}
-        className="w-full max-w-lg bg-white p-8 rounded-2xl shadow-lg space-y-4"
-      >
-        <h2 className="text-2xl font-bold text-center text-indigo-700 mb-4">
-          Operations Onboarding Form
-        </h2>
-
+    <div className="max-w-lg mx-auto bg-white shadow-lg rounded-xl p-8 mt-10">
+      <h2 className="text-2xl font-bold mb-6 text-center">Operations Onboarding</h2>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        
         {/* Name */}
         <div>
-          <label className="block text-gray-700 font-medium mb-1">Name</label>
+          <label className="block font-medium">Name</label>
           <input
             type="text"
             name="name"
-            placeholder="Enter full name"
             value={formData.name}
             onChange={handleChange}
+            className="w-full border rounded-lg px-3 py-2"
             required
-            className="w-full p-2 border rounded-lg focus:ring focus:ring-indigo-300"
           />
         </div>
 
         {/* Phone */}
         <div>
-          <label className="block text-gray-700 font-medium mb-1">Phone</label>
+          <label className="block font-medium">Phone No</label>
           <input
-            type="tel"
+            type="text"
             name="phone"
-            placeholder="Enter phone number"
             value={formData.phone}
             onChange={handleChange}
+            className="w-full border rounded-lg px-3 py-2"
             required
-            className="w-full p-2 border rounded-lg focus:ring focus:ring-indigo-300"
           />
         </div>
 
         {/* Email */}
         <div>
-          <label className="block text-gray-700 font-medium mb-1">Email</label>
+          <label className="block font-medium">Email ID</label>
           <input
             type="email"
             name="email"
-            placeholder="Enter email address"
             value={formData.email}
             onChange={handleChange}
+            className="w-full border rounded-lg px-3 py-2"
             required
-            className="w-full p-2 border rounded-lg focus:ring focus:ring-indigo-300"
           />
         </div>
 
         {/* Address */}
-        <h3 className="text-lg font-semibold text-indigo-600 mt-4">Address</h3>
         <div>
+          <label className="block font-medium">Address Line 1</label>
           <input
             type="text"
             name="addressLine1"
-            placeholder="Address Line 1"
             value={formData.addressLine1}
             onChange={handleChange}
-            required
-            className="w-full p-2 border rounded-lg focus:ring focus:ring-indigo-300 mb-2"
+            className="w-full border rounded-lg px-3 py-2"
           />
+        </div>
+        <div>
+          <label className="block font-medium">Address Line 2</label>
           <input
             type="text"
             name="addressLine2"
-            placeholder="Address Line 2"
             value={formData.addressLine2}
             onChange={handleChange}
-            className="w-full p-2 border rounded-lg focus:ring focus:ring-indigo-300 mb-2"
+            className="w-full border rounded-lg px-3 py-2"
           />
+        </div>
+        <div>
+          <label className="block font-medium">Address Line 3</label>
           <input
             type="text"
-            name="cityStatePin"
-            placeholder="City / State / Pin"
-            value={formData.cityStatePin}
+            name="addressLine3"
+            value={formData.addressLine3}
             onChange={handleChange}
-            required
-            className="w-full p-2 border rounded-lg focus:ring focus:ring-indigo-300"
+            className="w-full border rounded-lg px-3 py-2"
           />
         </div>
 
         {/* PAN */}
         <div>
-          <label className="block text-gray-700 font-medium mb-1">PAN</label>
+          <label className="block font-medium">PAN</label>
           <input
             type="text"
             name="pan"
-            placeholder="Enter PAN number"
             value={formData.pan}
             onChange={handleChange}
+            className="w-full border rounded-lg px-3 py-2"
             required
-            className="w-full p-2 border rounded-lg focus:ring focus:ring-indigo-300"
           />
         </div>
 
         {/* Password */}
         <div>
-          <label className="block text-gray-700 font-medium mb-1">Password</label>
+          <label className="block font-medium">Password</label>
           <input
             type="password"
             name="password"
-            placeholder="Enter password"
             value={formData.password}
             onChange={handleChange}
+            className="w-full border rounded-lg px-3 py-2"
             required
-            className="w-full p-2 border rounded-lg focus:ring focus:ring-indigo-300"
           />
         </div>
 
         {/* Warehouse Dropdown */}
         <div>
-          <label className="block text-gray-700 font-medium mb-1">Warehouse</label>
+          <label className="block font-medium">Warehouse</label>
           <select
             name="warehouse"
             value={formData.warehouse}
             onChange={handleChange}
+            className="w-full border rounded-lg px-3 py-2"
             required
-            className="w-full p-2 border rounded-lg focus:ring focus:ring-indigo-300"
           >
             <option value="">Select Warehouse</option>
-            {warehouses.map((w, idx) => (
-              <option key={idx} value={w}>
-                {w}
-              </option>
-            ))}
+            <option value="Delhi Warehouse">Delhi Warehouse</option>
+            <option value="Mumbai Warehouse">Mumbai Warehouse</option>
+            <option value="Bangalore Warehouse">Bangalore Warehouse</option>
           </select>
         </div>
 
         {/* Submit Button */}
         <button
           type="submit"
-          className="w-full bg-indigo-600 text-white p-2 rounded-lg hover:bg-indigo-700 transition"
+          className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700"
         >
           Submit
         </button>
