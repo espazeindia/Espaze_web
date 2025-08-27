@@ -116,7 +116,7 @@ const sidebarRoutes = [
   },
   {
     path: "/operationsonboardingform",
-    component: operationsonboardingform,
+    name: operationsonboardingform,
     access: ["operations"]
   },
 ];
