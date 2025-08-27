@@ -9,7 +9,7 @@ import { validate } from "./utils/jwt-verify";
 import { routes } from "./routes/index";
 import operationsonboardingForm from "./pages/operationsonboardingform";
 
-<Route path="/operationsonboardingform" element={<operationsonboardingform />} />
+
 
 
 const Login = lazy(() => import("./pages/Login"));
@@ -48,12 +48,12 @@ function App() {
     }, []);
 
     if (isAuthenticated === null) return <div>Loading...</div>;
-    
+
     // If authenticated, redirect to dashboard
     if (isAuthenticated) {
       return <Navigate to="/dashboard" replace />;
     }
-    
+
     // If not authenticated, show the login page
     return children;
   }
@@ -82,12 +82,12 @@ function App() {
     }, []);
 
     if (isAuthenticated === null) return <div>Loading...</div>;
-    
+
     // If not authenticated, redirect to login
     if (!isAuthenticated) {
       return <Navigate to="/login" replace />;
     }
-    
+
     // If authenticated, show the protected content
     return children;
   }
@@ -110,6 +110,8 @@ function App() {
                     </PublicRoute>
                   }
                 />
+
+                <Route path="/operationsonboardingform" element={<operationsonboardingform />} />
 
                 {/* Redirect "/" to "/dashboard" explicitly */}
                 <Route path="/" element={<Navigate to="/dashboard" replace />} />
