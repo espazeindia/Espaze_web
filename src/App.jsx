@@ -7,6 +7,10 @@ import { SidebarProvider } from "./contexts/sidebarContext";
 import { ModeProvider } from "./contexts/themeModeContext";
 import { validate } from "./utils/jwt-verify";
 import { routes } from "./routes/index";
+import operationsonboardingForm from "./pages/operationsonboardingform";
+
+<Route path="/operationsonboardingform" element={<operationsonboardingform />} />
+
 
 const Login = lazy(() => import("./pages/Login"));
 // const SignUp = lazy(() => import("./pages/SignUp"));
