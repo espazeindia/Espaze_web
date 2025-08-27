@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useSidebar } from "../../contexts/sidebarContext";
 import MenuIcon from "@mui/icons-material/Menu";
 import { useMode } from "../../contexts/themeModeContext";
-import { DarkMode, LightMode, Notifications, Person } from "@mui/icons-material";
+import { DarkMode, LightMode, Notifications, Person, GridView, LogoutOutlined } from "@mui/icons-material";
 import { validate } from "../../utils/jwt-verify";
 import Cookies from "js-cookie";
 import { Link, useNavigate } from "react-router-dom";
@@ -36,10 +36,10 @@ function Header() {
     <div
       className={`${
         theme ? "bg-white text-black border-b border-zinc-200" : "bg-neutral-950 text-white border-b border-zinc-800"
-      }   z-20 sticky top-0 h-[7vh] flex justify-between items-center px-5`}
+      }   z-20 sticky top-0 h-[7vh] flex items-center px-5`}
     >
-      <MenuIcon onClick={toggleSidebar} className={`${theme ? "text-black":"text-white"} text-2xl cursor-pointer`} />
-      <div className="flex items-center space-x-4 ">
+      <MenuIcon onClick={toggleSidebar} className={`${theme ? "text-black":"text-white"} text-2xl cursor-pointer mr-auto `} />
+      <div className="flex items-center space-x-4 ml-auto ">
         <button className={`${theme ? "text-black" : "text-white"} relative hover:cursor-pointer`}>
           <Notifications fontSize="small" />
           <div className="h-2 w-2 absolute top-0 right-0 bg-red-500 rounded-full"></div>
@@ -63,15 +63,18 @@ function Header() {
               openUser ? "block" : "hidden" 
             }`}
           >
-            <Link to="/dashboard" className={` ${theme ? "hover:bg-zinc-300":"hover:bg-zinc-800"} block w-full px-2 py-1 rounded-lg`}>
+            <Link to="/dashboard" className={` ${theme ? "hover:bg-zinc-300":"hover:bg-zinc-800"} block w-full px-2 py-1 rounded-lg flex items-center gap-2`}>
+              <GridView fontSize="small" />
               Dashboard
             </Link>
-            <Link to="/dashboard" className={` ${theme ? "hover:bg-zinc-300":"hover:bg-zinc-800"} block w-full px-2 py-1 rounded-lg`}>
-              Settings
+            <Link to="/profile" className={` ${theme ? "hover:bg-zinc-300":"hover:bg-zinc-800"} block w-full px-2 py-1 rounded-lg flex items-center gap-2`}>
+              <Person fontSize="small" />
+              User Profile
             </Link>
             <button
               onClick={handleLogOut}
-              className={` ${theme ? "hover:bg-zinc-300":"hover:bg-zinc-800"} block w-full px-2 py-1 rounded-lg text-left`}>
+              className={` ${theme ? "hover:bg-zinc-300":"hover:bg-zinc-800"} block w-full px-2 py-1 rounded-lg text-left flex items-center gap-2`}>
+              <LogoutOutlined fontSize="small" />
               Log Out
             </button>
           </div>

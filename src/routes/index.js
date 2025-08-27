@@ -1,5 +1,5 @@
 import { lazy } from "react";
-import { GridView, Inventory2Outlined, SupervisorAccountOutlined,ShoppingCart,Storefront} from "@mui/icons-material";
+import { GridView, Inventory2Outlined, SupervisorAccountOutlined,ShoppingCart,Storefront, Person } from "@mui/icons-material";
 const ProductOnboarding = lazy(() => import("../pages/ProductOnboarding"));
 const CategoriesPage = lazy(() => import("../pages/CategoriesPage"));
 const Dashboard = lazy(() => import("../pages/Dashboard"));
@@ -101,14 +101,7 @@ const sidebarRoutes = [
   name : "Category",
   access: ["operations"]  
 },
-{
-  path: "/profile",
-  icon: ShoppingCart,
-  name: "Profile",
-  access: ["seller"],
-},
 
 ];
-
 
 export { routes, sidebarRoutes };
