@@ -9,6 +9,7 @@ const Orders = lazy(() => import("../pages/Orders"));
 const Inventory= lazy(() => import("../pages/Inventory"));
 const ProductDetails = lazy(() => import("../pages/ProductDetails"));
 const selleronboardingform = lazy(() => import("../pages/selleronboardingform"));
+const operationsonboardingform = lazy(() => import("../pages/operationsonboardingform"));
 
 const routes = [
   {
