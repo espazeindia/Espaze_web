@@ -7,7 +7,7 @@ import { SidebarProvider } from "./contexts/sidebarContext";
 import { ModeProvider } from "./contexts/themeModeContext";
 import { validate } from "./utils/jwt-verify";
 import { routes } from "./routes/index";
-import operationsonboardingForm from "./pages/operationsonboardingform";
+import OperationsOnboardingForm from "./pages/operationsonboardingform";
 
 
 
