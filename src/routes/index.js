@@ -1,14 +1,15 @@
 import { lazy } from "react";
-import { GridView, Inventory2Outlined, SupervisorAccountOutlined,ShoppingCart,Storefront} from "@mui/icons-material";
+import { GridView, Inventory2Outlined, SupervisorAccountOutlined, ShoppingCart, Storefront, Warehouse } from "@mui/icons-material";
 const ProductOnboarding = lazy(() => import("../pages/ProductOnboarding"));
 const CategoriesPage = lazy(() => import("../pages/CategoriesPage"));
 const Dashboard = lazy(() => import("../pages/Dashboard"));
 const Products = lazy(() => import("../pages/Products"));
 const Customers = lazy(() => import("../pages/Customers"));
 const Orders = lazy(() => import("../pages/Orders"));
-const Inventory= lazy(() => import("../pages/Inventory"));
+const Inventory = lazy(() => import("../pages/Inventory"));
 const ProductDetails = lazy(() => import("../pages/ProductDetails"));
 const CategorySelection = lazy(() => import("../components/CategorySelection"));
+const WarehouseServices = lazy(() => import("../pages/WarehouseServices"));
 
 const routes = [
   {
@@ -45,6 +46,11 @@ const routes = [
     path: "/product-onboarding",
     component : ProductOnboarding,
     access : ["operations"]
+  },
+  {
+    path: "/warehouse-services",
+    component: WarehouseServices,
+    access: ["admin","operations","seller"]
   },
    {
     path: "/categories",
@@ -109,6 +115,12 @@ const sidebarRoutes = [
   name : "CategorySelection",
   access: ["seller"]  
 },
+  {
+    path: "/warehouse-services",
+    icon: Warehouse,
+    name: "Warehouse Services",
+    access: ["operations"]
+  },
 ];
 
 
