@@ -52,6 +52,7 @@ const routes = [
     component: WarehouseServices,
     access: ["admin","operations","seller"]
   },
+  
    {
     path: "/categories",
     component: CategoriesPage,
@@ -118,7 +119,7 @@ const sidebarRoutes = [
   {
     path: "/warehouse-services",
     icon: Warehouse,
-    name: "Warehouse Services",
+    name: "Warehouse Information",
     access: ["operations"]
   },
 ];
