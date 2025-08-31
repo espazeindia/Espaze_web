@@ -6,13 +6,10 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-d
 import { SidebarProvider } from "./contexts/sidebarContext";
 import { ModeProvider } from "./contexts/themeModeContext";
 import { validate } from "./utils/jwt-verify";
-import { routes } from "./routes/index";
-import OperationsOnboardingForm from "./pages/operationsonboardingform";  // ✅ Correct import (uppercase)
 
-
+import OperationsOnboardingForm from "./pages/operationsonboardingform";
 
 const Login = lazy(() => import("./pages/Login"));
-// const SignUp = lazy(() => import("./pages/SignUp"));
 const ForgetPassword = lazy(() => import("./pages/ForgetPassword"));
 const Layout = lazy(() => import("./components/layout/Layout"));
 const Page404 = lazy(() => import("./pages/Page404"));
@@ -27,32 +24,19 @@ function App() {
         if (cookie) {
           try {
             const isValid = await validate(cookie);
-            console.log(isValid);
-            if (isValid && isValid.role) {
-              setIsAuthenticated(true);
-            } else {
-              setIsAuthenticated(false);
-            }
-          } catch (error) {
-            console.error("Token validation error:", error);
+            setIsAuthenticated(isValid && isValid.role ? true : false);
+          } catch {
             setIsAuthenticated(false);
           }
         } else {
           setIsAuthenticated(false);
         }
       };
-
       checkAuth();
     }, []);
 
     if (isAuthenticated === null) return <div>Loading...</div>;
-
-    // If authenticated, redirect to dashboard
-    if (isAuthenticated) {
-      return <Navigate to="/dashboard" replace />;
-    }
-
-    // If not authenticated, show the login page
+    if (isAuthenticated) return <Navigate to="/dashboard" replace />;
     return children;
   }
 
@@ -65,28 +49,19 @@ function App() {
         if (cookie) {
           try {
             const isValid = await validate(cookie);
-            console.log(isValid);
             setIsAuthenticated(isValid && isValid.role ? true : false);
-          } catch (error) {
-            console.error("Token validation error:", error);
+          } catch {
             setIsAuthenticated(false);
           }
         } else {
           setIsAuthenticated(false);
         }
       };
-
       checkAuth();
     }, []);
 
     if (isAuthenticated === null) return <div>Loading...</div>;
-
-    // If not authenticated, redirect to login
-    if (!isAuthenticated) {
-      return <Navigate to="/login" replace />;
-    }
-
-    // If authenticated, show the protected content
+    if (!isAuthenticated) return <Navigate to="/login" replace />;
     return children;
   }
 
@@ -107,7 +82,6 @@ function App() {
                     </PublicRoute>
                   }
                 />
-                {/* <Route path="/signup" element={<PublicRoute><SignUp /></PublicRoute>} /> */}
                 <Route
                   path="/forgot-password"
                   element={
@@ -117,13 +91,7 @@ function App() {
                   }
                 />
 
-                {/* ✅ Operations Onboarding Form route */}
-                <Route
-                  path="/operationsonboardingform"
-                  element={<OperationsOnboardingForm />}
-                />
-
-                {/* Redirect "/" to "/dashboard" explicitly */}
+                {/* Redirect root to dashboard */}
                 <Route path="/" element={<Navigate to="/dashboard" replace />} />
 
                 {/* Protected routes */}
@@ -134,7 +102,10 @@ function App() {
                       <Layout />
                     </ProtectedRoute>
                   }
-                />
+                >
+                  {/* ✅ Nested under Layout → Sidebar visible */}
+                  <Route path="operationsonboardingform" element={<OperationsOnboardingForm />} />
+                </Route>
 
                 {/* Catch-all route */}
                 <Route path="*" element={<Page404 />} />

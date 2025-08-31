@@ -1,19 +1,27 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa";
-import { Eye, EyeOff, Image as ImageIcon, Star } from "lucide-react";
+import { Image as ImageIcon, Star } from "lucide-react";
 import { notifyError, notifySuccess } from "../utils/toast";
 import { useMode } from "../contexts/themeModeContext";
 import MetaDataServices from "../services/MetaDataServices";
 import InventoryServices from "../services/InventoryServices";
+import Cookies from "js-cookie"; // ✅ Added
 
 function ProductDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { theme } = useMode();
-
+  const userRole = Cookies.get("userRole") || "seller"; // ✅ Added
+  {userRole === "operations" && (
+  <p>
+    <span className="font-semibold">Product ID: </span>
+    {product.id}
+  </p>
+)}
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isFromInventory, setIsFromInventory] = useState(false);
 
   const transformProduct = (d, isInventory = false) => ({
     id: isInventory ? d.inventory_product_id : d.id,
@@ -23,12 +31,18 @@ function ProductDetails() {
     image: isInventory ? d.metadata_image : d.image,
     category_name: isInventory ? d.metadata_category_name : d.category_name,
     subcategory_name: isInventory ? d.metadata_subcategory_name : d.subcategory_name,
-    mrp: isInventory ? d.metadata_mrp : d.mrp,
-    total_stars: isInventory ? d.metadata_total_stars : d.total_stars,
-    total_reviews: isInventory ? d.metadata_total_reviews : d.total_reviews,
-    visible: isInventory ? d.product_visibility : d.visible,
-    quantity: isInventory ? d.product_quantity : undefined,
-    price: isInventory ? d.product_price : undefined,
+    total_stars: isInventory ? d.metadata_total_stars ?? 0 : d.total_stars ?? 0,
+    total_reviews: isInventory ? d.metadata_total_reviews ?? 0 : d.total_reviews ?? 0,
+    visible: isInventory ? (d.product_visibility || "hidden") : d.visible || "hidden",
+    quantity: isInventory ? (d.product_quantity ?? 0) : undefined,
+    price: isInventory ? (d.product_price ?? 0) : d.price ?? 0,
+    mrp: isInventory
+      ? d.product_mrp && d.product_mrp > 0
+        ? d.product_mrp
+        : d.product_price ?? 0
+      : d.mrp && d.mrp > 0
+      ? d.mrp
+      : d.price ?? 0,
     e_date: isInventory ? d.product_expiry_date : d.expiry_date,
     m_date: isInventory ? d.product_manufacturing_date : d.manufacturing_date,
   });
@@ -37,9 +51,8 @@ function ProductDetails() {
     try {
       setLoading(true);
       const result = await MetaDataServices.FetchMetadataById(pid);
-      if (result.success) {
-        setProduct(transformProduct(result.data));
-      } else notifyError(result.message || "Failed to fetch product details");
+      if (result?.success) setProduct(transformProduct(result.data));
+      else notifyError(result.message || "Failed to fetch product details");
     } catch (err) {
       if (err === "cookie error") navigate("/login");
       else notifyError(err?.response?.data?.message || err.message);
@@ -52,9 +65,8 @@ function ProductDetails() {
     try {
       setLoading(true);
       const result = await InventoryServices.FetchInventoryById(pid);
-      if (result.success) {
-        setProduct(transformProduct(result.data, true));
-      } else notifyError(result.message || "Failed to fetch product details");
+      if (result?.success) setProduct(transformProduct(result.data, true));
+      else notifyError(result.message || "Failed to fetch product details");
     } catch (err) {
       if (err === "cookie error") navigate("/login");
       else notifyError(err?.response?.data?.message || err.message);
@@ -65,13 +77,47 @@ function ProductDetails() {
 
   useEffect(() => {
     if (!id) return;
-    if (id.includes("metadata_")) fetchProduct(id.split("metadata_")[1]);
-    else if (id.includes("inventory_")) fetchInventory(id.split("inventory_")[1]);
+    if (id.includes("metadata_")) {
+      setIsFromInventory(false);
+      fetchProduct(id.split("metadata_")[1]);
+    } else if (id.includes("inventory_")) {
+      setIsFromInventory(true);
+      fetchInventory(id.split("inventory_")[1]);
+    }
   }, [id]);
 
-  const toggleVisibility = () => {
-    setProduct((p) => ({ ...p, visible: !p.visible }));
-    notifySuccess(`Product is now ${!product.visible ? "Visible" : "Hidden"}`);
+  const handleVisibilityToggle = async () => {
+    if (!product) return;
+    try {
+      const body = {
+        inventory_product_id: product.id,
+        product_visibility: product.visible === "hidden" ? "visible" : "hidden",
+      };
+      const updated = await InventoryServices.UpdateInventory(body);
+
+      setProduct({
+        ...product,
+        visible: updated.data?.product_visibility || product.visible,
+      });
+
+      notifySuccess(
+        `Product visibility updated to ${
+          updated.data?.product_visibility === "hidden" ? "Hidden" : "Visible"
+        }`
+      );
+    } catch (err) {
+      notifyError(err?.response?.data?.message || "Failed to update visibility");
+    }
+  };
+
+  const formatDate = (dateStr) => {
+    if (!dateStr) return "N/A";
+    const date = new Date(dateStr);
+    return date.toLocaleDateString("en-IN", {
+      day: "2-digit",
+      month: "long",
+      year: "numeric",
+    });
   };
 
   const containerBG = theme ? "bg-zinc-100 text-black" : "bg-neutral-950 text-white";
@@ -80,9 +126,10 @@ function ProductDetails() {
   const muted = theme ? "text-zinc-500" : "text-zinc-400";
   const borderClr = theme ? "border-zinc-200" : "border-zinc-700";
 
-  const Badge = ({ children, className = "" }) => (
+  const Badge = ({ children, className = "", onClick }) => (
     <span
-      className={`px-2.5 py-1 rounded-full text-xs font-semibold border ${className}`}
+      onClick={onClick}
+      className={`px-2.5 py-1 rounded-full text-xs font-semibold border cursor-pointer ${className}`}
     >
       {children}
     </span>
@@ -140,29 +187,23 @@ function ProductDetails() {
                 <div className="flex items-start justify-between">
                   <h2 className="text-2xl font-bold">{product.name}</h2>
                   <div className="flex flex-wrap gap-2">
-                    <Badge
-                      className={
-                        product.visible
-                          ? "bg-emerald-100 text-emerald-700 border-emerald-200"
-                          : "bg-red-100 text-red-700 border-red-200"
-                      }
-                    >
-                      <button onClick={toggleVisibility} className="flex items-center gap-1">
-                        {product.visible ? <Eye size={14} /> : <EyeOff size={14} />}
-                        {product.visible ? "Visible" : "Hidden"}
-                      </button>
-                    </Badge>
-
-                    <Badge
-                      className={
-                        product.quantity && product.quantity > 0
-                          ? "bg-green-100 text-green-700 border-green-200"
-                          : "bg-red-100 text-red-700 border-red-200"
-                      }
-                    >
-                      {product.quantity && product.quantity > 0 ? "In Stock" : "Out of Stock"}
-                    </Badge>
-
+                    {isFromInventory && (
+                      <>
+                        <Badge
+                          className={`${
+                            product.visible === "hidden"
+                              ? "bg-red-100 text-red-700 border-red-200"
+                              : "bg-green-100 text-green-700 border-green-200"
+                          }`}
+                          onClick={handleVisibilityToggle}
+                        >
+                          {product.visible === "hidden" ? "Hidden" : "Visible"}
+                        </Badge>
+                        <Badge className="bg-pink-100 text-pink-700 border-pink-200">
+                          {product.quantity === 0 ? "Out of Stock" : "In Stock"}
+                        </Badge>
+                      </>
+                    )}
                     {product.hsn_code && (
                       <Badge className="bg-indigo-100 text-indigo-700 border-indigo-200">
                         HSN: {product.hsn_code}
@@ -172,8 +213,8 @@ function ProductDetails() {
                 </div>
 
                 <div className="flex items-center gap-2 mt-2">
-                  <Stars count={product.total_stars || 0} />
-                  <span className={`text-xs ${muted}`}>({product.total_reviews || 0})</span>
+                  <Stars count={product.total_stars} />
+                  <span className={`text-xs ${muted}`}>({product.total_reviews})</span>
                 </div>
 
                 <div className="flex items-center gap-2 mt-2">
@@ -189,17 +230,6 @@ function ProductDetails() {
                   )}
                 </div>
 
-                <div className="flex flex-wrap items-center gap-3 mt-3">
-                  {product.price && (
-                    <span className="text-2xl font-semibold text-emerald-600">
-                      ₹{product.price}
-                    </span>
-                  )}
-                  {product.mrp && (
-                    <span className={`${muted}`}>Price: ₹0</span>
-                  )}
-                </div>
-
                 {product.description && (
                   <p className={`mt-4 leading-relaxed ${subText}`}>{product.description}</p>
                 )}
@@ -210,41 +240,57 @@ function ProductDetails() {
 
             <div className={`rounded-xl border ${borderClr} p-5`}>
               <h3 className="font-bold mb-4 text-xl">More Details</h3>
-
               <div className={`grid md:grid-cols-2 gap-6 text-sm ${subText}`}>
-                <div>
-                  <h4 className="font-bold text-lg text-current mb-2">Identifiers</h4>
-                  {product.id && <p>Product ID: {product.id}</p>}
-                  {product.hsn_code && <p>HSN Code: {product.hsn_code}</p>}
-                  {product.category_name && <p>Category: {product.category_name}</p>}
-                  {product.subcategory_name && <p>Subcategory: {product.subcategory_name}</p>}
-                </div>
-
-                <div>
-                  <h4 className="font-bold text-lg text-current mb-2">Pricing & Stock</h4>
-                  {product.mrp && <p> MRP: ₹{product.mrp}</p>}
-                  {product.price && <p>Price: ₹{product.price}</p>}
-                  {product.quantity !== undefined && <p>Quantity: {product.quantity}</p>}
-                  {product.visible !== undefined && (
+                {/* ✅ Conditional Product ID */}
+                {userRole === "operations" && (
+                  <p>
+                    <span className="font-semibold">Product ID: </span>
+                    {product.id}
+                  </p>
+                )}
+                <p>
+                  <span className="font-semibold">HSN Code: </span>
+                  {product.hsn_code || "N/A"}
+                </p>
+                <p>
+                  <span className="font-semibold">Category: </span>
+                  {product.category_name || "N/A"}
+                </p>
+                <p>
+                  <span className="font-semibold">Subcategory: </span>
+                  {product.subcategory_name || "N/A"}
+                </p>
+                <p>
+                  <span className="font-semibold">MRP: </span>₹{product.mrp}
+                </p>
+                {isFromInventory && (
+                  <>
                     <p>
-                      Visibility:{" "}
-                      <span className={product.visible ? "text-emerald-600" : "text-red-600"}>
-                        {product.visible ? "Visible" : "Hidden"}
-                      </span>
+                      <span className="font-semibold">Manufacturing: </span>
+                      {formatDate(product.m_date)}
                     </p>
-                  )}
-                </div>
-
-                <div>
-                  {product.m_date && <p>Manufacturing: {product.m_date}</p>}
-                  {product.e_date && <p>Expiry: {product.e_date}</p>}
-                </div>
-
-                <div>
-                  <h4 className="font-bold text-lg text-current mb-2">Reviews</h4>
-                  <p>Total Stars: {product.total_stars || 0}</p>
-                  <p>Total Reviews: {product.total_reviews || 0}</p>
-                </div>
+                    <p>
+                      <span className="font-semibold">Expiry: </span>
+                      {formatDate(product.e_date)}
+                    </p>
+                    <p>
+                      <span className="font-semibold">Quantity: </span>
+                      {product.quantity}
+                    </p>
+                    <p>
+                      <span className="font-semibold">Visibility: </span>
+                      {product.visible}
+                    </p>
+                  </>
+                )}
+                <p>
+                  <span className="font-semibold">Total Stars: </span>
+                  {product.total_stars}
+                </p>
+                <p>
+                  <span className="font-semibold">Total Reviews: </span>
+                  {product.total_reviews}
+                </p>
               </div>
             </div>
           </>
