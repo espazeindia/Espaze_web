@@ -6,19 +6,14 @@ import { notifyError, notifySuccess } from "../utils/toast";
 import { useMode } from "../contexts/themeModeContext";
 import MetaDataServices from "../services/MetaDataServices";
 import InventoryServices from "../services/InventoryServices";
-import Cookies from "js-cookie"; // ✅ Added
+import Cookies from "js-cookie";
 
 function ProductDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { theme } = useMode();
-  const userRole = Cookies.get("userRole") || "seller"; // ✅ Added
-  {userRole === "operations" && (
-  <p>
-    <span className="font-semibold">Product ID: </span>
-    {product.id}
-  </p>
-)}
+  const userRole = Cookies.get("userRole") || "seller";
+
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isFromInventory, setIsFromInventory] = useState(false);
@@ -41,8 +36,8 @@ function ProductDetails() {
         ? d.product_mrp
         : d.product_price ?? 0
       : d.mrp && d.mrp > 0
-      ? d.mrp
-      : d.price ?? 0,
+        ? d.mrp
+        : d.price ?? 0,
     e_date: isInventory ? d.product_expiry_date : d.expiry_date,
     m_date: isInventory ? d.product_manufacturing_date : d.manufacturing_date,
   });
@@ -94,12 +89,10 @@ function ProductDetails() {
         product_visibility: product.visible === "hidden" ? "visible" : "hidden",
       };
       const updated = await InventoryServices.UpdateInventory(body);
-
       setProduct({
         ...product,
         visible: updated.data?.product_visibility || product.visible,
       });
-
       notifySuccess(
         `Product visibility updated to ${
           updated.data?.product_visibility === "hidden" ? "Hidden" : "Visible"
@@ -185,7 +178,12 @@ function ProductDetails() {
 
               <div className="lg:w-2/3 w-full">
                 <div className="flex items-start justify-between">
-                  <h2 className="text-2xl font-bold">{product.name}</h2>
+                  <div>
+                    <h2 className="text-2xl font-bold">{product.name}</h2>
+                    {isFromInventory && (
+                      <p className="text-lg font-semibold mt-1">Price: ₹{product.price}</p>
+                    )}
+                  </div>
                   <div className="flex flex-wrap gap-2">
                     {isFromInventory && (
                       <>
@@ -241,13 +239,14 @@ function ProductDetails() {
             <div className={`rounded-xl border ${borderClr} p-5`}>
               <h3 className="font-bold mb-4 text-xl">More Details</h3>
               <div className={`grid md:grid-cols-2 gap-6 text-sm ${subText}`}>
-                {/* ✅ Conditional Product ID */}
+                {/* Show Product ID only for operations */}
                 {userRole === "operations" && (
                   <p>
                     <span className="font-semibold">Product ID: </span>
                     {product.id}
                   </p>
                 )}
+
                 <p>
                   <span className="font-semibold">HSN Code: </span>
                   {product.hsn_code || "N/A"}
@@ -265,6 +264,9 @@ function ProductDetails() {
                 </p>
                 {isFromInventory && (
                   <>
+                    <p>
+                      <span className="font-semibold">Price: </span>₹{product.price}
+                    </p>
                     <p>
                       <span className="font-semibold">Manufacturing: </span>
                       {formatDate(product.m_date)}
