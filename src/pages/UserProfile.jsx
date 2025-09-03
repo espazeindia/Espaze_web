@@ -3,12 +3,12 @@ import { useMode } from "../contexts/themeModeContext";
 import EyeOpen from "../assets/img/eye-open.svg";
 import EyeClosed from "../assets/img/eye-closed.svg";
 import { notifyError, notifySuccess } from "../utils/toast";
+import OnboardingServices from "../services/OnboardingServices";
 
 const UserProfile = () => {
   const [profileImage, setProfileImage] = useState(null);
   const [formData, setFormData] = useState({
     sellerName: "",
-    phoneNumber: "",
     panNumber: "",
     gstin: "",
     companyName: "",
@@ -38,16 +38,16 @@ const UserProfile = () => {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
 
-    if (name === "phoneNumber") {
-      if (!/^\d*$/.test(value)) {
-        notifyError("Phone number must contain digits only.");
-        return;
-      }
-      if (value.length > 10) {
-        notifyError("Phone number must be exactly 10 digits.");
-        return;
-      }
-    }
+    // if (name === "phoneNumber") {
+    //   if (!/^\d*$/.test(value)) {
+    //     notifyError("Phone number must contain digits only.");
+    //     return;
+    //   }
+    //   if (value.length > 10) {
+    //     notifyError("Phone number must be exactly 10 digits.");
+    //     return;
+    //   }
+    // }
 
     if (name === "pincode") {
       if (!/^\d*$/.test(value)) {
@@ -96,11 +96,10 @@ const UserProfile = () => {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async(e) => {
     e.preventDefault();
     if (
       !formData.sellerName ||
-      !formData.phoneNumber ||
       !formData.panNumber ||
       !formData.shopName ||
       !formData.securityPin ||
@@ -116,10 +115,6 @@ const UserProfile = () => {
       notifyError("Security pin must be exactly 6 digits.");
       return;
     }
-    if (formData.phoneNumber.length !== 10) {
-      notifyError("Phone number must be exactly 10 digits.");
-      return;
-    }
     if (formData.pincode.length !== 6) {
       notifyError("Pincode must be exactly 6 digits.");
       return;
@@ -132,16 +127,34 @@ const UserProfile = () => {
       notifyError("GSTIN must be exactly 15 characters.");
       return;
     }
-    setIsSubmitting(true);
-
-    setTimeout(() => {
-      setIsSubmitting(false);
-      setSubmitSuccess(true);
-      notifySuccess("Profile information saved successfully.");
-      setTimeout(() => {
-        setSubmitSuccess(false);
-      }, 2000);
-    }, 1500);
+    setIsSubmitting(true)
+    try {
+      const body = {
+        name : formData.sellerName,
+        address : formData.blockNo + ", "+ formData.areaDistrict + ", " + formData.state + ", " + formData.pincode,
+        gstin : formData.gstin,
+        pan: formData.panNumber,
+        companyName : formData.companyName,
+        shopName : formData.shopName,
+        pin : Number(formData.securityPin)
+      }
+      const res = await OnboardingServices.OnboardingSeller(body)
+      if(res.success === true){
+        notifySuccess(res.message)
+        setReload((prevData)=>{
+          return !prevData
+        })
+      }
+    } catch (error) {
+      if (err === "cookie error") {
+          Cookies.remove("EspazeCookie");
+          notifyError("Cookie error, please relogin and try again");
+        } else {
+          notifyError(err?.response?.data?.message || err.message);
+        }
+      
+    }
+    setIsSubmitting(false);
   };
 
   return (
@@ -228,23 +241,6 @@ const UserProfile = () => {
                   ? "bg-white border border-gray-300 text-gray-900 focus:ring-purple-600"
                   : "bg-neutral-900 border border-neutral-700 text-white focus:ring-purple-400"
                   }`}
-              />
-            </div>
-
-            <div className="flex flex-col gap-1">
-              <label className={`text-sm font-medium ${theme ? "text-gray-700" : "text-gray-300"}`}>Phone Number *</label>
-              <input
-                type="tel"
-                name="phoneNumber"
-                placeholder="98765 43210"
-                required
-                value={formData.phoneNumber}
-                onChange={handleInputChange}
-                className={`p-1.5 rounded-md text-sm focus:outline-none focus:ring-2 placeholder-gray-400 ${theme
-                  ? "bg-white border border-gray-300 text-gray-900 focus:ring-purple-600"
-                  : "bg-neutral-900 border border-neutral-700 text-white focus:ring-purple-400"
-                  }`}
-                maxLength={10}
               />
             </div>
 
@@ -418,9 +414,7 @@ const UserProfile = () => {
           <div className="mt-2">
             <button
               type="submit"
-              className={`w-full p-2.5 text-white font-semibold rounded-md transition-all ${submitSuccess
-                ? "bg-green-500"
-                : theme
+              className={`w-full p-2.5 text-white font-semibold rounded-md transition-all ${theme
                   ? "bg-purple-600 hover:bg-purple-700"
                   : "bg-purple-700 hover:bg-purple-800"
                 }`}
@@ -428,8 +422,6 @@ const UserProfile = () => {
             >
               {isSubmitting
                 ? "Processing..."
-                : submitSuccess
-                  ? "Profile Saved!"
                   : "Save and Continue"}
             </button>
           </div>
