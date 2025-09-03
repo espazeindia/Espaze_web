@@ -1,115 +1,180 @@
 import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, ChevronDown } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 
 const AddWarehouse = () => {
   const navigate = useNavigate();
 
-  // UI-only state (no persistence)
+  // Form data (UI-only)
   const [formData, setFormData] = useState({
     ownerName: "",
     phoneNumber: "",
     addressLine1: "",
     addressLine2: "",
-    addressLine3: "",            // now used as Owner Pincode
+    addressLine3: "", // Owner PIN
     warehouseName: "",
     warehouseAddress1: "",
     warehouseAddress2: "",
-    warehouseAddress3: "",       // now used as Warehouse Pincode
+    warehouseAddress3: "", // Warehouse PIN
     warehouseSize: "",
     leaseFileName: "",
   });
-  const [errors, setErrors] = useState({ leaseFile: "" });
+
+  // Per-field error messages
+  const [errors, setErrors] = useState({
+    ownerName: "",
+    phoneNumber: "",
+    addressLine1: "",
+    addressLine2: "",
+    addressLine3: "",
+    warehouseName: "",
+    warehouseAddress1: "",
+    warehouseAddress2: "",
+    warehouseAddress3: "",
+    warehouseSize: "",
+    leaseFile: "",
+  });
+
+  // Submit status: idle | saving | success
+  const [status, setStatus] = useState("idle");
+
+  const setError = (field, message) =>
+    setErrors((e) => ({ ...e, [field]: message }));
+
+  // Single-field validator
+  const validateField = (name, value) => {
+    switch (name) {
+      case "ownerName":
+      case "warehouseName": {
+        if (!value.trim()) return "This field is required.";
+        if (!/^[A-Za-z\s]+$/.test(value)) {
+          return "Only alphabetical letters and spaces allowed.";
+        }
+        return "";
+      }
+      case "phoneNumber": {
+        if (!value.trim()) return "This field is required.";
+        if (!/^\d{0,10}$/.test(value)) return "Digits only (0–9).";
+        if (value.length !== 10) return "Enter a 10-digit phone number.";
+        return "";
+      }
+      case "addressLine1":
+      case "addressLine2":
+      case "warehouseAddress1":
+      case "warehouseAddress2": {
+        if (!value.trim()) return "This field is required.";
+        return "";
+      }
+      case "addressLine3":
+      case "warehouseAddress3": {
+        if (!value.trim()) return "This field is required.";
+        if (!/^\d+$/.test(value)) return "Digits only (0–9).";
+        if (value.length !== 6) return "Enter a 6-digit PIN code.";
+        return "";
+      }
+      case "warehouseSize": {
+        if (!value.trim()) return "This field is required.";
+        if (!/^\d+$/.test(value)) return "Enter a valid number (digits only).";
+        return "";
+      }
+      case "leaseFile": {
+        if (!value) return "Please upload your lease document (PDF).";
+        if (!(value.type === "application/pdf" || /\.pdf$/i.test(value.name || ""))) {
+          return "Unsupported file type. Upload a PDF document.";
+        }
+        return "";
+      }
+      default:
+        return "";
+    }
+  };
 
   const handleChange = (e) => {
+    if (status !== "idle") return; // lock form while saving/saved
+
     const { name, value, files } = e.target;
 
     if (name === "leaseFile") {
       const file = files && files[0];
-      if (!file) {
-        setFormData((s) => ({ ...s, leaseFileName: "" }));
-        setErrors((s) => ({ ...s, leaseFile: "PDF is required." }));
-        return;
-      }
-      const isPdf =
-        file.type === "application/pdf" || /\.pdf$/i.test(file.name || "");
-      if (!isPdf) {
-        setFormData((s) => ({ ...s, leaseFileName: "" }));
-        setErrors((s) => ({ ...s, leaseFile: "Please upload a PDF file." }));
-        e.target.value = "";
-        return;
-      }
-      setErrors((s) => ({ ...s, leaseFile: "" }));
-      setFormData((s) => ({ ...s, leaseFileName: file.name }));
-      return;
-    }
-
-    // Names: letters + spaces only
-    if (name === "ownerName" || name === "warehouseName") {
-      const cleaned = value.replace(/[^A-Za-z\s]/g, "");
-      setFormData((s) => ({ ...s, [name]: cleaned }));
-      return;
-    }
-
-    // Phone: digits only, max 10
-    if (name === "phoneNumber") {
-      const cleaned = value.replace(/\D/g, "").slice(0, 10);
-      setFormData((s) => ({ ...s, phoneNumber: cleaned }));
-      return;
-    }
-
-    // Size: digits only
-    if (name === "warehouseSize") {
-      const cleaned = value.replace(/\D/g, "");
-      setFormData((s) => ({ ...s, warehouseSize: cleaned }));
-      return;
-    }
-
-    // Pincode (owner & warehouse): digits only, max 6
-    if (name === "addressLine3" || name === "warehouseAddress3") {
-      const cleaned = value.replace(/\D/g, "").slice(0, 6);
-      setFormData((s) => ({ ...s, [name]: cleaned }));
+      const msg = validateField("leaseFile", file || null);
+      setError("leaseFile", msg);
+      setFormData((s) => ({ ...s, leaseFileName: file ? file.name : "" }));
       return;
     }
 
     setFormData((s) => ({ ...s, [name]: value }));
+    const msg = validateField(name, value);
+    setError(name, msg);
   };
 
+  const handleBlur = (e) => {
+    const { name } = e.target;
+    const msg = validateField(name, formData[name]);
+    setError(name, msg);
+  };
+
+  // Overall validity: no errors + all required fields non-empty
   const isValid = useMemo(() => {
     const requiredFilled =
       formData.ownerName.trim() &&
       formData.phoneNumber.trim() &&
       formData.addressLine1.trim() &&
       formData.addressLine2.trim() &&
-      formData.addressLine3.trim() &&             // pincode
+      formData.addressLine3.trim() &&
       formData.warehouseName.trim() &&
       formData.warehouseAddress1.trim() &&
       formData.warehouseAddress2.trim() &&
-      formData.warehouseAddress3.trim() &&        // pincode
+      formData.warehouseAddress3.trim() &&
       formData.warehouseSize.trim() &&
       formData.leaseFileName.trim();
 
-    const phoneOk = /^\d{10}$/.test(formData.phoneNumber);
-    const namesOk =
-      /^[A-Za-z\s]+$/.test(formData.ownerName) &&
-      /^[A-Za-z\s]+$/.test(formData.warehouseName);
-    const sizeOk = /^\d+$/.test(formData.warehouseSize);
-    const pincodesOk =
-      /^\d{6}$/.test(formData.addressLine3) &&
-      /^\d{6}$/.test(formData.warehouseAddress3);
-    const fileOk = !errors.leaseFile;
-
-    return Boolean(
-      requiredFilled && phoneOk && namesOk && sizeOk && pincodesOk && fileOk
-    );
+    const noErrors = Object.values(errors).every((m) => !m);
+    return Boolean(requiredFilled && noErrors);
   }, [formData, errors]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!isValid) return;
-    // No backend yet
-    // navigate("/dashboard");
+
+    // Final pass: validate everything and show first error
+    const nextErrors = { ...errors };
+    Object.entries(formData).forEach(([field, val]) => {
+      if (field === "leaseFileName") return;
+      nextErrors[field] = validateField(field, val);
+    });
+    nextErrors.leaseFile = formData.leaseFileName
+      ? ""
+      : "Please upload your lease document (PDF).";
+    setErrors(nextErrors);
+
+    const firstError = Object.entries(nextErrors).find(([, msg]) => msg);
+    if (firstError) {
+      const [field] = firstError;
+      const el = document.querySelector(`[name="${field}"]`);
+      if (el?.scrollIntoView)
+        el.scrollIntoView({ behavior: "smooth", block: "center" });
+      return;
+    }
+
+    // Simulate save → turn button green & fade, then success, then navigate
+    setStatus("saving");
+    setTimeout(() => {
+      setStatus("success");
+      setTimeout(() => navigate("/dashboard"), 900);
+    }, 1000);
   };
+
+  const btnBase =
+    "w-full rounded-lg px-6 py-3 text-white font-semibold transition flex items-center justify-center gap-2";
+  const btnStateClass =
+    status === "idle"
+      ? isValid
+        ? "bg-purple-600 hover:bg-purple-700 focus:ring-4 focus:ring-purple-300"
+        : "bg-purple-300 cursor-not-allowed"
+      : status === "saving"
+      ? "bg-green-600 opacity-80 cursor-wait"
+      : "bg-green-600";
+
+  const disabled = status !== "idle" || !isValid;
 
   return (
     <div className="min-h-screen bg-gray-50 p-4 md:p-6">
@@ -119,6 +184,7 @@ const AddWarehouse = () => {
           onClick={() => navigate("/dashboard")}
           className="inline-flex items-center hover:opacity-80 transition"
           aria-label="Back to dashboard"
+          disabled={status !== "idle"}
         >
           <ArrowLeft size={24} className="text-gray-900" />
         </button>
@@ -131,6 +197,7 @@ const AddWarehouse = () => {
       <form
         onSubmit={handleSubmit}
         noValidate
+        aria-busy={status !== "idle"}
         className="w-full bg-white border border-gray-200 rounded-xl shadow-sm p-4 md:p-6"
       >
         {/* Owner Details */}
@@ -151,49 +218,48 @@ const AddWarehouse = () => {
                 placeholder="Enter your full name"
                 value={formData.ownerName}
                 onChange={handleChange}
-                className="mt-1 w-full h-10 rounded-lg border border-gray-300 px-3 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                onBlur={handleBlur}
+                disabled={status !== "idle"}
+                className={`mt-1 w-full h-10 rounded-lg border px-3 focus:outline-none ${
+                  errors.ownerName
+                    ? "border-red-500 focus:ring-2 focus:ring-red-500"
+                    : "border-gray-300 focus:ring-2 focus:ring-purple-500"
+                }`}
                 required
                 inputMode="text"
                 pattern="[A-Za-z\s]+"
-                title="Letters and spaces only"
               />
+              {errors.ownerName && (
+                <p className="mt-1 text-xs text-red-600">{errors.ownerName}</p>
+              )}
             </div>
 
-            {/* Phone Number with aligned chevron */}
+            {/* Phone Number */}
             <div>
               <label className="block text-sm font-medium text-gray-700">
                 Phone Number *
               </label>
-              <div className="mt-1 flex w-full">
-                <div className="relative">
-                  <select
-                    className="h-10 pr-8 pl-3 rounded-l-lg border border-gray-300 bg-gray-50 text-gray-800 focus:outline-none appearance-none cursor-not-allowed"
-                    defaultValue="+91"
-                    disabled
-                    aria-label="Country code"
-                  >
-                    <option value="+91">+91</option>
-                  </select>
-                  <ChevronDown
-                    className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500"
-                    aria-hidden="true"
-                  />
-                </div>
-
-                <input
-                  type="tel"
-                  name="phoneNumber"
-                  placeholder="98765 43210"
-                  value={formData.phoneNumber}
-                  onChange={handleChange}
-                  className="h-10 w-full rounded-r-lg border border-l-0 border-gray-300 px-3 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  required
-                  inputMode="numeric"
-                  pattern="\d{10}"
-                  maxLength={10}
-                  title="Enter a 10-digit phone number"
-                />
-              </div>
+              <input
+                type="tel"
+                name="phoneNumber"
+                placeholder="9876543210"
+                value={formData.phoneNumber}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                disabled={status !== "idle"}
+                className={`mt-1 h-10 w-full rounded-lg border px-3 focus:outline-none ${
+                  errors.phoneNumber
+                    ? "border-red-500 focus:ring-2 focus:ring-red-500"
+                    : "border-gray-300 focus:ring-2 focus:ring-purple-500"
+                }`}
+                required
+                inputMode="numeric"
+                maxLength={10}
+                pattern="\d{10}"
+              />
+              {errors.phoneNumber && (
+                <p className="mt-1 text-xs text-red-600">{errors.phoneNumber}</p>
+              )}
             </div>
 
             {/* Address Line 1 */}
@@ -207,12 +273,21 @@ const AddWarehouse = () => {
                 placeholder="Block no / Locality"
                 value={formData.addressLine1}
                 onChange={handleChange}
-                className="mt-1 w-full h-10 rounded-lg border border-gray-300 px-3 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                onBlur={handleBlur}
+                disabled={status !== "idle"}
+                className={`mt-1 w-full h-10 rounded-lg border px-3 focus:outline-none ${
+                  errors.addressLine1
+                    ? "border-red-500 focus:ring-2 focus:ring-red-500"
+                    : "border-gray-300 focus:ring-2 focus:ring-purple-500"
+                }`}
                 required
               />
+              {errors.addressLine1 && (
+                <p className="mt-1 text-xs text-red-600">{errors.addressLine1}</p>
+              )}
             </div>
 
-            {/* Address Line 2 (now includes State) */}
+            {/* Address Line 2 */}
             <div>
               <label className="block text-sm font-medium text-gray-700">
                 Address Line 2 *
@@ -223,12 +298,21 @@ const AddWarehouse = () => {
                 placeholder="State / District"
                 value={formData.addressLine2}
                 onChange={handleChange}
-                className="mt-1 w-full h-10 rounded-lg border border-gray-300 px-3 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                onBlur={handleBlur}
+                disabled={status !== "idle"}
+                className={`mt-1 w-full h-10 rounded-lg border px-3 focus:outline-none ${
+                  errors.addressLine2
+                    ? "border-red-500 focus:ring-2 focus:ring-red-500"
+                    : "border-gray-300 focus:ring-2 focus:ring-purple-500"
+                }`}
                 required
               />
+              {errors.addressLine2 && (
+                <p className="mt-1 text-xs text-red-600">{errors.addressLine2}</p>
+              )}
             </div>
 
-            {/* Pincode (replaces Address Line 3) */}
+            {/* Owner Pincode */}
             <div className="md:col-span-2">
               <label className="block text-sm font-medium text-gray-700">
                 Pincode *
@@ -239,13 +323,21 @@ const AddWarehouse = () => {
                 placeholder="6-digit PIN code"
                 value={formData.addressLine3}
                 onChange={handleChange}
-                className="mt-1 h-10 w-full md:w-auto md:max-w-[200px] rounded-lg border border-gray-300 px-3 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                onBlur={handleBlur}
+                disabled={status !== "idle"}
+                className={`mt-1 h-10 w-full md:w-auto md:max-w-[200px] rounded-lg border px-3 focus:outline-none ${
+                  errors.addressLine3
+                    ? "border-red-500 focus:ring-2 focus:ring-red-500"
+                    : "border-gray-300 focus:ring-2 focus:ring-purple-500"
+                }`}
                 required
                 inputMode="numeric"
-                pattern="\d{6}"
                 maxLength={6}
-                title="Enter a 6-digit pincode"
+                pattern="\d{6}"
               />
+              {errors.addressLine3 && (
+                <p className="mt-1 text-xs text-red-600">{errors.addressLine3}</p>
+              )}
             </div>
           </div>
         </div>
@@ -268,12 +360,20 @@ const AddWarehouse = () => {
                 placeholder="Enter name"
                 value={formData.warehouseName}
                 onChange={handleChange}
-                className="mt-1 w-full h-10 rounded-lg border border-gray-300 px-3 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                onBlur={handleBlur}
+                disabled={status !== "idle"}
+                className={`mt-1 w-full h-10 rounded-lg border px-3 focus:outline-none ${
+                  errors.warehouseName
+                    ? "border-red-500 focus:ring-2 focus:ring-red-500"
+                    : "border-gray-300 focus:ring-2 focus:ring-purple-500"
+                }`}
                 required
                 inputMode="text"
                 pattern="[A-Za-z\s]+"
-                title="Letters and spaces only"
               />
+              {errors.warehouseName && (
+                <p className="mt-1 text-xs text-red-600">{errors.warehouseName}</p>
+              )}
             </div>
 
             {/* Warehouse Size */}
@@ -287,12 +387,19 @@ const AddWarehouse = () => {
                 placeholder="e.g. 2500"
                 value={formData.warehouseSize}
                 onChange={handleChange}
-                className="mt-1 w-full h-10 rounded-lg border border-gray-300 px-3 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                onBlur={handleBlur}
+                disabled={status !== "idle"}
+                className={`mt-1 w-full h-10 rounded-lg border px-3 focus:outline-none ${
+                  errors.warehouseSize
+                    ? "border-red-500 focus:ring-2 focus:ring-red-500"
+                    : "border-gray-300 focus:ring-2 focus:ring-purple-500"
+                }`}
                 required
                 inputMode="numeric"
-                pattern="\d+"
-                title="Digits only"
               />
+              {errors.warehouseSize && (
+                <p className="mt-1 text-xs text-red-600">{errors.warehouseSize}</p>
+              )}
             </div>
 
             {/* Lease PDF */}
@@ -305,6 +412,12 @@ const AddWarehouse = () => {
                 name="leaseFile"
                 accept="application/pdf"
                 onChange={handleChange}
+                onBlur={(e) => {
+                  const file = e.target.files && e.target.files[0];
+                  const msg = validateField("leaseFile", file || null);
+                  setError("leaseFile", msg);
+                }}
+                disabled={status !== "idle"}
                 className={`mt-1 w-full h-10 rounded-lg border px-3 py-2 focus:outline-none ${
                   errors.leaseFile
                     ? "border-red-500 focus:ring-2 focus:ring-red-500"
@@ -333,12 +446,23 @@ const AddWarehouse = () => {
                 placeholder="Flat/House No."
                 value={formData.warehouseAddress1}
                 onChange={handleChange}
-                className="mt-1 w-full h-10 rounded-lg border border-gray-300 px-3 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                onBlur={handleBlur}
+                disabled={status !== "idle"}
+                className={`mt-1 w-full h-10 rounded-lg border px-3 focus:outline-none ${
+                  errors.warehouseAddress1
+                    ? "border-red-500 focus:ring-2 focus:ring-red-500"
+                    : "border-gray-300 focus:ring-2 focus:ring-purple-500"
+                }`}
                 required
               />
+              {errors.warehouseAddress1 && (
+                <p className="mt-1 text-xs text-red-600">
+                  {errors.warehouseAddress1}
+                </p>
+              )}
             </div>
 
-            {/* Warehouse Address 2 (now includes State) */}
+            {/* Warehouse Address 2 */}
             <div>
               <label className="block text-sm font-medium text-gray-700">
                 Address Line 2 *
@@ -349,9 +473,20 @@ const AddWarehouse = () => {
                 placeholder="State / District"
                 value={formData.warehouseAddress2}
                 onChange={handleChange}
-                className="mt-1 w-full h-10 rounded-lg border border-gray-300 px-3 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                onBlur={handleBlur}
+                disabled={status !== "idle"}
+                className={`mt-1 w-full h-10 rounded-lg border px-3 focus:outline-none ${
+                  errors.warehouseAddress2
+                    ? "border-red-500 focus:ring-2 focus:ring-red-500"
+                    : "border-gray-300 focus:ring-2 focus:ring-purple-500"
+                }`}
                 required
               />
+              {errors.warehouseAddress2 && (
+                <p className="mt-1 text-xs text-red-600">
+                  {errors.warehouseAddress2}
+                </p>
+              )}
             </div>
 
             {/* Warehouse Pincode */}
@@ -365,13 +500,23 @@ const AddWarehouse = () => {
                 placeholder="6-digit PIN code"
                 value={formData.warehouseAddress3}
                 onChange={handleChange}
-                className="mt-1 h-10 w-full md:w-auto md:max-w-[200px] rounded-lg border border-gray-300 px-3 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                onBlur={handleBlur}
+                disabled={status !== "idle"}
+                className={`mt-1 h-10 w-full md:w-auto md:max-w-[200px] rounded-lg border px-3 focus:outline-none ${
+                  errors.warehouseAddress3
+                    ? "border-red-500 focus:ring-2 focus:ring-red-500"
+                    : "border-gray-300 focus:ring-2 focus:ring-purple-500"
+                }`}
                 required
                 inputMode="numeric"
-                pattern="\d{6}"
                 maxLength={6}
-                title="Enter a 6-digit pincode"
+                pattern="\d{6}"
               />
+              {errors.warehouseAddress3 && (
+                <p className="mt-1 text-xs text-red-600">
+                  {errors.warehouseAddress3}
+                </p>
+              )}
             </div>
           </div>
         </div>
@@ -380,15 +525,63 @@ const AddWarehouse = () => {
         <div className="pt-2">
           <button
             type="submit"
-            disabled={!isValid}
-            className={`w-full rounded-lg px-6 py-3 text-white font-semibold transition ${
-              isValid
-                ? "bg-purple-600 hover:bg-purple-700 focus:ring-4 focus:ring-purple-300"
-                : "bg-purple-300 cursor-not-allowed"
-            }`}
-            title={!isValid ? "Please complete all fields correctly" : "Save and Continue"}
+            disabled={disabled}
+            className={`${btnBase} ${btnStateClass}`}
+            title={
+              status === "idle"
+                ? isValid
+                  ? "Save and Continue"
+                  : "Please complete all fields correctly"
+                : status === "saving"
+                ? "Saving..."
+                : "Saved"
+            }
+            aria-live="polite"
           >
-            Save and Continue
+            {status === "saving" && (
+              <svg
+                className="animate-spin h-4 w-4"
+                viewBox="0 0 24 24"
+                fill="none"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                />
+                <path
+                  className="opacity-75"
+                  d="M4 12a8 8 0 018-8"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                  strokeLinecap="round"
+                />
+              </svg>
+            )}
+            {status === "success" && (
+              <svg
+                className="h-5 w-5"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+                aria-hidden="true"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M16.707 5.293a1 1 0 010 1.414l-7.25 7.25a1 1 0 01-1.414 0l-3-3a1 1 0 111.414-1.414l2.293 2.293 6.543-6.543a1 1 0 011.414 0z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            )}
+            <span>
+              {status === "idle"
+                ? "Save and Continue"
+                : status === "saving"
+                ? "Saving..."
+                : "Saved"}
+            </span>
           </button>
         </div>
       </form>
