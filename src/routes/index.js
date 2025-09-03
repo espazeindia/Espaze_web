@@ -1,14 +1,14 @@
 import { lazy } from "react";
-import { GridView, Inventory2Outlined, SupervisorAccountOutlined,ShoppingCart,Storefront, Person } from "@mui/icons-material";
+import { GridView, Inventory2Outlined, SupervisorAccountOutlined,ShoppingCart,Storefront} from "@mui/icons-material";
 const ProductOnboarding = lazy(() => import("../pages/ProductOnboarding"));
 const CategoriesPage = lazy(() => import("../pages/CategoriesPage"));
 const Dashboard = lazy(() => import("../pages/Dashboard"));
 const Products = lazy(() => import("../pages/Products"));
 const Customers = lazy(() => import("../pages/Customers"));
 const Orders = lazy(() => import("../pages/Orders"));
-const Inventory= lazy(() => import("../pages/Inventory"));
+const Inventory = lazy(() => import("../pages/Inventory"));
 const ProductDetails = lazy(() => import("../pages/ProductDetails"));
-const UserProfile = lazy(() => import("../pages/UserProfile"));
+
 
 const routes = [
   {
@@ -46,16 +46,18 @@ const routes = [
     component : ProductOnboarding,
     access : ["operations"]
   },
+  {
+    path: "/warehouse-services",
+    component: WarehouseServices,
+    access: ["admin","operations","seller"]
+  },
+  
    {
     path: "/categories",
     component: CategoriesPage,
     access: ["operations"]
   },
-  {
-    path: "/profile",
-    component: UserProfile,
-    access: ["seller"],
-  },
+
 ];
 
 const sidebarRoutes = [
@@ -101,7 +103,6 @@ const sidebarRoutes = [
   name : "Category",
   access: ["operations"]  
 },
-
 ];
 
 export { routes, sidebarRoutes };
