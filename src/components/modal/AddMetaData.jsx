@@ -87,7 +87,7 @@ function AddMetaData({ isOpen, onClose, setReload }) {
       setSubCategoryLoading(false);
     };
     if (categoryOfPro && categoryOfPro !== "" && isOpen) {
-      setSubCategoryOfPro("")
+      setSubCategoryOfPro("");
       SubCategoryCall();
     }
   }, [categoryOfPro]);
@@ -131,8 +131,8 @@ function AddMetaData({ isOpen, onClose, setReload }) {
           mrp: 0,
           image: "",
         });
-        setcategoryOfPro("")
-        setSubCategoryOfPro("")
+        setcategoryOfPro("");
+        setSubCategoryOfPro("");
         onClose();
       }}
     >
@@ -208,6 +208,7 @@ function AddMetaData({ isOpen, onClose, setReload }) {
                   disabled={categoryLoading}
                   value={categoryOfPro}
                   placeholder={"Select Category"}
+                  required
                   onChange={(_, val) => setcategoryOfPro(val)}
                 >
                   {categories ? (
@@ -221,14 +222,19 @@ function AddMetaData({ isOpen, onClose, setReload }) {
                   )}
                 </Select>
               </FormControl>
-              <FormControl size="lg" className={`space-y-1 ${subCategoryLoading ? " cursor-not-allowed" : " cursor-pointer"}`}>
+              <FormControl
+                size="lg"
+                className={`space-y-1 ${
+                  subCategoryLoading ? " cursor-not-allowed" : " cursor-pointer"
+                }`}
+              >
                 <label className={theme ? "text-zinc-800" : "text-zinc-300"}>Sub Category</label>
                 <Select
                   disabled={subCategoryLoading}
                   value={subCategoryOfPro}
+                  required
                   placeholder={"Select Sub-Category"}
                   onChange={(_, val) => setSubCategoryOfPro(val)}
-                  
                 >
                   {subCategories !== null ? (
                     subCategories.map((sub) => (
