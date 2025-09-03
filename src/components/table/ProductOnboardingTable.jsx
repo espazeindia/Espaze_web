@@ -24,12 +24,10 @@ function ProductOnboardingTable({
   const [currentProduct, setCurrentProduct] = useState({});
   const [deleteProduct, setDeleteProduct] = useState(-1);
   const [deleteModal, setDeleteModal] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState("");
 
   const handleProduct = (data) => {
-    setSelectedProduct(data);
     navigate(`/product-details/metadata_${data.id}`);
-  }
+  };
 
   const handleDelete = (id) => {
     setDeleteProduct(id);
@@ -41,8 +39,9 @@ function ProductOnboardingTable({
   };
   return (
     <div
-      className={`mt-10 p-2 rounded-lg w-full  sideBarNone ${theme ? "bg-white" : "bg-zinc-800"} ${loading && "animate-pulse"
-        }`}
+      className={`mt-10 p-2 rounded-lg w-full  sideBarNone ${theme ? "bg-white" : "bg-zinc-800"} ${
+        loading && "animate-pulse"
+      }`}
     >
       <div className="w-full">
         <div className="grid grid-cols-8 border-b py-4 text-sm border-gray-300 border-dotted">
@@ -93,12 +92,11 @@ function ProductOnboardingTable({
               onboardingData.map((data, index) => (
                 <div
                   key={index}
-                  onClick={()=>{
-                    handleProduct(data)
+                  onClick={() => {
+                    handleProduct(data);
                   }}
                   className="grid grid-cols-8 items-center text-sm border-b py-4 border-gray-300 border-dotted cursor-pointer hover:bg-zinc-100"
                 >
-
                   <div
                     className={`text-center font-medium ${theme ? "text-zinc-800" : "text-white"}`}
                   >
@@ -140,23 +138,25 @@ function ProductOnboardingTable({
                     ${theme ? "text-black" : "text-white"}`}
                   >
                     <button
-                      className={`cursor-pointer ${theme
+                      className={`cursor-pointer ${
+                        theme
                           ? "text-green-600 hover:text-green-700"
                           : "text-green-400 hover:text-green-700"
-                        }`}
+                      }`}
                       onClick={(e) => {
-                        e.stopPropagation()
+                        e.stopPropagation();
                         handleEdit(data);
                       }}
                     >
                       <Edit />
                     </button>
                     <button
-                      className={` hover:text-red-600 cursor-pointer ${theme ? "text-red-500" : "text-red-500"}`}
+                      className={` hover:text-red-600 cursor-pointer ${
+                        theme ? "text-red-500" : "text-red-500"
+                      }`}
                       onClick={(e) => {
-                        e.stopPropagation()
+                        e.stopPropagation();
                         handleDelete(data.id);
-      
                       }}
                     >
                       <Delete />
@@ -165,7 +165,10 @@ function ProductOnboardingTable({
                 </div>
               ))
             ) : (
-              <div className=" w-full h-[48vh] flex justify-center items-center text-2xl font-semibold"> No Metadata Found</div>
+              <div className=" w-full h-[48vh] flex justify-center items-center text-2xl font-semibold">
+                {" "}
+                No Metadata Found
+              </div>
             )
           ) : (
             Array.from({ length: limit }).map((_, index) => (
@@ -189,7 +192,7 @@ function ProductOnboardingTable({
           setEditModal(false);
         }}
         currentProduct={currentProduct}
-        setOnboardingData={setOnboardingData}
+        setReload={setReload}
       />
       <DeleteMetaData
         isOpen={deleteModal}
