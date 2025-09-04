@@ -1,21 +1,21 @@
 import requests from "./httpService";
 
 const LoginServices = {
-  LoginOperationalGuy: async (body) => {
+  LoginOperationalGuy: (body) => {
     return requests.post("/login/operational_guy/login", body);
   },
 
-  GetOtp: async (param) => {
+  GetOtp: (param) => {
     return requests.get("/login/seller/getOTP", { params: param });
   },
 
-  LoginSellerByOtp: async (param) => {
+  LoginSellerByOtp: (param) => {
     return requests.get("/login/seller/verifyOTP", {
       params: param,
     });
   },
 
-  LoginSellerByPin: async (param) => {
+  LoginSellerByPin: (param) => {
     return requests.get("/login/seller/verifyPin", {
       params: param,
     });

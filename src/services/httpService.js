@@ -1,7 +1,7 @@
 import axios from "axios";
 import Cookies from "js-cookie";
+import { notifyError } from "../utils/toast";
 
-//console.log("base url", import.meta.env.VITE_APP_API_BASE_URL);
 
 const instance = axios.create({
   baseURL: `${import.meta.env.VITE_APP_API_BASE_URL}`,
@@ -12,21 +12,81 @@ const instance = axios.create({
   },
 });
 
+instance.interceptors.request.use((config) => {
+  const token = Cookies.get("EspazeCookie");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
 
 const responseBody = (response) => response.data;
 
 const requests = {
   get: (url, body, headers) =>
-    instance.get(url, body, headers).then(responseBody),
+    instance
+      .get(url, body, headers)
+      .then(responseBody)
+      .catch((error) => {
+        if (error.response?.status === 401) {
+          Cookies.remove("token");
+          window.location.href = "/login";
+          notifyError("User Session Expired Login Again")
+        }
+        throw error;
+      }),
 
-  post: (url, body, headers) => instance.post(url, body, headers).then(responseBody),
+  post: (url, body, headers) =>
+    instance
+      .post(url, body, headers)
+      .then(responseBody)
+      .catch((error) => {
+        if (error.response?.status === 401) {
+          Cookies.remove("token");
+          window.location.href = "/login";
+          notifyError("User Session Expired Login Again")
+        }
+        throw error;
+      }),
 
   put: (url, body, headers) =>
-    instance.put(url, body, headers).then(responseBody),
+    instance
+      .put(url, body, headers)
+      .then(responseBody)
+      .catch((error) => {
+        if (error.response?.status === 401) {
+          Cookies.remove("token");
+          window.location.href = "/login";
+          notifyError("User Session Expired Login Again")
+        }
+        throw error;
+      }),
 
-  patch: (url, body) => instance.patch(url, body).then(responseBody),
+  patch: (url, body) =>
+    instance
+      .patch(url, body)
+      .then(responseBody)
+      .catch((error) => {
+        if (error.response?.status === 401) {
+          Cookies.remove("token");
+          window.location.href = "/login";
+          notifyError("User Session Expired Login Again")
+        }
+        throw error;
+      }),
 
-  delete: (url, body) => instance.delete(url, body).then(responseBody),
+  delete: (url, body) =>
+    instance
+      .delete(url, body)
+      .then(responseBody)
+      .catch((error) => {
+        if (error.response?.status === 401) {
+          Cookies.remove("token");
+          window.location.href = "/login";
+          notifyError("User Session Expired Login Again")
+        }
+        throw error;
+      }),
 };
 
 export default requests;

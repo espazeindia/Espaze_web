@@ -58,6 +58,11 @@ const routes = [
     component: UserProfile,
     access: ["seller"],
   },
+  {
+    path: "/product-details/:id",
+    component: ProductDetails,
+    access: ["operations", "seller"],
+  },
 ];
 
 const sidebarRoutes = [
@@ -103,7 +108,6 @@ const sidebarRoutes = [
     name: "Category",
     access: ["operations"],
   },
-
 ];
 
 export { routes, sidebarRoutes };
