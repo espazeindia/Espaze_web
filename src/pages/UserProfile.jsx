@@ -147,13 +147,9 @@ const UserProfile = () => {
         notifySuccess(res.message);
       }
     } catch (error) {
-      if (err === "cookie error") {
-        Cookies.remove("EspazeCookie");
-        notifyError("Cookie error, please relogin and try again");
-      } else {
-        notifyError(err?.response?.data?.message || err.message);
-      }
+      notifyError(error?.response?.data?.message || error.message);
     }
+
     setIsSubmitting(false);
   };
 

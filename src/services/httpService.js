@@ -29,7 +29,7 @@ const requests = {
       .then(responseBody)
       .catch((error) => {
         if (error.response?.status === 401) {
-          Cookies.remove("token");
+          Cookies.remove("EspazeCookie");
           window.location.href = "/login";
           notifyError("User Session Expired Login Again")
         }
@@ -42,7 +42,7 @@ const requests = {
       .then(responseBody)
       .catch((error) => {
         if (error.response?.status === 401) {
-          Cookies.remove("token");
+          Cookies.remove("EspazeCookie");
           window.location.href = "/login";
           notifyError("User Session Expired Login Again")
         }
@@ -55,7 +55,7 @@ const requests = {
       .then(responseBody)
       .catch((error) => {
         if (error.response?.status === 401) {
-          Cookies.remove("token");
+          Cookies.remove("EspazeCookie");
           window.location.href = "/login";
           notifyError("User Session Expired Login Again")
         }
@@ -68,7 +68,7 @@ const requests = {
       .then(responseBody)
       .catch((error) => {
         if (error.response?.status === 401) {
-          Cookies.remove("token");
+          Cookies.remove("EspazeCookie");
           window.location.href = "/login";
           notifyError("User Session Expired Login Again")
         }
@@ -81,7 +81,7 @@ const requests = {
       .then(responseBody)
       .catch((error) => {
         if (error.response?.status === 401) {
-          Cookies.remove("token");
+          Cookies.remove("EspazeCookie");
           window.location.href = "/login";
           notifyError("User Session Expired Login Again")
         }
