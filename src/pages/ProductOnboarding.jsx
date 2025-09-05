@@ -21,8 +21,8 @@ function ProductOnboarding() {
   const [loading, setLoading] = useState(true);
   const [reload, setReload] = useState(false);
 
-  // Get user role from cookie (or auth context)
-  const userRole = Cookies.get("userRole") || "seller"; // Example: "operations" or "seller"
+  // ✅ Get user role (default seller if not found)
+  const userRole = Cookies.get("userRole") || "seller";
 
   const handleOpenAddMetaDataModal = () => setOpenAddMetaData(true);
 
@@ -33,18 +33,19 @@ function ProductOnboarding() {
         const result = await MetaDataServices.FetchMetadata(limit, page, search);
 
         if (result.success) {
-          const transformed = result.data.metadata?.map((data) => ({
-            id: data.id ?? "N/A",
-            productName: data.name ?? "",
-            productDescription: data.description ?? "",
-            category: data.category_id ?? "",
-            subCategory: data.subcategory_id ?? "",
-            code: data.hsn_code ?? "",
-            mrp: data.mrp ?? "",
-            image: data.image ?? "",
-            category_name: data.category_name ?? "",
-            subcategory_name: data.subcategory_name ?? "",
-          })) || [];
+          const transformed =
+            result.data.metadata?.map((data) => ({
+              id: data.id ?? "N/A",
+              productName: data.name ?? "",
+              productDescription: data.description ?? "",
+              category: data.category_id ?? "",
+              subCategory: data.subcategory_id ?? "",
+              code: data.hsn_code ?? "",
+              mrp: data.mrp ?? "",
+              image: data.image ?? "",
+              category_name: data.category_name ?? "",
+              subcategory_name: data.subcategory_name ?? "",
+            })) || [];
 
           setTotalDetails({
             total: result.data.total ?? 0,
@@ -73,28 +74,49 @@ function ProductOnboarding() {
     return () => clearTimeout(timeout);
   }, [searchInput]);
 
-  const handleChangeDebounce = useCallback((searchData) => setSearchInput(searchData), []);
+  const handleChangeDebounce = useCallback(
+    (searchData) => setSearchInput(searchData),
+    []
+  );
 
   return (
-    <div className={`p-5 min-h-full ${theme ? "bg-zinc-100 text-black" : "bg-neutral-950 text-white"}`}>
-      <div className="font-bold text-2xl">Product Onboarding ({userRole === "operations" ? "Operations" : "Seller"})</div>
+    <div
+      className={`p-5 min-h-full ${
+        theme ? "bg-zinc-100 text-black" : "bg-neutral-950 text-white"
+      }`}
+    >
+      {/* ✅ Show role in heading */}
+      <div className="font-bold text-2xl">
+        Product Onboarding (
+        {userRole === "operations" ? "Operations" : "Seller"})
+      </div>
 
       <div className="flex justify-between mt-5">
         <input
           onChange={(e) => handleChangeDebounce(e.target.value)}
           className={`w-[70vw] p-1 px-4 rounded-md focus:outline-0 ${
-            theme ? "bg-white text-zinc-700 shadow-zinc-300" : "bg-zinc-800 text-zinc-200 shadow-zinc-700"
+            theme
+              ? "bg-white text-zinc-700 shadow-zinc-300"
+              : "bg-zinc-800 text-zinc-200 shadow-zinc-700"
           }`}
           placeholder="Search By MetaData Name"
         />
         <div className="flex gap-2">
-          <div className={`p-1 px-6 rounded-md font-medium ${theme ? "text-zinc-700 border-1 border-zinc-700" : "border-zinc-200 border-1 text-white"}`}>
+          <div
+            className={`p-1 px-6 rounded-md font-medium ${
+              theme
+                ? "text-zinc-700 border-1 border-zinc-700"
+                : "border-zinc-200 border-1 text-white"
+            }`}
+          >
             Filters
           </div>
           <button
             onClick={handleOpenAddMetaDataModal}
             className={`p-1 px-7 rounded-md font-medium cursor-pointer hover:bg-green-600 hover:text-white ${
-              theme ? "text-green-600 border-1 border-green-600" : "text-green-500 border-1 border-green-500"
+              theme
+                ? "text-green-600 border-1 border-green-600"
+                : "text-green-500 border-1 border-green-500"
             }`}
           >
             Add
@@ -102,20 +124,27 @@ function ProductOnboarding() {
         </div>
       </div>
 
-      <ProductOnboardingTable
-        onboardingData={onboardingData}
-        setOnboardingData={setOnboardingData}
-        setPage={setPage}
-        page={page}
-        limit={limit}
-        setLimit={setLimit}
-        totalDetails={totalDetails}
-        loading={loading}
-        setReload={setReload}
-        showProductId={userRole === "operations"} // Only show Product ID for operations
-      />
+      {/* ✅ Fix scroll issue with overflow-x-auto */}
+      <div className="mt-5 overflow-x-auto">
+        <ProductOnboardingTable
+          onboardingData={onboardingData}
+          setOnboardingData={setOnboardingData}
+          setPage={setPage}
+          page={page}
+          limit={limit}
+          setLimit={setLimit}
+          totalDetails={totalDetails}
+          loading={loading}
+          setReload={setReload}
+          showProductId={userRole === "operations"} // Only show Product ID for operations
+        />
+      </div>
 
-      <AddMetaData isOpen={openAddMetaData} onClose={() => setOpenAddMetaData(false)} setReload={setReload} />
+      <AddMetaData
+        isOpen={openAddMetaData}
+        onClose={() => setOpenAddMetaData(false)}
+        setReload={setReload}
+      />
     </div>
   );
 }

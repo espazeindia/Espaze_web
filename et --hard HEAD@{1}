@@ -1,0 +1,94 @@
+[33m9bda8e4[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mDeepti[m[33m)[m HEAD@{0}: checkout: moving from Sneha to Deepti
+[33mcf426d8[m[33m ([m[1;31morigin/Sneha[m[33m, [m[1;32mSneha[m[33m)[m HEAD@{1}: pull origin Sneha: Fast-forward
+[33m8373b7e[m HEAD@{2}: checkout: moving from Deepti to Sneha
+[33m9bda8e4[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mDeepti[m[33m)[m HEAD@{3}: commit: changes in product deatils form
+[33mb8e7e4e[m[33m ([m[1;31morigin/Deepti[m[33m)[m HEAD@{4}: reset: moving to HEAD
+[33mb8e7e4e[m[33m ([m[1;31morigin/Deepti[m[33m)[m HEAD@{5}: commit: changes in product details page
+[33m3b7da75[m HEAD@{6}: commit: seller login ui changes made
+[33md429458[m HEAD@{7}: reset: moving to d429458
+[33m4b22822[m HEAD@{8}: commit: labels added to operationsonboarding form
+[33md429458[m HEAD@{9}: reset: moving to d429458
+[33mb95b97a[m HEAD@{10}: commit: changes in inventory
+[33m1d6e8e8[m HEAD@{11}: commit: product details change when logging in as inventory
+[33m1bee5bd[m HEAD@{12}: commit: changes
+[33m093d60d[m HEAD@{13}: commit: changes on product details when seller logins
+[33md7f64bd[m HEAD@{14}: commit: added toast notifications for success and error
+[33m58559c6[m HEAD@{15}: commit: password hint added
+[33m5433596[m HEAD@{16}: commit: sidebar issue resolved
+[33m453916f[m HEAD@{17}: commit: some more changes on onboarding form sidebar
+[33m343f208[m HEAD@{18}: commit: changes in operationsonboarding form layout
+[33m1de5a7a[m HEAD@{19}: commit: n
+[33md429458[m HEAD@{20}: commit: change
+[33mb4c3d6a[m HEAD@{21}: commit: k
+[33m20500d0[m HEAD@{22}: commit: h
+[33m96c1b3a[m HEAD@{23}: commit: L
+[33mb25997f[m HEAD@{24}: commit: d
+[33mc724eb3[m HEAD@{25}: commit: f
+[33m2637bde[m HEAD@{26}: commit: g
+[33m5a59eb6[m HEAD@{27}: reset: moving to HEAD
+[33m5a59eb6[m HEAD@{28}: checkout: moving from Deepti to Deepti
+[33m5a59eb6[m HEAD@{29}: commit: g
+[33mde2f2c3[m HEAD@{30}: commit: G
+[33m73a9f59[m HEAD@{31}: commit: H
+[33m6e0e320[m HEAD@{32}: commit: J
+[33m750623a[m HEAD@{33}: commit: h
+[33m957dcdf[m HEAD@{34}: commit: k
+[33mb729f05[m HEAD@{35}: commit: J
+[33ma54cc97[m HEAD@{36}: commit: n
+[33m7939914[m HEAD@{37}: commit: j
+[33m659e359[m HEAD@{38}: commit: j
+[33ma366f66[m HEAD@{39}: commit: M
+[33mb27d85f[m HEAD@{40}: commit: L
+[33m0f1c79f[m HEAD@{41}: commit: K
+[33m8521b01[m HEAD@{42}: commit: P
+[33mdad5738[m HEAD@{43}: commit: L
+[33mb0452a0[m HEAD@{44}: commit: H
+[33mdcf44dc[m HEAD@{45}: commit: k
+[33m0001bd7[m HEAD@{46}: commit: L
+[33m31e4304[m HEAD@{47}: commit: K
+[33m727f270[m HEAD@{48}: commit: l
+[33m7382c82[m HEAD@{49}: commit: k
+[33m713a708[m HEAD@{50}: commit: k
+[33m3ac69e1[m HEAD@{51}: commit: K
+[33m47d915b[m HEAD@{52}: commit: L
+[33m9a14b91[m HEAD@{53}: commit: l
+[33m32867d6[m HEAD@{54}: commit: g
+[33m792001d[m HEAD@{55}: commit: k
+[33m5070904[m HEAD@{56}: commit: h
+[33m96f7023[m HEAD@{57}: commit: k
+[33mf9bc77e[m HEAD@{58}: commit: L
+[33m8d6030c[m HEAD@{59}: commit: h
+[33mdd5d44d[m HEAD@{60}: commit: l
+[33m7b79c0a[m HEAD@{61}: commit: h
+[33me5b579a[m HEAD@{62}: commit: b
+[33mf44e86e[m HEAD@{63}: commit: j
+[33m7bebde3[m HEAD@{64}: commit: k
+[33m4b93b71[m HEAD@{65}: commit: new
+[33m15d0c39[m HEAD@{66}: commit: k
+[33m1cba28b[m HEAD@{67}: commit: c
+[33m8dd13b7[m HEAD@{68}: commit: j
+[33m5cb36c0[m HEAD@{69}: commit: changes
+[33m1f2dd57[m HEAD@{70}: pull origin Sneha: updating HEAD
+[33m1f2dd57[m HEAD@{71}: commit: done
+[33m24edc63[m HEAD@{72}: commit: h
+[33mc67a3b8[m HEAD@{73}: commit: g
+[33m688e960[m HEAD@{74}: commit: changes
+[33m474a15e[m HEAD@{75}: commit: changes
+[33m7fb3f37[m HEAD@{76}: commit: b
+[33m7623c25[m HEAD@{77}: commit: changes
+[33m12d1253[m HEAD@{78}: commit: f
+[33mf3ed9c3[m HEAD@{79}: commit: form
+[33maf58314[m HEAD@{80}: commit: j
+[33me96d6df[m HEAD@{81}: commit: f
+[33md0f080d[m HEAD@{82}: commit: d
+[33mda892a7[m HEAD@{83}: commit: d
+[33m15f69a0[m HEAD@{84}: commit: c
+[33m0003d95[m HEAD@{85}: commit: b
+[33m273f2f1[m HEAD@{86}: commit: a
+[33m3b9c7a9[m HEAD@{87}: commit: changee
+[33m0d80ff7[m HEAD@{88}: commit: some more changes
+[33m41161c5[m HEAD@{89}: commit: changes
+[33m6851741[m HEAD@{90}: commit: new changes
+[33mb4a60e6[m[33m ([m[1;31morigin/intergrationChanges[m[33m, [m[1;32mintergrationChanges[m[33m)[m HEAD@{91}: checkout: moving from intergrationChanges to Deepti
+[33mb4a60e6[m[33m ([m[1;31morigin/intergrationChanges[m[33m, [m[1;32mintergrationChanges[m[33m)[m HEAD@{92}: checkout: moving from master to intergrationChanges
+[33m8dc3f82[m[33m ([m[1;31morigin/master[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmaster[m[33m)[m HEAD@{93}: clone: from https://github.com/espazeindia/Espaze_web.git
