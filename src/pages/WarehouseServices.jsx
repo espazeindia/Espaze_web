@@ -1,27 +1,20 @@
-import React, { useMemo, useState } from "react";
+import React, { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
+import { notifyError, notifySuccess } from "../utils/toast";
+const useFormData = (initialData) => {
+  const [formData, setFormData] = useState(initialData);
+
+  return {
+    formData,
+    setFormData
+  };
+};
 
 const AddWarehouse = () => {
   const navigate = useNavigate();
 
-  // Form data (UI-only)
-  const [formData, setFormData] = useState({
-    ownerName: "",
-    phoneNumber: "",
-    addressLine1: "",
-    addressLine2: "",
-    addressLine3: "", // Owner PIN
-    warehouseName: "",
-    warehouseAddress1: "",
-    warehouseAddress2: "",
-    warehouseAddress3: "", // Warehouse PIN
-    warehouseSize: "",
-    leaseFileName: "",
-  });
-
-  // Per-field error messages
-  const [errors, setErrors] = useState({
+  const initialFormData = {
     ownerName: "",
     phoneNumber: "",
     addressLine1: "",
@@ -32,149 +25,111 @@ const AddWarehouse = () => {
     warehouseAddress2: "",
     warehouseAddress3: "",
     warehouseSize: "",
-    leaseFile: "",
-  });
-
-  // Submit status: idle | saving | success
-  const [status, setStatus] = useState("idle");
-
-  const setError = (field, message) =>
-    setErrors((e) => ({ ...e, [field]: message }));
-
-  // Single-field validator
-  const validateField = (name, value) => {
-    switch (name) {
-      case "ownerName":
-      case "warehouseName": {
-        if (!value.trim()) return "This field is required.";
-        if (!/^[A-Za-z\s]+$/.test(value)) {
-          return "Only alphabetical letters and spaces allowed.";
-        }
-        return "";
-      }
-      case "phoneNumber": {
-        if (!value.trim()) return "This field is required.";
-        if (!/^\d{0,10}$/.test(value)) return "Digits only (0–9).";
-        if (value.length !== 10) return "Enter a 10-digit phone number.";
-        return "";
-      }
-      case "addressLine1":
-      case "addressLine2":
-      case "warehouseAddress1":
-      case "warehouseAddress2": {
-        if (!value.trim()) return "This field is required.";
-        return "";
-      }
-      case "addressLine3":
-      case "warehouseAddress3": {
-        if (!value.trim()) return "This field is required.";
-        if (!/^\d+$/.test(value)) return "Digits only (0–9).";
-        if (value.length !== 6) return "Enter a 6-digit PIN code.";
-        return "";
-      }
-      case "warehouseSize": {
-        if (!value.trim()) return "This field is required.";
-        if (!/^\d+$/.test(value)) return "Enter a valid number (digits only).";
-        return "";
-      }
-      case "leaseFile": {
-        if (!value) return "Please upload your lease document (PDF).";
-        if (!(value.type === "application/pdf" || /\.pdf$/i.test(value.name || ""))) {
-          return "Unsupported file type. Upload a PDF document.";
-        }
-        return "";
-      }
-      default:
-        return "";
-    }
+    leaseFileName: "",
   };
 
-  const handleChange = (e) => {
-    if (status !== "idle") return; // lock form while saving/saved
+  const {
+    formData,
+    setFormData
+  } = useFormData(initialFormData);
+
+  const [status, setStatus] = useState("idle");
+
+  const handleChange = useCallback((e) => {
+    if (status !== "idle") return;
 
     const { name, value, files } = e.target;
 
     if (name === "leaseFile") {
       const file = files && files[0];
-      const msg = validateField("leaseFile", file || null);
-      setError("leaseFile", msg);
       setFormData((s) => ({ ...s, leaseFileName: file ? file.name : "" }));
       return;
     }
 
-    setFormData((s) => ({ ...s, [name]: value }));
-    const msg = validateField(name, value);
-    setError(name, msg);
-  };
-
-  const handleBlur = (e) => {
-    const { name } = e.target;
-    const msg = validateField(name, formData[name]);
-    setError(name, msg);
-  };
-
-  // Overall validity: no errors + all required fields non-empty
-  const isValid = useMemo(() => {
-    const requiredFilled =
-      formData.ownerName.trim() &&
-      formData.phoneNumber.trim() &&
-      formData.addressLine1.trim() &&
-      formData.addressLine2.trim() &&
-      formData.addressLine3.trim() &&
-      formData.warehouseName.trim() &&
-      formData.warehouseAddress1.trim() &&
-      formData.warehouseAddress2.trim() &&
-      formData.warehouseAddress3.trim() &&
-      formData.warehouseSize.trim() &&
-      formData.leaseFileName.trim();
-
-    const noErrors = Object.values(errors).every((m) => !m);
-    return Boolean(requiredFilled && noErrors);
-  }, [formData, errors]);
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    // Final pass: validate everything and show first error
-    const nextErrors = { ...errors };
-    Object.entries(formData).forEach(([field, val]) => {
-      if (field === "leaseFileName") return;
-      nextErrors[field] = validateField(field, val);
-    });
-    nextErrors.leaseFile = formData.leaseFileName
-      ? ""
-      : "Please upload your lease document (PDF).";
-    setErrors(nextErrors);
-
-    const firstError = Object.entries(nextErrors).find(([, msg]) => msg);
-    if (firstError) {
-      const [field] = firstError;
-      const el = document.querySelector(`[name="${field}"]`);
-      if (el?.scrollIntoView)
-        el.scrollIntoView({ behavior: "smooth", block: "center" });
+    if (name === "phoneNumber" && value && !/^\d*$/.test(value)) {
+      notifyError("Phone number must contain digits only.");
+      return;
+    }
+    if (name === "phoneNumber" && value.length > 10) {
+      notifyError("Phone number must be exactly 10 digits.");
+      return;
+    }
+    if ((name === "addressLine3" || name === "warehouseAddress3") && value && !/^\d*$/.test(value)) {
+      notifyError("Pincode must contain digits only.");
+      return;
+    }
+    if ((name === "addressLine3" || name === "warehouseAddress3") && value.length > 6) {
+      notifyError("Pincode must be exactly 6 digits.");
+      return;
+    }
+    if (name === "warehouseSize" && value && !/^\d*$/.test(value)) {
+      notifyError("Warehouse size must contain digits only.");
+      return;
+    }
+    if ((name === "ownerName" || name === "warehouseName") && value && !/^[A-Za-z\s]*$/.test(value)) {
+      notifyError("Name can only contain letters and spaces.");
       return;
     }
 
-    // Simulate save → turn button green & fade, then success, then navigate
+    setFormData((s) => ({ ...s, [name]: value }));
+    
+  }, [status, setFormData]);
+
+  const handleSubmit = useCallback((e) => {
+    e.preventDefault();
+
+    if (
+      !formData.ownerName.trim() ||
+      !formData.phoneNumber.trim() ||
+      !formData.addressLine1.trim() ||
+      !formData.addressLine2.trim() ||
+      !formData.addressLine3.trim() ||
+      !formData.warehouseName.trim() ||
+      !formData.warehouseAddress1.trim() ||
+      !formData.warehouseAddress2.trim() ||
+      !formData.warehouseAddress3.trim() ||
+      !formData.warehouseSize.trim() ||
+      !formData.leaseFileName.trim()
+    ) {
+      notifyError("Please complete all required fields before submitting.");
+      return;
+    }
+
+    if (formData.phoneNumber.length !== 10) {
+      notifyError("Phone number must be exactly 10 digits.");
+      return;
+    }
+    if (formData.addressLine3.length !== 6) {
+      notifyError("Owner pincode must be exactly 6 digits.");
+      return;
+    }
+    if (formData.warehouseAddress3.length !== 6) {
+      notifyError("Warehouse pincode must be exactly 6 digits.");
+      return;
+    }
+    if (parseInt(formData.warehouseSize, 10) <= 0) {
+      notifyError("Warehouse size must be greater than 0.");
+      return;
+    }
+
     setStatus("saving");
     setTimeout(() => {
       setStatus("success");
+      notifySuccess("Warehouse details saved successfully!");
       setTimeout(() => navigate("/dashboard"), 900);
     }, 1000);
-  };
+  }, [formData, navigate]);
 
   const btnBase =
     "w-full rounded-lg px-6 py-3 text-white font-semibold transition flex items-center justify-center gap-2";
   const btnStateClass =
     status === "idle"
-      ? isValid
-        ? "bg-purple-600 hover:bg-purple-700 focus:ring-4 focus:ring-purple-300"
-        : "bg-purple-300 cursor-not-allowed"
+      ? "bg-purple-600 hover:bg-purple-700 focus:ring-4 focus:ring-purple-300"
       : status === "saving"
       ? "bg-green-600 opacity-80 cursor-wait"
       : "bg-green-600";
 
-  const disabled = status !== "idle" || !isValid;
+  const disabled = status !== "idle";
 
   return (
     <div className="min-h-screen bg-gray-50 p-4 md:p-6">
@@ -196,7 +151,6 @@ const AddWarehouse = () => {
       {/* Full-width content */}
       <form
         onSubmit={handleSubmit}
-        noValidate
         aria-busy={status !== "idle"}
         className="w-full bg-white border border-gray-200 rounded-xl shadow-sm p-4 md:p-6"
       >
@@ -218,20 +172,13 @@ const AddWarehouse = () => {
                 placeholder="Enter your full name"
                 value={formData.ownerName}
                 onChange={handleChange}
-                onBlur={handleBlur}
                 disabled={status !== "idle"}
-                className={`mt-1 w-full h-10 rounded-lg border px-3 focus:outline-none ${
-                  errors.ownerName
-                    ? "border-red-500 focus:ring-2 focus:ring-red-500"
-                    : "border-gray-300 focus:ring-2 focus:ring-purple-500"
-                }`}
+                className="mt-1 w-full h-10 rounded-lg border px-3 focus:outline-none transition-colors duration-200 border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
                 required
                 inputMode="text"
                 pattern="[A-Za-z\s]+"
+                title="Only alphabetical letters and spaces allowed"
               />
-              {errors.ownerName && (
-                <p className="mt-1 text-xs text-red-600">{errors.ownerName}</p>
-              )}
             </div>
 
             {/* Phone Number */}
@@ -245,21 +192,15 @@ const AddWarehouse = () => {
                 placeholder="9876543210"
                 value={formData.phoneNumber}
                 onChange={handleChange}
-                onBlur={handleBlur}
                 disabled={status !== "idle"}
-                className={`mt-1 h-10 w-full rounded-lg border px-3 focus:outline-none ${
-                  errors.phoneNumber
-                    ? "border-red-500 focus:ring-2 focus:ring-red-500"
-                    : "border-gray-300 focus:ring-2 focus:ring-purple-500"
-                }`}
+                className="mt-1 h-10 w-full rounded-lg border px-3 focus:outline-none transition-colors duration-200 border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
                 required
                 inputMode="numeric"
                 maxLength={10}
-                pattern="\d{10}"
+                minLength={10}
+                pattern="[6-9][0-9]{9}"
+                title="Enter a 10-digit phone number starting with 6, 7, 8, or 9"
               />
-              {errors.phoneNumber && (
-                <p className="mt-1 text-xs text-red-600">{errors.phoneNumber}</p>
-              )}
             </div>
 
             {/* Address Line 1 */}
@@ -273,18 +214,11 @@ const AddWarehouse = () => {
                 placeholder="Block no / Locality"
                 value={formData.addressLine1}
                 onChange={handleChange}
-                onBlur={handleBlur}
                 disabled={status !== "idle"}
-                className={`mt-1 w-full h-10 rounded-lg border px-3 focus:outline-none ${
-                  errors.addressLine1
-                    ? "border-red-500 focus:ring-2 focus:ring-red-500"
-                    : "border-gray-300 focus:ring-2 focus:ring-purple-500"
-                }`}
+                className="mt-1 w-full h-10 rounded-lg border px-3 focus:outline-none transition-colors duration-200 border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
                 required
+                title="Address Line 1 is required"
               />
-              {errors.addressLine1 && (
-                <p className="mt-1 text-xs text-red-600">{errors.addressLine1}</p>
-              )}
             </div>
 
             {/* Address Line 2 */}
@@ -298,18 +232,11 @@ const AddWarehouse = () => {
                 placeholder="State / District"
                 value={formData.addressLine2}
                 onChange={handleChange}
-                onBlur={handleBlur}
                 disabled={status !== "idle"}
-                className={`mt-1 w-full h-10 rounded-lg border px-3 focus:outline-none ${
-                  errors.addressLine2
-                    ? "border-red-500 focus:ring-2 focus:ring-red-500"
-                    : "border-gray-300 focus:ring-2 focus:ring-purple-500"
-                }`}
+                className="mt-1 w-full h-10 rounded-lg border px-3 focus:outline-none transition-colors duration-200 border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
                 required
+                title="Address Line 2 is required"
               />
-              {errors.addressLine2 && (
-                <p className="mt-1 text-xs text-red-600">{errors.addressLine2}</p>
-              )}
             </div>
 
             {/* Owner Pincode */}
@@ -318,26 +245,20 @@ const AddWarehouse = () => {
                 Pincode *
               </label>
               <input
-                type="text"
+                type="tel"
                 name="addressLine3"
                 placeholder="6-digit PIN code"
                 value={formData.addressLine3}
                 onChange={handleChange}
-                onBlur={handleBlur}
                 disabled={status !== "idle"}
-                className={`mt-1 h-10 w-full md:w-auto md:max-w-[200px] rounded-lg border px-3 focus:outline-none ${
-                  errors.addressLine3
-                    ? "border-red-500 focus:ring-2 focus:ring-red-500"
-                    : "border-gray-300 focus:ring-2 focus:ring-purple-500"
-                }`}
+                className="mt-1 h-10 w-full md:w-auto md:max-w-[200px] rounded-lg border px-3 focus:outline-none transition-colors duration-200 border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
                 required
                 inputMode="numeric"
                 maxLength={6}
-                pattern="\d{6}"
+                minLength={6}
+                pattern="[1-9][0-9]{5}"
+                title="Enter a 6-digit PIN code (cannot start with 0)"
               />
-              {errors.addressLine3 && (
-                <p className="mt-1 text-xs text-red-600">{errors.addressLine3}</p>
-              )}
             </div>
           </div>
         </div>
@@ -360,20 +281,13 @@ const AddWarehouse = () => {
                 placeholder="Enter name"
                 value={formData.warehouseName}
                 onChange={handleChange}
-                onBlur={handleBlur}
                 disabled={status !== "idle"}
-                className={`mt-1 w-full h-10 rounded-lg border px-3 focus:outline-none ${
-                  errors.warehouseName
-                    ? "border-red-500 focus:ring-2 focus:ring-red-500"
-                    : "border-gray-300 focus:ring-2 focus:ring-purple-500"
-                }`}
+                className="mt-1 w-full h-10 rounded-lg border px-3 focus:outline-none transition-colors duration-200 border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
                 required
                 inputMode="text"
                 pattern="[A-Za-z\s]+"
+                title="Only alphabetical letters and spaces allowed"
               />
-              {errors.warehouseName && (
-                <p className="mt-1 text-xs text-red-600">{errors.warehouseName}</p>
-              )}
             </div>
 
             {/* Warehouse Size */}
@@ -387,19 +301,13 @@ const AddWarehouse = () => {
                 placeholder="e.g. 2500"
                 value={formData.warehouseSize}
                 onChange={handleChange}
-                onBlur={handleBlur}
                 disabled={status !== "idle"}
-                className={`mt-1 w-full h-10 rounded-lg border px-3 focus:outline-none ${
-                  errors.warehouseSize
-                    ? "border-red-500 focus:ring-2 focus:ring-red-500"
-                    : "border-gray-300 focus:ring-2 focus:ring-purple-500"
-                }`}
+                className="mt-1 w-full h-10 rounded-lg border px-3 focus:outline-none transition-colors duration-200 border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
                 required
                 inputMode="numeric"
+                pattern="[1-9][0-9]*"
+                title="Enter a valid number greater than 0"
               />
-              {errors.warehouseSize && (
-                <p className="mt-1 text-xs text-red-600">{errors.warehouseSize}</p>
-              )}
             </div>
 
             {/* Lease PDF */}
@@ -412,26 +320,15 @@ const AddWarehouse = () => {
                 name="leaseFile"
                 accept="application/pdf"
                 onChange={handleChange}
-                onBlur={(e) => {
-                  const file = e.target.files && e.target.files[0];
-                  const msg = validateField("leaseFile", file || null);
-                  setError("leaseFile", msg);
-                }}
                 disabled={status !== "idle"}
-                className={`mt-1 w-full h-10 rounded-lg border px-3 py-2 focus:outline-none ${
-                  errors.leaseFile
-                    ? "border-red-500 focus:ring-2 focus:ring-red-500"
-                    : "border-gray-300 focus:ring-2 focus:ring-purple-500"
-                }`}
+                className="mt-1 w-full h-10 rounded-lg border px-3 py-2 focus:outline-none transition-colors duration-200 border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
                 required
+                title="Please upload your lease document (PDF)"
               />
-              {formData.leaseFileName && !errors.leaseFile && (
+              {formData.leaseFileName && (
                 <p className="text-xs text-gray-500 mt-1">
                   Selected: {formData.leaseFileName}
                 </p>
-              )}
-              {errors.leaseFile && (
-                <p className="text-xs text-red-600 mt-1">{errors.leaseFile}</p>
               )}
             </div>
 
@@ -446,20 +343,11 @@ const AddWarehouse = () => {
                 placeholder="Flat/House No."
                 value={formData.warehouseAddress1}
                 onChange={handleChange}
-                onBlur={handleBlur}
                 disabled={status !== "idle"}
-                className={`mt-1 w-full h-10 rounded-lg border px-3 focus:outline-none ${
-                  errors.warehouseAddress1
-                    ? "border-red-500 focus:ring-2 focus:ring-red-500"
-                    : "border-gray-300 focus:ring-2 focus:ring-purple-500"
-                }`}
+                className="mt-1 w-full h-10 rounded-lg border px-3 focus:outline-none transition-colors duration-200 border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
                 required
+                title="Warehouse Address Line 1 is required"
               />
-              {errors.warehouseAddress1 && (
-                <p className="mt-1 text-xs text-red-600">
-                  {errors.warehouseAddress1}
-                </p>
-              )}
             </div>
 
             {/* Warehouse Address 2 */}
@@ -473,20 +361,11 @@ const AddWarehouse = () => {
                 placeholder="State / District"
                 value={formData.warehouseAddress2}
                 onChange={handleChange}
-                onBlur={handleBlur}
                 disabled={status !== "idle"}
-                className={`mt-1 w-full h-10 rounded-lg border px-3 focus:outline-none ${
-                  errors.warehouseAddress2
-                    ? "border-red-500 focus:ring-2 focus:ring-red-500"
-                    : "border-gray-300 focus:ring-2 focus:ring-purple-500"
-                }`}
+                className="mt-1 w-full h-10 rounded-lg border px-3 focus:outline-none transition-colors duration-200 border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
                 required
+                title="Warehouse Address Line 2 is required"
               />
-              {errors.warehouseAddress2 && (
-                <p className="mt-1 text-xs text-red-600">
-                  {errors.warehouseAddress2}
-                </p>
-              )}
             </div>
 
             {/* Warehouse Pincode */}
@@ -495,28 +374,20 @@ const AddWarehouse = () => {
                 Pincode *
               </label>
               <input
-                type="text"
+                type="tel"
                 name="warehouseAddress3"
                 placeholder="6-digit PIN code"
                 value={formData.warehouseAddress3}
                 onChange={handleChange}
-                onBlur={handleBlur}
                 disabled={status !== "idle"}
-                className={`mt-1 h-10 w-full md:w-auto md:max-w-[200px] rounded-lg border px-3 focus:outline-none ${
-                  errors.warehouseAddress3
-                    ? "border-red-500 focus:ring-2 focus:ring-red-500"
-                    : "border-gray-300 focus:ring-2 focus:ring-purple-500"
-                }`}
+                className="mt-1 h-10 w-full md:w-auto md:max-w-[200px] rounded-lg border px-3 focus:outline-none transition-colors duration-200 border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
                 required
                 inputMode="numeric"
                 maxLength={6}
-                pattern="\d{6}"
+                minLength={6}
+                pattern="[1-9][0-9]{5}"
+                title="Enter a 6-digit PIN code (cannot start with 0)"
               />
-              {errors.warehouseAddress3 && (
-                <p className="mt-1 text-xs text-red-600">
-                  {errors.warehouseAddress3}
-                </p>
-              )}
             </div>
           </div>
         </div>
@@ -529,9 +400,7 @@ const AddWarehouse = () => {
             className={`${btnBase} ${btnStateClass}`}
             title={
               status === "idle"
-                ? isValid
-                  ? "Save and Continue"
-                  : "Please complete all fields correctly"
+                ? "Save and Continue"
                 : status === "saving"
                 ? "Saving..."
                 : "Saved"
