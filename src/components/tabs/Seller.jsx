@@ -101,6 +101,10 @@ function Seller() {
         if (res.success) {
           notifySuccess(res.message);
           Cookies.set("EspazeCookie", res.token);
+
+          // ✅ set role here
+          localStorage.setItem("userRole", "seller");
+
           navigate("/");
         }
       } catch (error) {
@@ -124,6 +128,10 @@ function Seller() {
         if (res.success) {
           notifySuccess(res.message);
           Cookies.set("EspazeCookie", res.token);
+
+          // ✅ set role here
+          localStorage.setItem("userRole", "seller");
+
           navigate("/");
         }
       } catch (err) {
@@ -156,9 +164,6 @@ function Seller() {
           >
             Choose Login Method
           </h3>
-          {/* <p className={`text-xs ${theme ? "text-gray-600" : "text-gray-300"}`}>
-            Select how you'd like to authenticate
-          </p> */}
         </div>
 
         <div

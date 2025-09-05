@@ -12,6 +12,8 @@ function ProductDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { theme } = useMode();
+
+  // ✅ Read role from cookie
   const userRole = Cookies.get("userRole") || "seller";
 
   const [product, setProduct] = useState(null);
@@ -103,6 +105,40 @@ function ProductDetails() {
     }
   };
 
+  // ✅ Delete function
+  const handleDelete = async () => {
+    if (!product) return;
+    if (!window.confirm("Are you sure you want to delete this product?")) return;
+
+    try {
+      let result;
+      if (isFromInventory) {
+        result = await InventoryServices.DeleteInventory(product.id);
+      } else {
+        result = await MetaDataServices.DeleteMetadata(product.id);
+      }
+
+      if (result?.success) {
+        notifySuccess("Product deleted successfully!");
+        navigate("/product-onboarding");
+      } else {
+        notifyError(result.message || "Failed to delete product");
+      }
+    } catch (err) {
+      notifyError(err?.response?.data?.message || err.message);
+    }
+  };
+
+  // ✅ Edit function
+  const handleEdit = () => {
+    if (!product) return;
+    if (isFromInventory) {
+      navigate(`/inventory/edit/${product.id}`);
+    } else {
+      navigate(`/metadata/edit/${product.id}`);
+    }
+  };
+
   const formatDate = (dateStr) => {
     if (!dateStr) return "N/A";
     const date = new Date(dateStr);
@@ -141,7 +177,8 @@ function ProductDetails() {
   ));
 
   return (
-    <div className={`p-5 min-h-full ${containerBG}`}>
+    <div className={`p-5 min-h-full flex flex-col ${containerBG}`}>
+      {/* Header */}
       <div className="flex items-center mb-5">
         <button
           onClick={() => navigate("/product-onboarding")}
@@ -153,12 +190,15 @@ function ProductDetails() {
         <h1 className="font-bold text-xl">Product Details</h1>
       </div>
 
-      <div className={`rounded-2xl p-6 ${cardBG} border ${borderClr} shadow-md`}>
+      {/* Content Card */}
+      <div className={`rounded-2xl p-6 flex-1 ${cardBG} border ${borderClr} shadow-md`}>
         {!product ? (
           <div className={`text-center py-16 ${muted}`}>No product found</div>
         ) : (
           <>
+            {/* Image + Info */}
             <div className="flex flex-col lg:flex-row gap-6">
+              {/* Image */}
               <div className="lg:w-1/3 w-full">
                 <div className="rounded-2xl border border-zinc-200 dark:border-zinc-700 p-3 bg-zinc-50 dark:bg-zinc-900 h-60 flex items-center justify-center">
                   {product.image ? (
@@ -176,6 +216,7 @@ function ProductDetails() {
                 </div>
               </div>
 
+              {/* Info */}
               <div className="lg:w-2/3 w-full">
                 <div className="flex items-start justify-between">
                   <div>
@@ -236,10 +277,10 @@ function ProductDetails() {
 
             <div className={`my-6 border-t ${borderClr}`} />
 
+            {/* More Details */}
             <div className={`rounded-xl border ${borderClr} p-5`}>
               <h3 className="font-bold mb-4 text-xl">More Details</h3>
               <div className={`grid md:grid-cols-2 gap-6 text-sm ${subText}`}>
-                {/* Show Product ID only for operations */}
                 {userRole === "operations" && (
                   <p>
                     <span className="font-semibold">Product ID: </span>
@@ -298,6 +339,24 @@ function ProductDetails() {
           </>
         )}
       </div>
+
+      {/* ✅ Edit & Delete only for Operations role */}
+      {product && userRole === "operations" && (
+        <div className="mt-6 flex justify-end gap-3">
+          <button
+            onClick={handleEdit}
+            className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition"
+          >
+            Edit
+          </button>
+          <button
+            onClick={handleDelete}
+            className="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 transition"
+          >
+            Delete
+          </button>
+        </div>
+      )}
     </div>
   );
 }

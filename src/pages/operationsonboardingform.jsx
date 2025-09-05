@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { notifySuccess, notifyError } from "../utils/toast";
 
 const OperationsOnboardingForm = () => {
@@ -6,9 +6,9 @@ const OperationsOnboardingForm = () => {
     name: "",
     phone: "",
     email: "",
-    addressLine1: "",
-    addressLine2: "",
-    addressLine3: "",
+    flatNo: "",
+    street: "",
+    pincode: "",
     pan: "",
     password: "",
     warehouse: "",
@@ -17,17 +17,6 @@ const OperationsOnboardingForm = () => {
 
   const [showPasswordHint, setShowPasswordHint] = useState(false);
   const [passwordError, setPasswordError] = useState("");
-
-  // 🔒 Hide global scrollbars only while this component is mounted
-  useEffect(() => {
-    const cls = "ops-scrollbar-hide";
-    document.documentElement.classList.add(cls);
-    document.body.classList.add(cls);
-    return () => {
-      document.documentElement.classList.remove(cls);
-      document.body.classList.remove(cls);
-    };
-  }, []);
 
   // ✅ Password Validation
   const validatePassword = (password) => {
@@ -92,9 +81,9 @@ const OperationsOnboardingForm = () => {
       name: "",
       phone: "",
       email: "",
-      addressLine1: "",
-      addressLine2: "",
-      addressLine3: "",
+      flatNo: "",
+      street: "",
+      pincode: "",
       pan: "",
       password: "",
       warehouse: "",
@@ -104,212 +93,209 @@ const OperationsOnboardingForm = () => {
   };
 
   return (
-    <>
-      {/* Global scrollbar hide CSS (active only when class is applied via useEffect) */}
-      <style>{`
-        .ops-scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
-        .ops-scrollbar-hide::-webkit-scrollbar { display: none; }
-      `}</style>
+    <div className="h-screen flex items-center justify-center bg-gray-100 px-2">
+      <div className="bg-white shadow-lg rounded-xl w-full max-w-4xl p-6">
+        {/* Heading */}
+        <h2 className="text-2xl font-bold text-gray-800 text-center mb-1">
+          Operations Onboarding
+        </h2>
+        <p className="text-gray-500 text-center mb-6">
+          Complete your profile information
+        </p>
 
-      <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
-        <div className="bg-white shadow-lg rounded-xl w-full max-w-6xl p-8">
-          {/* Heading */}
-          <h2 className="text-2xl font-bold text-gray-800 text-center">
-            Operations Onboarding
-          </h2>
-          <p className="text-gray-500 text-center mb-6">
-            Complete your profile information
-          </p>
-
-          {/* Profile Picture Upload */}
-          <div className="flex justify-center mb-8">
-            <label className="w-28 h-28 rounded-full bg-gray-100 flex items-center justify-center border-2 border-dashed border-gray-400 cursor-pointer overflow-hidden hover:border-purple-500 transition">
-              {formData.profilePic ? (
-                <img
-                  src={URL.createObjectURL(formData.profilePic)}
-                  alt="Profile"
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <span className="text-3xl text-gray-400">+</span>
-              )}
-              <input
-                type="file"
-                name="profilePic"
-                accept="image/*"
-                onChange={handleChange}
-                className="hidden"
+        {/* Profile Picture Upload */}
+        <div className="flex justify-center mb-6">
+          <label className="w-24 h-24 rounded-full bg-gray-100 flex items-center justify-center border-2 border-dashed border-gray-400 cursor-pointer overflow-hidden hover:border-purple-500 transition">
+            {formData.profilePic ? (
+              <img
+                src={URL.createObjectURL(formData.profilePic)}
+                alt="Profile"
+                className="w-full h-full object-cover"
               />
-            </label>
-          </div>
+            ) : (
+              <span className="text-2xl text-gray-400">+</span>
+            )}
+            <input
+              type="file"
+              name="profilePic"
+              accept="image/*"
+              onChange={handleChange}
+              className="hidden"
+            />
+          </label>
+        </div>
 
-          {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Name, Phone, PAN */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Full Name
-                </label>
-                <input
-                  type="text"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  required
-                  className="p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-400 w-full"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Phone Number
-                </label>
-                <input
-                  type="tel"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  required
-                  maxLength={10}
-                  className="p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-400 w-full"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  PAN Number
-                </label>
-                <input
-                  type="text"
-                  name="pan"
-                  value={formData.pan}
-                  onChange={handleChange}
-                  maxLength={10}
-                  required
-                  className="p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-400 uppercase w-full"
-                />
-              </div>
-            </div>
-
-            {/* Email & Password */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Email ID
-                </label>
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  required
-                  className="p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-400 w-full"
-                />
-              </div>
-              <div className="relative">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Password
-                </label>
-                <input
-                  type="password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  required
-                  className={`p-3 rounded-lg border w-full focus:ring-2 focus:ring-purple-400 ${
-                    passwordError ? "border-red-500" : "border-gray-300"
-                  }`}
-                  onFocus={() => setShowPasswordHint(true)}
-                  onBlur={() => setShowPasswordHint(false)}
-                />
-                {showPasswordHint && (
-                  <div className="absolute top-full left-0 mt-2 w-full bg-white border border-gray-200 rounded-lg p-3 text-sm text-gray-700 shadow-lg z-10">
-                    <p className="font-semibold mb-1">Password must include:</p>
-                    <ul className="list-disc pl-5 space-y-1 text-gray-600">
-                      <li>At least 8 characters</li>
-                      <li>One uppercase letter</li>
-                      <li>One lowercase letter</li>
-                      <li>One number</li>
-                      <li>One special character (!@#$%^&*)</li>
-                    </ul>
-                  </div>
-                )}
-                {passwordError && (
-                  <p className="text-sm text-red-600 mt-1">{passwordError}</p>
-                )}
-              </div>
-            </div>
-
-            {/* Address */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Address Line 1
-                </label>
-                <input
-                  type="text"
-                  name="addressLine1"
-                  value={formData.addressLine1}
-                  onChange={handleChange}
-                  required
-                  className="p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-400 w-full"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Address Line 2
-                </label>
-                <input
-                  type="text"
-                  name="addressLine2"
-                  value={formData.addressLine2}
-                  onChange={handleChange}
-                  className="p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-400 w-full"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Address Line 3
-                </label>
-                <input
-                  type="text"
-                  name="addressLine3"
-                  value={formData.addressLine3}
-                  onChange={handleChange}
-                  className="p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-400 w-full"
-                />
-              </div>
-            </div>
-
-            {/* Warehouse Dropdown */}
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="space-y-6 overflow-hidden">
+          {/* Name, Phone, PAN */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Select Warehouse
+                Full Name
               </label>
-              <select
-                name="warehouse"
-                value={formData.warehouse}
+              <input
+                type="text"
+                name="name"
+                value={formData.name}
                 onChange={handleChange}
                 required
-                className="w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-400"
-              >
-                <option value="">Select Warehouse</option>
-                <option value="Warehouse A">Warehouse A</option>
-                <option value="Warehouse B">Warehouse B</option>
-                <option value="Warehouse C">Warehouse C</option>
-              </select>
+                className="px-3 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-400 w-full"
+              />
             </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Phone Number
+              </label>
+              <input
+                type="tel"
+                name="phone"
+                value={formData.phone}
+                onChange={handleChange}
+                required
+                maxLength={10}
+                className="px-3 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-400 w-full"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                PAN Number
+              </label>
+              <input
+                type="text"
+                name="pan"
+                value={formData.pan}
+                onChange={handleChange}
+                maxLength={10}
+                required
+                className="px-3 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-400 uppercase w-full"
+              />
+            </div>
+          </div>
 
-            {/* Submit Button */}
-            <button
-              type="submit"
-              className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 rounded-lg shadow-md transition"
+          {/* Email & Password */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Email ID
+              </label>
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                required
+                className="px-3 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-400 w-full"
+              />
+            </div>
+            <div className="relative">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Password
+              </label>
+              <input
+                type="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                required
+                className={`px-3 py-2 rounded-lg border w-full focus:ring-2 focus:ring-purple-400 ${
+                  passwordError ? "border-red-500" : "border-gray-300"
+                }`}
+                onFocus={() => setShowPasswordHint(true)}
+                onBlur={() => setShowPasswordHint(false)}
+              />
+              {showPasswordHint && (
+                <div className="absolute top-full left-0 mt-1 w-full bg-white border border-gray-200 rounded-lg p-2 text-xs text-gray-700 shadow-lg z-10">
+                  <p className="font-semibold mb-1">Password must include:</p>
+                  <ul className="list-disc pl-4 space-y-0.5 text-gray-600">
+                    <li>At least 8 characters</li>
+                    <li>One uppercase letter</li>
+                    <li>One lowercase letter</li>
+                    <li>One number</li>
+                    <li>One special character (!@#$%^&*)</li>
+                  </ul>
+                </div>
+              )}
+              {passwordError && (
+                <p className="text-xs text-red-600 mt-1">{passwordError}</p>
+              )}
+            </div>
+          </div>
+
+          {/* Address */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Flat / House No.
+              </label>
+              <input
+                type="text"
+                name="flatNo"
+                value={formData.flatNo}
+                onChange={handleChange}
+                required
+                placeholder="E.g. A-102"
+                className="px-3 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-400 w-full"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Block / Street
+              </label>
+              <input
+                type="text"
+                name="street"
+                value={formData.street}
+                onChange={handleChange}
+                placeholder="E.g. MG Road"
+                className="px-3 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-400 w-full"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Pin Code
+              </label>
+              <input
+                type="text"
+                name="pincode"
+                value={formData.pincode}
+                onChange={handleChange}
+                maxLength={6}
+                required
+                placeholder="E.g. 110001"
+                className="px-3 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-400 w-full"
+              />
+            </div>
+          </div>
+
+          {/* Warehouse Dropdown */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Select Warehouse
+            </label>
+            <select
+              name="warehouse"
+              value={formData.warehouse}
+              onChange={handleChange}
+              required
+              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-400 bg-white select-with-chevron"
             >
-              Save and Continue
-            </button>
-          </form>
-        </div>
+              <option value="">Select Warehouse</option>
+              <option value="Warehouse A">Warehouse A</option>
+              <option value="Warehouse B">Warehouse B</option>
+              <option value="Warehouse C">Warehouse C</option>
+            </select>
+          </div>
+
+          {/* Submit Button */}
+          <button
+            type="submit"
+            className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 rounded-lg shadow-md transition"
+          >
+            Save and Continue
+          </button>
+        </form>
       </div>
-    </>
+    </div>
   );
 };
 

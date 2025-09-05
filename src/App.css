@@ -1,10 +1,72 @@
 @import "tailwindcss";
 
-.sideBarNone::-webkit-scrollbar {
-  display: none;
+/* Make box-sizing predictable */
+*, *::before, *::after {
+  box-sizing: border-box;
 }
 
+/* ===== Hide scrollbars visually but keep scrolling =====
+   This makes the scrollbars invisible across browsers while keeping scroll behavior.
+   Note: macOS "Always" scrollbar setting may still show a thin OS-level bar. */
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
 
+  /* allow scrolling but hide visuals */
+  overflow: auto !important;
+  -webkit-overflow-scrolling: touch;
+  -ms-overflow-style: none !important;  /* IE/Edge */
+  scrollbar-width: none !important;     /* Firefox */
+}
+
+/* Chrome, Safari */
+html::-webkit-scrollbar,
+body::-webkit-scrollbar,
+#root::-webkit-scrollbar {
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
+}
+
+/* If you want to target other root ids used by frameworks */
+/* #__next, #app */
+#__next, #app {
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
+}
+#__next::-webkit-scrollbar,
+#app::-webkit-scrollbar {
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* Small helper for hiding scrollbars on any element you tag with .hide-scrollbar */
+.hide-scrollbar {
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
+}
+.hide-scrollbar::-webkit-scrollbar {
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
+}
+
+/* ===== Select styling (add right padding so content doesn't touch border + remove native arrow overlap) ===== */
+.select-with-chevron {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  padding-right: 2.5rem;         /* space for native arrow / custom SVG */
+  background-position: right 0.75rem center;
+  background-repeat: no-repeat;
+  background-size: 1rem;
+  background-color: white;
+  /* optional subtle chevron (light gray) using inline SVG data URL */
+  background-image: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 20 20'%3E%3Cpath fill='%23888' d='M7 7l3 3 3-3'/%3E%3C/svg%3E");
+}
+
+/* keep your existing dark mode date picker fix */
 .darkMode input[type="date"]::-webkit-calendar-picker-indicator {
-  filter: invert(1); /* Inverts colors to make it dark */
+  filter: invert(1);
 }
