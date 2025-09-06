@@ -11,7 +11,6 @@ const ProductDetails = lazy(() => import("../pages/ProductDetails"));
 const UserProfile = lazy(() => import("../pages/UserProfile"));
 const WarehouseServices = lazy(() => import("../pages/WarehouseServices"));
 
-
 const routes = [
   {
     path: "/dashboard",
