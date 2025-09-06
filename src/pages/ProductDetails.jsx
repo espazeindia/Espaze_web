@@ -13,7 +13,6 @@ function ProductDetails() {
   const navigate = useNavigate();
   const { theme } = useMode();
 
-  // ✅ Read role from cookie
   const userRole = Cookies.get("userRole") || "seller";
 
   const [product, setProduct] = useState(null);
@@ -83,29 +82,15 @@ function ProductDetails() {
     }
   }, [id]);
 
-  const handleVisibilityToggle = async () => {
+  const handleEdit = () => {
     if (!product) return;
-    try {
-      const body = {
-        inventory_product_id: product.id,
-        product_visibility: product.visible === "hidden" ? "visible" : "hidden",
-      };
-      const updated = await InventoryServices.UpdateInventory(body);
-      setProduct({
-        ...product,
-        visible: updated.data?.product_visibility || product.visible,
-      });
-      notifySuccess(
-        `Product visibility updated to ${
-          updated.data?.product_visibility === "hidden" ? "Hidden" : "Visible"
-        }`
-      );
-    } catch (err) {
-      notifyError(err?.response?.data?.message || "Failed to update visibility");
+    if (isFromInventory) {
+      navigate(`/inventory/edit/${product.id}`);
+    } else {
+      navigate(`/metadata/edit/${product.id}`);
     }
   };
 
-  // ✅ Delete function
   const handleDelete = async () => {
     if (!product) return;
     if (!window.confirm("Are you sure you want to delete this product?")) return;
@@ -129,16 +114,6 @@ function ProductDetails() {
     }
   };
 
-  // ✅ Edit function
-  const handleEdit = () => {
-    if (!product) return;
-    if (isFromInventory) {
-      navigate(`/inventory/edit/${product.id}`);
-    } else {
-      navigate(`/metadata/edit/${product.id}`);
-    }
-  };
-
   const formatDate = (dateStr) => {
     if (!dateStr) return "N/A";
     const date = new Date(dateStr);
@@ -155,11 +130,8 @@ function ProductDetails() {
   const muted = theme ? "text-zinc-500" : "text-zinc-400";
   const borderClr = theme ? "border-zinc-200" : "border-zinc-700";
 
-  const Badge = ({ children, className = "", onClick }) => (
-    <span
-      onClick={onClick}
-      className={`px-2.5 py-1 rounded-full text-xs font-semibold border cursor-pointer ${className}`}
-    >
+  const Badge = ({ children, className = "" }) => (
+    <span className={`px-2.5 py-1 rounded-full text-xs font-semibold border ${className}`}>
       {children}
     </span>
   );
@@ -196,7 +168,6 @@ function ProductDetails() {
           <div className={`text-center py-16 ${muted}`}>No product found</div>
         ) : (
           <>
-            {/* Image + Info */}
             <div className="flex flex-col lg:flex-row gap-6">
               {/* Image */}
               <div className="lg:w-1/3 w-full">
@@ -229,12 +200,10 @@ function ProductDetails() {
                     {isFromInventory && (
                       <>
                         <Badge
-                          className={`${
-                            product.visible === "hidden"
-                              ? "bg-red-100 text-red-700 border-red-200"
-                              : "bg-green-100 text-green-700 border-green-200"
-                          }`}
-                          onClick={handleVisibilityToggle}
+                          className={`${product.visible === "hidden"
+                            ? "bg-red-100 text-red-700 border-red-200"
+                            : "bg-green-100 text-green-700 border-green-200"
+                            }`}
                         >
                           {product.visible === "hidden" ? "Hidden" : "Visible"}
                         </Badge>
@@ -287,7 +256,6 @@ function ProductDetails() {
                     {product.id}
                   </p>
                 )}
-
                 <p>
                   <span className="font-semibold">HSN Code: </span>
                   {product.hsn_code || "N/A"}
@@ -340,18 +308,18 @@ function ProductDetails() {
         )}
       </div>
 
-      {/* ✅ Edit & Delete only for Operations role */}
+      {/* Edit & Delete only for Operations */}
       {product && userRole === "operations" && (
-        <div className="mt-6 flex justify-end gap-3">
+        <div className="mt-6 flex justify-center gap-3">
           <button
             onClick={handleEdit}
-            className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition"
+            className="px-5 py-2 rounded-lg border border-green-600 text-green-600 hover:bg-green-600 hover:text-white transition"
           >
             Edit
           </button>
           <button
             onClick={handleDelete}
-            className="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 transition"
+            className="px-5 py-2 rounded-lg border border-red-600 text-red-600 hover:bg-red-600 hover:text-white transition"
           >
             Delete
           </button>
