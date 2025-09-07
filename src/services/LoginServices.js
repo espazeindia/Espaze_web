@@ -20,6 +20,12 @@ const LoginServices = {
       params: param,
     });
   },
+
+// to be reviewed
+  LoginAdmin: async (body) => {
+    return requests.post("/login/admin/login", body);
+  },
 };
+// till here
 
 export default LoginServices;
