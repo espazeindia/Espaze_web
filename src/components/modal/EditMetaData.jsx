@@ -18,7 +18,7 @@ import { notifySuccess, notifyError } from "../../utils/toast";
 import CategoryServices from "../../services/CategoryServices";
 import { LoaderCircle } from "lucide-react";
 
-function EditMetaData({ isOpen, onClose, currentProduct, setOnboardingData }) {
+function EditMetaData({ isOpen, onClose, currentProduct, setReload }) {
   const { theme } = useMode();
 
   const [categoryOfPro, setcategoryOfPro] = useState("");
@@ -102,7 +102,7 @@ function EditMetaData({ isOpen, onClose, currentProduct, setOnboardingData }) {
       }
       setSubCategoryLoading(false);
     };
-    if (categoryOfPro && categoryOfPro !== ""  && isOpen) {
+    if (categoryOfPro && categoryOfPro !== "" && isOpen) {
       SubCategoryCall();
     }
   }, [categoryOfPro]);
@@ -123,9 +123,7 @@ function EditMetaData({ isOpen, onClose, currentProduct, setOnboardingData }) {
       };
       const res = await MetaDataServices.UpdateMetaData(body, editedData.id);
       if (res.success === true) {
-        setOnboardingData((prevData) =>
-          prevData.map((data) => (data.id === editedData.id ? editedData : data))
-        );
+        setReload((prevData) => !prevData);
         notifySuccess(res.message);
       }
     } catch (err) {
@@ -213,7 +211,10 @@ function EditMetaData({ isOpen, onClose, currentProduct, setOnboardingData }) {
                   disabled={categoryLoading}
                   value={categoryOfPro}
                   placeholder={"Select Category"}
-                  onChange={(_, val) => {setSubCategoryOfPro(""); setcategoryOfPro(val);}}
+                  onChange={(_, val) => {
+                    setSubCategoryOfPro("");
+                    setcategoryOfPro(val);
+                  }}
                 >
                   {categories ? (
                     categories.map((category) => (
