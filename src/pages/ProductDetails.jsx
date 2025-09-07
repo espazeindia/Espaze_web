@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa";
-import { Image as ImageIcon, Star } from "lucide-react";
+import { Image as ImageIcon, Star, Pencil } from "lucide-react";
 import { Switch } from "@mui/joy";
 import { notifyError } from "../utils/toast";
 import { useMode } from "../contexts/themeModeContext";
@@ -15,8 +15,7 @@ function ProductDetails() {
   const navigate = useNavigate();
   const { theme } = useMode();
 
-  // ✅ Fixed: don't default to "seller"
-  const userRole = Cookies.get("userRole") || null;
+  const userRole = Cookies.get("userRole") || "seller";
 
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -140,7 +139,6 @@ function ProductDetails() {
           <div className={`text-center py-16 ${muted}`}>No product found</div>
         ) : (
           <>
-            {/* ---- IMAGE + INFO ---- */}
             <div className="flex flex-col lg:flex-row gap-6">
               {/* Image */}
               <div className="lg:w-1/3 w-full">
@@ -170,7 +168,7 @@ function ProductDetails() {
                     )}
                   </div>
                   <div className="flex flex-wrap gap-2 items-center">
-                    {/* Visible/Hidden switch */}
+                    {/* Hidden/Visible Badge with switch */}
                     {isFromInventory && (
                       <div className="flex items-center gap-2">
                         <Badge
@@ -312,31 +310,24 @@ function ProductDetails() {
         )}
       </div>
 
-      {/* ✅ Floating Edit + Delete buttons only for Operations */}
-      {userRole === "operations" && product && (
-        <div className="fixed bottom-6 right-6 flex gap-3">
-          <button
-            onClick={() => setOpenEditModal(true)}
-            className="px-4 py-2 rounded-lg border border-green-600 text-green-600 hover:bg-green-600 hover:text-white transition font-medium"
-          >
-            Edit
-          </button>
-          <button
-            onClick={() => alert("Delete logic here")}
-            className="px-4 py-2 rounded-lg border border-red-600 text-red-600 hover:bg-red-600 hover:text-white transition font-medium"
-          >
-            Delete
-          </button>
-        </div>
+      {/* Floating Bottom-Right Edit Button (inventory style FAB) */}
+      {isFromInventory && (
+        <button
+          onClick={() => setOpenEditModal(true)}
+          className="fixed bottom-6 right-6 bg-green-600 hover:bg-green-700 text-white p-3 rounded-full shadow-lg transition"
+          aria-label="Edit product"
+        >
+          <Pencil size={20} />
+        </button>
       )}
 
-      {/* Update Product Modal */}
+      {/* Update Product Modal — use same props as InventoryTable expects */}
       {openEditModal && (
         <EditModalComponent
           isOpen={openEditModal}
           onClose={() => setOpenEditModal(false)}
           data={product}
-          setReload={() => {}}
+          setReload={() => {}} // optional noop; pass real setter if available
         />
       )}
     </div>
