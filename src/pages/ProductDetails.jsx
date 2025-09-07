@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa";
-import { Image as ImageIcon, Star } from "lucide-react";
-import { notifyError, notifySuccess } from "../utils/toast";
+import { Image as ImageIcon, Star, Pencil } from "lucide-react";
+import { Switch } from "@mui/joy";
+import { notifyError } from "../utils/toast";
 import { useMode } from "../contexts/themeModeContext";
 import MetaDataServices from "../services/MetaDataServices";
 import InventoryServices from "../services/InventoryServices";
 import Cookies from "js-cookie";
+import EditModalComponent from "../components/modal/UpdateInventory";
 
 function ProductDetails() {
   const { id } = useParams();
@@ -18,6 +20,7 @@ function ProductDetails() {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isFromInventory, setIsFromInventory] = useState(false);
+  const [openEditModal, setOpenEditModal] = useState(false);
 
   const transformProduct = (d, isInventory = false) => ({
     id: isInventory ? d.inventory_product_id : d.id,
@@ -81,38 +84,6 @@ function ProductDetails() {
       fetchInventory(id.split("inventory_")[1]);
     }
   }, [id]);
-
-  const handleEdit = () => {
-    if (!product) return;
-    if (isFromInventory) {
-      navigate(`/inventory/edit/${product.id}`);
-    } else {
-      navigate(`/metadata/edit/${product.id}`);
-    }
-  };
-
-  const handleDelete = async () => {
-    if (!product) return;
-    if (!window.confirm("Are you sure you want to delete this product?")) return;
-
-    try {
-      let result;
-      if (isFromInventory) {
-        result = await InventoryServices.DeleteInventory(product.id);
-      } else {
-        result = await MetaDataServices.DeleteMetadata(product.id);
-      }
-
-      if (result?.success) {
-        notifySuccess("Product deleted successfully!");
-        navigate("/product-onboarding");
-      } else {
-        notifyError(result.message || "Failed to delete product");
-      }
-    } catch (err) {
-      notifyError(err?.response?.data?.message || err.message);
-    }
-  };
 
   const formatDate = (dateStr) => {
     if (!dateStr) return "N/A";
@@ -196,22 +167,43 @@ function ProductDetails() {
                       <p className="text-lg font-semibold mt-1">Price: ₹{product.price}</p>
                     )}
                   </div>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-2 items-center">
+                    {/* Toggle Badge */}
                     {isFromInventory && (
-                      <>
-                        <Badge
-                          className={`${product.visible === "hidden"
+                      <Badge
+                        className={`flex items-center gap-2 ${product.visible === "hidden"
                             ? "bg-red-100 text-red-700 border-red-200"
                             : "bg-green-100 text-green-700 border-green-200"
-                            }`}
-                        >
-                          {product.visible === "hidden" ? "Hidden" : "Visible"}
-                        </Badge>
-                        <Badge className="bg-pink-100 text-pink-700 border-pink-200">
-                          {product.quantity === 0 ? "Out of Stock" : "In Stock"}
-                        </Badge>
-                      </>
+                          }`}
+                      >
+                        {product.visible === "hidden" ? "Hidden" : "Visible"}
+                        <Switch
+                          checked={product.visible !== "hidden"}
+                          onChange={(e) =>
+                            setProduct((prev) => ({
+                              ...prev,
+                              visible: e.target.checked ? "visible" : "hidden",
+                            }))
+                          }
+                          sx={{
+                            "--Switch-trackRadius": "13px",
+                            "--Switch-trackWidth": "36px",
+                            "--Switch-trackHeight": "18px",
+                            "--Switch-thumbSize": "12px",
+                            "&.Mui-checked": { "--Switch-trackBackground": "#16a34a" },
+                          }}
+                        />
+                      </Badge>
                     )}
+
+                    {/* Stock Badge */}
+                    {isFromInventory && (
+                      <Badge className="bg-pink-100 text-pink-700 border-pink-200">
+                        {product.quantity === 0 ? "Out of Stock" : "In Stock"}
+                      </Badge>
+                    )}
+
+                    {/* HSN Badge */}
                     {product.hsn_code && (
                       <Badge className="bg-indigo-100 text-indigo-700 border-indigo-200">
                         HSN: {product.hsn_code}
@@ -308,23 +300,26 @@ function ProductDetails() {
         )}
       </div>
 
-      {/* Edit & Delete only for Operations */}
-      {product && userRole === "operations" && (
-        <div className="mt-6 flex justify-center gap-3">
+      {/* Floating Bottom-Right Edit Button */}
+      {isFromInventory && (
+        <>
           <button
-            onClick={handleEdit}
-            className="px-5 py-2 rounded-lg border border-green-600 text-green-600 hover:bg-green-600 hover:text-white transition"
+            onClick={() => setOpenEditModal(true)}
+            className="fixed bottom-6 right-6 bg-green-600 hover:bg-green-700 text-white p-3 rounded-full shadow-lg transition"
           >
-            Edit
+            <Pencil size={20} />
           </button>
-          <button
-            onClick={handleDelete}
-            className="px-5 py-2 rounded-lg border border-red-600 text-red-600 hover:bg-red-600 hover:text-white transition"
-          >
-            Delete
-          </button>
-        </div>
+
+          {openEditModal && (
+            <EditModalComponent
+              open={openEditModal}
+              handleClose={() => setOpenEditModal(false)}
+              product={product}
+            />
+          )}
+        </>
       )}
+
     </div>
   );
 }

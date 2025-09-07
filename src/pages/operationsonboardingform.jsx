@@ -37,6 +37,7 @@ const OperationsOnboardingForm = () => {
   // ✅ Individual field validation
   const validateField = (name, value) => {
     if (!value && name !== "profilePic") return `${name} is required`;
+
     switch (name) {
       case "name":
         if (!/^[A-Za-z\s]+$/.test(value)) return "Name can contain only letters and spaces";
@@ -65,25 +66,29 @@ const OperationsOnboardingForm = () => {
     }
   };
 
-  // ✅ Handle Input Change (only update state, no toast)
+  // ✅ Handle Input Change + Real-time Toast
   const handleChange = (e) => {
     const { name, value, files } = e.target;
+    let updatedValue = value;
+
     if (name === "profilePic") {
       setFormData({ ...formData, profilePic: files[0] });
-    } else {
-      setFormData({ ...formData, [name]: value });
+      return;
     }
-  };
 
-  // ✅ Validate on Blur (when leaving field)
-  const handleBlur = (e) => {
-    const { name, value } = e.target;
-    const errorMsg = validateField(name, value);
+    if (name === "pan") {
+      updatedValue = value.toUpperCase();
+    }
+
+    setFormData({ ...formData, [name]: updatedValue });
+
+    // Real-time validation + toast
+    const errorMsg = validateField(name, updatedValue);
     setErrors((prev) => ({ ...prev, [name]: errorMsg }));
-
     if (errorMsg) notifyError(errorMsg);
   };
 
+  // ✅ Final Submit Validation
   const handleSubmit = (e) => {
     e.preventDefault();
     const newErrors = {};
@@ -102,6 +107,7 @@ const OperationsOnboardingForm = () => {
     console.log("Form Submitted: ", formData);
     notifySuccess("✅ Operation Onboarding Successful!");
 
+    // Reset
     setFormData({
       name: "",
       phone: "",
@@ -159,7 +165,6 @@ const OperationsOnboardingForm = () => {
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
-                onBlur={handleBlur}
                 placeholder="Enter full name"
                 className={`px-3 py-2 rounded-lg border w-full focus:ring-2 focus:ring-purple-400 ${
                   errors.name ? "border-red-500" : "border-gray-300"
@@ -173,7 +178,6 @@ const OperationsOnboardingForm = () => {
                 name="phone"
                 value={formData.phone}
                 onChange={handleChange}
-                onBlur={handleBlur}
                 placeholder="10-digit number"
                 maxLength={10}
                 className={`px-3 py-2 rounded-lg border w-full focus:ring-2 focus:ring-purple-400 ${
@@ -188,7 +192,6 @@ const OperationsOnboardingForm = () => {
                 name="pan"
                 value={formData.pan}
                 onChange={handleChange}
-                onBlur={handleBlur}
                 placeholder="ABCDE1234F"
                 maxLength={10}
                 className={`px-3 py-2 rounded-lg border w-full focus:ring-2 focus:ring-purple-400 uppercase ${
@@ -207,7 +210,6 @@ const OperationsOnboardingForm = () => {
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                onBlur={handleBlur}
                 placeholder="user@example.com"
                 className={`px-3 py-2 rounded-lg border w-full focus:ring-2 focus:ring-purple-400 ${
                   errors.email ? "border-red-500" : "border-gray-300"
@@ -221,12 +223,11 @@ const OperationsOnboardingForm = () => {
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
-                onBlur={handleBlur}
                 className={`px-3 py-2 rounded-lg border w-full focus:ring-2 focus:ring-purple-400 ${
                   errors.password ? "border-red-500" : "border-gray-300"
                 }`}
                 onFocus={() => setShowPasswordHint(true)}
-                onBlurCapture={() => setShowPasswordHint(false)}
+                onBlur={() => setShowPasswordHint(false)}
               />
               {showPasswordHint && (
                 <div className="absolute top-full left-0 mt-1 w-full bg-white border border-gray-200 rounded-lg p-2 text-xs text-gray-700 shadow-lg z-10">
@@ -252,7 +253,6 @@ const OperationsOnboardingForm = () => {
                 name="flatNo"
                 value={formData.flatNo}
                 onChange={handleChange}
-                onBlur={handleBlur}
                 placeholder="E.g. A-102"
                 className={`px-3 py-2 rounded-lg border w-full focus:ring-2 focus:ring-purple-400 ${
                   errors.flatNo ? "border-red-500" : "border-gray-300"
@@ -277,7 +277,6 @@ const OperationsOnboardingForm = () => {
                 name="pincode"
                 value={formData.pincode}
                 onChange={handleChange}
-                onBlur={handleBlur}
                 maxLength={6}
                 placeholder="E.g. 110001"
                 className={`px-3 py-2 rounded-lg border w-full focus:ring-2 focus:ring-purple-400 ${
@@ -294,7 +293,6 @@ const OperationsOnboardingForm = () => {
               name="warehouse"
               value={formData.warehouse}
               onChange={handleChange}
-              onBlur={handleBlur}
               className={`w-full px-4 py-3 rounded-lg border focus:ring-2 focus:ring-purple-400 bg-white select-with-chevron ${
                 errors.warehouse ? "border-red-500" : "border-gray-300"
               }`}
