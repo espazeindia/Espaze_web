@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
 import { useMode } from "../contexts/themeModeContext";
 import AddMetaData from "../components/modal/AddMetaData";
-import ProductOnboardingTable from "../components/table/ProductOnboardingTable";
-import { notifyError } from "../utils/toast";
+import ProductOnboardingTable from "../components/table/ProductOnboardingTable"; // keep your import path
+import { notifyError, notifySuccess } from "../utils/toast";
 import { useNavigate } from "react-router-dom";
 import MetaDataServices from "../services/MetaDataServices";
 import Cookies from "js-cookie";
@@ -21,8 +21,10 @@ function ProductOnboarding() {
   const [loading, setLoading] = useState(true);
   const [reload, setReload] = useState(false);
 
-  // ✅ Get user role (default seller if not found)
+  // Get user role (default seller if not found)
   const userRole = Cookies.get("userRole") || "seller";
+  const isOperations = userRole === "operations";
+  const navigate = router;
 
   const handleOpenAddMetaDataModal = () => setOpenAddMetaData(true);
 
@@ -57,7 +59,7 @@ function ProductOnboarding() {
       } catch (err) {
         if (err === "cookie error") {
           Cookies.remove("EspazeCookie");
-          router("/login");
+          navigate("/login");
           notifyError("Cookie error, please relogin and try again");
         } else {
           notifyError(err?.response?.data?.message || err.message);
@@ -67,7 +69,7 @@ function ProductOnboarding() {
     };
 
     getMetadata();
-  }, [search, page, limit, reload, router]);
+  }, [search, page, limit, reload, navigate]);
 
   useEffect(() => {
     const timeout = setTimeout(() => setSearch(searchInput), 500);
@@ -79,16 +81,40 @@ function ProductOnboarding() {
     []
   );
 
+  // ----------------------------
+  // Handlers passed to table
+  // ----------------------------
+  const handleEditProduct = (id) => {
+    // For operations, open product details page (inventory/metadata) where edit flow is available
+    // navigate to metadata details (product details page handles role-based UI)
+    navigate(`/product-details/metadata_${id}`);
+  };
+
+  const handleDeleteProduct = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this metadata?")) return;
+
+    try {
+      const res = await MetaDataServices.DeleteMetadata(id);
+      if (res?.success) {
+        notifySuccess(res.message || "Metadata deleted");
+        setReload((r) => !r);
+      } else {
+        notifyError(res?.message || "Failed to delete metadata");
+      }
+    } catch (err) {
+      notifyError(err?.response?.data?.message || err.message);
+    }
+  };
+
   return (
     <div
       className={`p-5 min-h-full ${
         theme ? "bg-zinc-100 text-black" : "bg-neutral-950 text-white"
       }`}
     >
-      {/* ✅ Show role in heading */}
+      {/* Show role in heading */}
       <div className="font-bold text-2xl">
-        Product Onboarding (
-        {userRole === "operations" ? "Operations" : "Seller"})
+        Product Onboarding ({isOperations ? "Operations" : "Seller"})
       </div>
 
       <div className="flex justify-between mt-5">
@@ -124,7 +150,7 @@ function ProductOnboarding() {
         </div>
       </div>
 
-      {/* ✅ Fix scroll issue with overflow-x-auto */}
+      {/* Table wrapper */}
       <div className="mt-5 overflow-x-auto">
         <ProductOnboardingTable
           onboardingData={onboardingData}
@@ -136,7 +162,11 @@ function ProductOnboarding() {
           totalDetails={totalDetails}
           loading={loading}
           setReload={setReload}
-          showProductId={userRole === "operations"} // Only show Product ID for operations
+          showProductId={isOperations}
+          // NEW: pass role flag & handlers
+          isOperations={isOperations}
+          handleEditProduct={handleEditProduct}
+          handleDeleteProduct={handleDeleteProduct}
         />
       </div>
 

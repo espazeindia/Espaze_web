@@ -1,21 +1,22 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa";
-import { Image as ImageIcon, Star, Pencil } from "lucide-react";
+import { Image as ImageIcon, Star } from "lucide-react";
 import { Switch } from "@mui/joy";
 import { notifyError } from "../utils/toast";
 import { useMode } from "../contexts/themeModeContext";
 import MetaDataServices from "../services/MetaDataServices";
 import InventoryServices from "../services/InventoryServices";
 import Cookies from "js-cookie";
-import EditModalComponent from "../components/modal/UpdateInventory";
+import EditModalComponent from "../components/modal/UpdateInventory"; // keep as in your project
 
 function ProductDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { theme } = useMode();
 
-  const userRole = Cookies.get("userRole") || "seller";
+  // ✅ Fixed: don't default to "seller"
+  const userRole = Cookies.get("userRole") || null;
 
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -40,8 +41,8 @@ function ProductDetails() {
         ? d.product_mrp
         : d.product_price ?? 0
       : d.mrp && d.mrp > 0
-        ? d.mrp
-        : d.price ?? 0,
+      ? d.mrp
+      : d.price ?? 0,
     e_date: isInventory ? d.product_expiry_date : d.expiry_date,
     m_date: isInventory ? d.product_manufacturing_date : d.manufacturing_date,
   });
@@ -139,6 +140,7 @@ function ProductDetails() {
           <div className={`text-center py-16 ${muted}`}>No product found</div>
         ) : (
           <>
+            {/* ---- IMAGE + INFO ---- */}
             <div className="flex flex-col lg:flex-row gap-6">
               {/* Image */}
               <div className="lg:w-1/3 w-full">
@@ -168,15 +170,19 @@ function ProductDetails() {
                     )}
                   </div>
                   <div className="flex flex-wrap gap-2 items-center">
-                    {/* Toggle Badge */}
+                    {/* Visible/Hidden switch */}
                     {isFromInventory && (
-                      <Badge
-                        className={`flex items-center gap-2 ${product.visible === "hidden"
-                            ? "bg-red-100 text-red-700 border-red-200"
-                            : "bg-green-100 text-green-700 border-green-200"
-                          }`}
-                      >
-                        {product.visible === "hidden" ? "Hidden" : "Visible"}
+                      <div className="flex items-center gap-2">
+                        <Badge
+                          className={
+                            product.visible === "hidden"
+                              ? "bg-red-100 text-red-700 border-red-200"
+                              : "bg-green-100 text-green-700 border-green-200"
+                          }
+                        >
+                          {product.visible === "hidden" ? "Hidden" : "Visible"}
+                        </Badge>
+
                         <Switch
                           checked={product.visible !== "hidden"}
                           onChange={(e) =>
@@ -193,12 +199,18 @@ function ProductDetails() {
                             "&.Mui-checked": { "--Switch-trackBackground": "#16a34a" },
                           }}
                         />
-                      </Badge>
+                      </div>
                     )}
 
                     {/* Stock Badge */}
                     {isFromInventory && (
-                      <Badge className="bg-pink-100 text-pink-700 border-pink-200">
+                      <Badge
+                        className={
+                          product.quantity === 0
+                            ? "bg-pink-100 text-pink-700 border-pink-200"
+                            : "bg-green-100 text-green-700 border-green-200"
+                        }
+                      >
                         {product.quantity === 0 ? "Out of Stock" : "In Stock"}
                       </Badge>
                     )}
@@ -300,26 +312,33 @@ function ProductDetails() {
         )}
       </div>
 
-      {/* Floating Bottom-Right Edit Button */}
-      {isFromInventory && (
-        <>
+      {/* ✅ Floating Edit + Delete buttons only for Operations */}
+      {userRole === "operations" && product && (
+        <div className="fixed bottom-6 right-6 flex gap-3">
           <button
             onClick={() => setOpenEditModal(true)}
-            className="fixed bottom-6 right-6 bg-green-600 hover:bg-green-700 text-white p-3 rounded-full shadow-lg transition"
+            className="px-4 py-2 rounded-lg border border-green-600 text-green-600 hover:bg-green-600 hover:text-white transition font-medium"
           >
-            <Pencil size={20} />
+            Edit
           </button>
-
-          {openEditModal && (
-            <EditModalComponent
-              open={openEditModal}
-              handleClose={() => setOpenEditModal(false)}
-              product={product}
-            />
-          )}
-        </>
+          <button
+            onClick={() => alert("Delete logic here")}
+            className="px-4 py-2 rounded-lg border border-red-600 text-red-600 hover:bg-red-600 hover:text-white transition font-medium"
+          >
+            Delete
+          </button>
+        </div>
       )}
 
+      {/* Update Product Modal */}
+      {openEditModal && (
+        <EditModalComponent
+          isOpen={openEditModal}
+          onClose={() => setOpenEditModal(false)}
+          data={product}
+          setReload={() => {}}
+        />
+      )}
     </div>
   );
 }
