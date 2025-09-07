@@ -18,7 +18,6 @@ const OperationsOnboardingForm = () => {
   const [errors, setErrors] = useState({});
   const [showPasswordHint, setShowPasswordHint] = useState(false);
 
-  // ✅ Password Validation
   const validatePassword = (password) => {
     const minLength = /.{8,}/;
     const uppercase = /[A-Z]/;
@@ -34,7 +33,6 @@ const OperationsOnboardingForm = () => {
     return "";
   };
 
-  // ✅ Individual field validation
   const validateField = (name, value) => {
     if (!value && name !== "profilePic") return `${name} is required`;
 
@@ -66,7 +64,6 @@ const OperationsOnboardingForm = () => {
     }
   };
 
-  // ✅ Handle Input Change + Real-time Toast
   const handleChange = (e) => {
     const { name, value, files } = e.target;
     let updatedValue = value;
@@ -82,13 +79,11 @@ const OperationsOnboardingForm = () => {
 
     setFormData({ ...formData, [name]: updatedValue });
 
-    // Real-time validation + toast
     const errorMsg = validateField(name, updatedValue);
     setErrors((prev) => ({ ...prev, [name]: errorMsg }));
     if (errorMsg) notifyError(errorMsg);
   };
 
-  // ✅ Final Submit Validation
   const handleSubmit = (e) => {
     e.preventDefault();
     const newErrors = {};
@@ -107,7 +102,6 @@ const OperationsOnboardingForm = () => {
     console.log("Form Submitted: ", formData);
     notifySuccess("✅ Operation Onboarding Successful!");
 
-    // Reset
     setFormData({
       name: "",
       phone: "",

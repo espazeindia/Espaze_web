@@ -25,9 +25,6 @@ function ProductOnboardingTable({
   const [deleteProduct, setDeleteProduct] = useState(-1);
   const [deleteModal, setDeleteModal] = useState(false);
 
-  // ✅ role from cookie
-  const userRole = Cookies.get("userRole") || "seller";
-
   const handleProduct = (data) => {
     navigate(`/product-details/metadata_${data.id}`);
   };
@@ -44,8 +41,9 @@ function ProductOnboardingTable({
 
   return (
     <div
-      className={`mt-10 p-2 rounded-lg w-full sideBarNone ${theme ? "bg-white" : "bg-zinc-800"
-        } ${loading && "animate-pulse"}`}
+      className={`mt-10 p-2 rounded-lg w-full  sideBarNone ${theme ? "bg-white" : "bg-zinc-800"} ${
+        loading && "animate-pulse"
+      }`}
     >
       <div className="w-full overflow-x-auto">
         {/* Table Header */}
@@ -105,38 +103,20 @@ function ProductOnboardingTable({
               onboardingData.map((data, index) => (
                 <div
                   key={index}
-                  onClick={() => handleProduct(data)}
-                  className={`grid items-center text-sm border-b py-4 border-gray-300 border-dotted cursor-pointer hover:bg-zinc-100 min-w-[1000px]`}
-                  style={{
-                    gridTemplateColumns: userRole === "operations"
-                      ? "repeat(6, 1fr) 150px"
-                      : "repeat(8, 1fr) 150px",
+                  onClick={() => {
+                    handleProduct(data);
                   }}
+                  className="grid grid-cols-8 items-center text-sm border-b py-4 border-gray-300 border-dotted cursor-pointer hover:bg-zinc-100"
                 >
-                  {userRole !== "operations" && (
-                    <>
-                      <div
-                        className={`text-center font-medium ${theme ? "text-zinc-800" : "text-white"
-                          }`}
-                      >
-                        {data.id || "N/A"}
-                      </div>
-                      <div className="flex items-center justify-center">
-                        {data.image ? (
-                          <img
-                            src={data.image}
-                            alt="product"
-                            className="h-12 w-12 object-cover rounded-lg"
-                          />
-                        ) : (
-                          <span className="text-gray-400 text-xs">No Image</span>
-                        )}
-                      </div>
-                    </>
-                  )}
-                  {/* Product Name */}
-                  <div className={`text-center font-medium ${theme ? "text-zinc-800" : "text-white"}`}>
-                    {data.productName || ""}
+                  <div
+                    className={`text-center font-medium ${theme ? "text-zinc-800" : "text-white"}`}
+                  >
+                    {data.image}
+                  </div>
+                  <div
+                    className={`text-center font-medium ${theme ? "text-zinc-800" : "text-white"}`}
+                  >
+                    {data.productName}
                   </div>
 
                   {/* Product Code */}
@@ -161,30 +141,42 @@ function ProductOnboardingTable({
                       : "N/A"}
                   </div>
 
-                  {/* ✅ Actions column fixed to the right */}
-                  {userRole === "operations" && (
-                    <div
-                      className="flex items-center justify-center gap-2"
-                      onClick={(e) => e.stopPropagation()}
+                  <div
+                    className={`text-center flex items-center justify-center gap-3 font-medium 
+                    ${theme ? "text-black" : "text-white"}`}
+                  >
+                    <button
+                      className={`cursor-pointer ${
+                        theme
+                          ? "text-green-600 hover:text-green-700"
+                          : "text-green-400 hover:text-green-700"
+                      }`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleEdit(data);
+                      }}
                     >
-                      <button
-                        onClick={() => handleEdit(data)}
-                        className="px-3 py-1 rounded-lg border border-green-600 text-green-600 hover:bg-green-600 hover:text-white transition"
-                      >
-                        <Edit fontSize="small" />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(data.id)}
-                        className="px-3 py-1 rounded-lg border border-red-600 text-red-600 hover:bg-red-600 hover:text-white transition"
-                      >
-                        <Delete fontSize="small" />
-                      </button>
-                    </div>
-                  )}
+                      <Edit />
+                    </button>
+                    <button
+                      className={` hover:text-red-600 cursor-pointer ${
+                        theme ? "text-red-500" : "text-red-500"
+                      }`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDelete(data.id);
+                      }}
+                    >
+                      <Delete />
+                    </button>
+                  </div>
                 </div>
               ))
             ) : (
-              <div className="text-center mt-10">No products found</div>
+              <div className=" w-full h-[48vh] flex justify-center items-center text-2xl font-semibold">
+                {" "}
+                No Metadata Found
+              </div>
             )
           ) : (
             <div className="text-center mt-10">Loading...</div>
@@ -200,26 +192,23 @@ function ProductOnboardingTable({
         limit={limit}
         totalDetails={totalDetails}
       />
-
-      {/* Modals */}
-      {editModal && (
-        <EditMetaData
-          open={editModal}
-          setOpen={setEditModal}
-          product={currentProduct}
-          setOnboardingData={setOnboardingData}
-          setReload={setReload}
-        />
-      )}
-      {deleteModal && (
-        <DeleteMetaData
-          open={deleteModal}
-          setOpen={setDeleteModal}
-          id={deleteProduct}
-          setOnboardingData={setOnboardingData}
-          setReload={setReload}
-        />
-      )}
+      <EditMetaData
+        isOpen={editModal}
+        onClose={() => {
+          setEditModal(false);
+        }}
+        currentProduct={currentProduct}
+        setReload={setReload}
+      />
+      <DeleteMetaData
+        isOpen={deleteModal}
+        onClose={() => {
+          setDeleteModal(false);
+        }}
+        deleteProduct={deleteProduct}
+        setOnboardingData={setOnboardingData}
+        setReload={setReload}
+      />
     </div>
   );
 }

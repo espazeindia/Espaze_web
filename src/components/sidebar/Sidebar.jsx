@@ -11,6 +11,7 @@ import LigthLogo from "../../assets/img/logo_light.png";
 import smallLogo from "../../assets/img/logo.png";
 import smallLightLogo from "../../assets/img/logo2.png";
 import { validate } from "../../utils/jwt-verify";
+import Person from "@mui/icons-material/Person";
 
 function Sidebar() {
   const navigate = useNavigate();
@@ -24,7 +25,7 @@ function Sidebar() {
   };
 
   const [filteredRoutes, setFilteredRoutes] = useState([]);
-  const [loading, setLoading] = useState(true); // Track loading state
+  const [loading, setLoading] = useState(true); 
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -36,7 +37,7 @@ function Sidebar() {
         );
         setFilteredRoutes(filterRoutes);
       }
-      setLoading(false); // Mark as loaded after checking auth
+      setLoading(false); 
     };
 
     checkAuth();
@@ -107,20 +108,8 @@ function Sidebar() {
       {/* Help & Logout Section */}
       <div className={`space-y-1 ${sidebarOpen ? "px-3" : ""}`}>
         <div className=" pt-3">
-          {/* <Link
-            to="/help"
-            className={`flex items-center px-4
-           py-2 rounded-md text-gray-400 hover:text-white `}
-          >
-            <HelpOutlineIcon />
-            <span
-              className={`ml-3 transition-all duration-150  ${sidebarOpen ? "indline" : "hidden"} `}
-            >
-              Help & Center
-            </span>
-          </Link> */}
           <Link
-            to="/settings"
+            to="/profile"
             className={`${
               theme
                 ? "text-zinc-600 hover:text-black"
@@ -128,13 +117,13 @@ function Sidebar() {
             } flex items-center px-4
              py-1 rounded-md ${sidebarOpen ? "" : "justify-center"} `}
           >
-            <SettingsIcon />
+            <Person />
             <span
               className={`ml-3 transition-all duration-150  ${
                 sidebarOpen ? "indline" : "hidden"
               } `}
             >
-              Settings
+              User Profile
             </span>
           </Link>
         </div>

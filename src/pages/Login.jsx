@@ -5,11 +5,21 @@ import { DarkMode, LightMode, Store, Settings } from "@mui/icons-material";
 import { useMode } from "../contexts/themeModeContext";
 import Seller from "../components/tabs/Seller";
 import Operations from "../components/tabs/Operations";
+import Admin from "../components/tabs/Admin";
 import Cookies from "js-cookie"; // 👈 Add this import
 
 function Login() {
   const { theme, toggleTheme } = useMode();
   const [user, setUser] = useState("seller");
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  const handleAdminLoginClick = () => {
+    setIsAdmin(true);
+  };
+
+  const handleBackToLogin = () => {
+    setIsAdmin(false);
+  };
 
   // helper: set role in state + cookie
   const handleRoleSelect = (role) => {
@@ -39,7 +49,7 @@ function Login() {
         ></div>
       </div>
 
-      <div className="relative z-10 w-full max-w-md">
+      <div className="relative z-10 w-full max-w-md pb-20 sm:pb-0">
         {/* Main card */}
         <div
           className={`backdrop-blur-xl rounded-2xl shadow-2xl border transition-all duration-300 transform hover:scale-[1.02] ${
@@ -49,13 +59,22 @@ function Login() {
           }`}
         >
           <div className="p-6">
+            {isAdmin && (
+              <button
+                type="button"
+                onClick={handleBackToLogin}
+                className={`flex items-center gap-2 text-sm font-medium transition-colors ${
+                  theme ? "text-gray-700 hover:text-gray-900" : "text-gray-300 hover:text-gray-100"
+                }`}
+              >
+                <ArrowBack fontSize="small" />
+              </button>
+            )}
             {/* Logo and header */}
             <div className="text-center mb-4">
               <div className="flex justify-center mb-2">
                 <div
-                  className={`p-2 rounded-xl ${
-                    theme ? "bg-violet-100" : "bg-purple-900/50"
-                  }`}
+                  className={`p-2 rounded-xl ${theme ? "bg-violet-100" : "bg-purple-900/50"}`}
                 >
                   {theme ? (
                     <img
@@ -74,114 +93,126 @@ function Login() {
               </div>
 
               <h1
-                className={`text-2xl font-bold mb-1 ${
-                  theme ? "text-gray-900" : "text-white"
-                }`}
+                className={`text-2xl font-bold mb-1 ${theme ? "text-gray-900" : "text-white"}`}
               >
                 Welcome Back
               </h1>
 
-              <p
-                className={`text-xs ${
-                  theme ? "text-gray-600" : "text-gray-300"
-                }`}
-              >
-                Choose your account type to continue
-              </p>
+              {isAdmin && (
+                <p
+                  className={`text-xl font-bold text-black`}
+                >
+                  Login As Admin
+                </p>
+              )}
+
+              {!isAdmin && (
+                <p
+                  className={`text-xs ${theme ? "text-gray-600" : "text-gray-300"}`}
+                >
+                  Choose your account type to continue
+                </p>
+              )}
             </div>
 
             {/* User type selector - Card based */}
-            <div className="mb-6">
-              <div className="grid grid-cols-2 gap-3">
-                {/* Seller Button */}
-                <button
-                  onClick={() => handleRoleSelect("seller")}
-                  className={`relative p-4 rounded-xl border-2 transition-all duration-300 transform hover:scale-105 ${
-                    user === "seller"
-                      ? "border-violet-700 bg-gradient-to-br from-violet-100 to-purple-100 shadow-lg"
-                      : theme
-                      ? "border-gray-200 bg-white hover:border-violet-300 hover:shadow-md"
-                      : "border-gray-600 bg-gray-800 hover:border-violet-400 hover:shadow-md"
-                  }`}
-                >
-                  <div className="text-center space-y-2">
-                    <div
-                      className={`w-10 h-10 mx-auto rounded-full flex items-center justify-center ${
-                        user === "seller"
-                          ? "bg-gradient-to-r from-violet-500 to-purple-600 text-white"
-                          : theme
-                          ? "bg-gray-100 text-gray-600"
-                          : "bg-gray-700 text-gray-300"
-                      }`}
-                    >
-                      <Store fontSize="small" />
-                    </div>
-                    <div>
-                      <h3
-                        className={`font-semibold text-sm ${
+            {!isAdmin && (
+              <div className="mb-6">
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    onClick={() => setUser("seller")}
+                    className={`relative p-4 rounded-xl border-2 transition-all duration-300 transform hover:scale-105 ${
+                      user === "seller"
+                        ? "border-violet-700 bg-gradient-to-br from-violet-100 to-purple-100 shadow-lg"
+                        : theme
+                        ? "border-gray-200 bg-white hover:border-violet-300 hover:shadow-md"
+                        : "border-gray-600 bg-gray-800 hover:border-violet-400 hover:shadow-md"
+                    }`}
+                  >
+                    <div className="text-center space-y-2">
+                      <div
+                        className={`w-10 h-10 mx-auto rounded-full flex items-center justify-center ${
                           user === "seller"
-                            ? "text-violet-700"
+                            ? "bg-gradient-to-r from-violet-500 to-purple-600 text-white"
                             : theme
-                            ? "text-gray-800"
-                            : "text-white"
+                            ? "bg-gray-100 text-gray-600"
+                            : "bg-gray-700 text-gray-300"
                         }`}
                       >
-                        Seller
-                      </h3>
+                        <Store fontSize="small" />
+                      </div>
+                      <div>
+                        <h3
+                          className={`font-semibold text-sm ${
+                            user === "seller"
+                              ? "text-violet-700"
+                              : theme
+                              ? "text-gray-800"
+                              : "text-white"
+                          }`}
+                        >
+                          Seller
+                        </h3>
+                      </div>
                     </div>
-                  </div>
-                  {user === "seller" && (
-                    <div className="absolute top-2 right-2 w-2.5 h-2.5 bg-violet-500 rounded-full"></div>
-                  )}
-                </button>
+                    {user === "seller" && (
+                      <div className="absolute top-2 right-2 w-2.5 h-2.5 bg-violet-500 rounded-full"></div>
+                    )}
+                  </button>
 
-                {/* Operations Button */}
-                <button
-                  onClick={() => handleRoleSelect("operations")}
-                  className={`relative p-4 rounded-xl border-2 transition-all duration-300 transform hover:scale-105 ${
-                    user === "operations"
-                      ? "border-violet-700 bg-gradient-to-br from-violet-100 to-purple-100 shadow-lg"
-                      : theme
-                      ? "border-gray-200 bg-white hover:border-violet-300 hover:shadow-md"
-                      : "border-gray-600 bg-gray-800 hover:border-violet-400 hover:shadow-md"
-                  }`}
-                >
-                  <div className="text-center space-y-2">
-                    <div
-                      className={`w-10 h-10 mx-auto rounded-full flex items-center justify-center ${
-                        user === "operations"
-                          ? "bg-gradient-to-r from-violet-500 to-purple-600 text-white"
-                          : theme
-                          ? "bg-gray-100 text-gray-600"
-                          : "bg-gray-700 text-gray-300"
-                      }`}
-                    >
-                      <Settings fontSize="small" />
-                    </div>
-                    <div>
-                      <h3
-                        className={`font-semibold text-sm ${
+                  <button
+                    onClick={() => setUser("operations")}
+                    className={`relative p-4 rounded-xl border-2 transition-all duration-300 transform hover:scale-105 ${
+                      user === "operations"
+                        ? "border-violet-700 bg-gradient-to-br from-violet-100 to-purple-100 shadow-lg"
+                        : theme
+                        ? "border-gray-200 bg-white hover:border-violet-300 hover:shadow-md"
+                        : "border-gray-600 bg-gray-800 hover:border-violet-400 hover:shadow-md"
+                    }`}
+                  >
+                    <div className="text-center space-y-2">
+                      <div
+                        className={`w-10 h-10 mx-auto rounded-full flex items-center justify-center ${
                           user === "operations"
-                            ? "text-violet-700"
+                            ? "bg-gradient-to-r from-violet-500 to-purple-600 text-white"
                             : theme
-                            ? "text-gray-800"
-                            : "text-white"
+                            ? "bg-gray-100 text-gray-600"
+                            : "bg-gray-700 text-gray-300"
                         }`}
                       >
-                        Operations
-                      </h3>
+                        <Settings fontSize="small" />
+                      </div>
+                      <div>
+                        <h3
+                          className={`font-semibold text-sm ${
+                            user === "operations"
+                              ? "text-violet-700"
+                              : theme
+                              ? "text-gray-800"
+                              : "text-white"
+                          }`}
+                        >
+                          Operations
+                        </h3>
+                      </div>
                     </div>
-                  </div>
-                  {user === "operations" && (
-                    <div className="absolute top-2 right-2 w-2.5 h-2.5 bg-violet-500 rounded-full"></div>
-                  )}
-                </button>
+                    {user === "operations" && (
+                      <div className="absolute top-2 right-2 w-2.5 h-2.5 bg-violet-500 rounded-full"></div>
+                    )}
+                  </button>
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Login form */}
             <div className="space-y-4">
-              {user === "seller" ? <Seller /> : <Operations />}
+              {isAdmin ? (
+                <Admin onBackToLogin={handleBackToLogin} />
+              ) : user === "seller" ? (
+                <Seller onAdminLogin={handleAdminLoginClick} />
+              ) : (
+                <Operations onAdminLogin={handleAdminLoginClick} />
+              )}
             </div>
           </div>
         </div>

@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { Link, NavLink } from "react-router-dom";
 import { notifyError, notifySuccess } from "../../utils/toast";
 
-function Operations() {
+function Operations({ showSeller, onAdminLogin }) {
   const navigate = useNavigate();
   const { theme, toggleTheme } = useMode();
   const [formData, setFormData] = useState({
@@ -27,7 +27,7 @@ function Operations() {
       notifyError("Invalid Email Format");
       return;
     }
-    
+
     setIsLoading(true);
     try {
       const res = await LoginServices.LoginOperationalGuy({
@@ -59,9 +59,11 @@ function Operations() {
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Email input */}
         <div className="space-y-1.5">
-          <label className={`text-sm font-semibold flex items-center gap-2 ${
-            theme ? "text-gray-700" : "text-gray-200"
-          }`}>
+          <label
+            className={`text-sm font-semibold flex items-center gap-2 ${
+              theme ? "text-gray-700" : "text-gray-200"
+            }`}
+          >
             <Email fontSize="small" />
             Email Address
           </label>
@@ -75,8 +77,8 @@ function Operations() {
             size="lg"
             placeholder="Enter your email address"
             className={`transition-all duration-300 ${
-              theme 
-                ? "bg-white border-gray-200 focus:border-violet-500 focus:ring-violet-500/20" 
+              theme
+                ? "bg-white border-gray-200 focus:border-violet-500 focus:ring-violet-500/20"
                 : "bg-gray-800 border-gray-600 focus:border-violet-400 focus:ring-violet-400/20"
             }`}
           />
@@ -84,17 +86,19 @@ function Operations() {
 
         {/* Password input */}
         <div className="space-y-1.5">
-          <label className={`text-sm font-semibold flex items-center gap-2 ${
-            theme ? "text-gray-700" : "text-gray-200"
-          }`}>
+          <label
+            className={`text-sm font-semibold flex items-center gap-2 ${
+              theme ? "text-gray-700" : "text-gray-200"
+            }`}
+          >
             <Lock fontSize="small" />
             Password
           </label>
           <div className="relative">
             <Input
               className={`transition-all duration-300 pr-12 ${
-                theme 
-                  ? "bg-white border-gray-200 focus:border-violet-500 focus:ring-violet-500/20" 
+                theme
+                  ? "bg-white border-gray-200 focus:border-violet-500 focus:ring-violet-500/20"
                   : "bg-gray-800 border-gray-600 focus:border-violet-400 focus:ring-violet-400/20"
               }`}
               type={showPassword ? "text" : "password"}
@@ -110,8 +114,8 @@ function Operations() {
               type="button"
               onClick={() => setShowPassword(!showPassword)}
               className={`absolute right-3 top-1/2 transform -translate-y-1/2 p-1 rounded-md transition-colors ${
-                theme 
-                  ? "text-gray-400 hover:text-gray-600" 
+                theme
+                  ? "text-gray-400 hover:text-gray-600"
                   : "text-gray-400 hover:text-gray-200"
               }`}
             >
@@ -141,8 +145,8 @@ function Operations() {
             )}
           </button>
 
-          {/* Forgot password link */}
-          <div className="text-center">
+          {/* Forgot password link and Login as Admin button */}
+          <div className="flex justify-between items-center">
             <Link
               className={`text-sm font-medium transition-colors hover:underline ${
                 theme ? "text-violet-600 hover:text-violet-700" : "text-violet-400 hover:text-violet-300"
@@ -151,6 +155,15 @@ function Operations() {
             >
               Forgot Password?
             </Link>
+            <button
+              type="button"
+              className={`text-sm font-medium transition-colors hover:underline ${
+                theme ? "text-violet-600 hover:text-violet-700" : "text-violet-400 hover:text-violet-300"
+              }`}
+              onClick={onAdminLogin}
+            >
+              Login as Admin
+            </button>
           </div>
         </div>
       </form>
