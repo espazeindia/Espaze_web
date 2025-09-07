@@ -8,7 +8,7 @@ import { useMode } from "../contexts/themeModeContext";
 import MetaDataServices from "../services/MetaDataServices";
 import InventoryServices from "../services/InventoryServices";
 import Cookies from "js-cookie";
-import EditModalComponent from "../components/modal/UpdateInventory"; // keep as in your project
+import EditModalComponent from "../components/modal/UpdateInventory";
 
 function ProductDetails() {
   const { id } = useParams();
@@ -168,7 +168,6 @@ function ProductDetails() {
                     )}
                   </div>
                   <div className="flex flex-wrap gap-2 items-center">
-                    {/* Hidden/Visible Badge with switch */}
                     {isFromInventory && (
                       <div className="flex items-center gap-2">
                         <Badge
@@ -180,7 +179,6 @@ function ProductDetails() {
                         >
                           {product.visible === "hidden" ? "Hidden" : "Visible"}
                         </Badge>
-
                         <Switch
                           checked={product.visible !== "hidden"}
                           onChange={(e) =>
@@ -200,7 +198,6 @@ function ProductDetails() {
                       </div>
                     )}
 
-                    {/* Stock Badge */}
                     {isFromInventory && (
                       <Badge
                         className={
@@ -213,7 +210,6 @@ function ProductDetails() {
                       </Badge>
                     )}
 
-                    {/* HSN Badge */}
                     {product.hsn_code && (
                       <Badge className="bg-indigo-100 text-indigo-700 border-indigo-200">
                         HSN: {product.hsn_code}
@@ -310,7 +306,7 @@ function ProductDetails() {
         )}
       </div>
 
-      {/* Floating Bottom-Right Edit Button (inventory style FAB) */}
+      {/* Inventory Pencil Button */}
       {isFromInventory && (
         <button
           onClick={() => setOpenEditModal(true)}
@@ -321,13 +317,31 @@ function ProductDetails() {
         </button>
       )}
 
-      {/* Update Product Modal — use same props as InventoryTable expects */}
+      {/* Operations Edit + Delete Buttons */}
+      {userRole === "operations" && product && (
+        <div className="fixed bottom-6 right-6 flex gap-3">
+          <button
+            onClick={() => setOpenEditModal(true)}
+            className="px-4 py-2 rounded-lg border border-green-600 text-green-600 hover:bg-green-600 hover:text-white transition font-medium"
+          >
+            Edit
+          </button>
+          <button
+            onClick={() => alert("Delete logic here")}
+            className="px-4 py-2 rounded-lg border border-red-600 text-red-600 hover:bg-red-600 hover:text-white transition font-medium"
+          >
+            Delete
+          </button>
+        </div>
+      )}
+
+      {/* Update Product Modal */}
       {openEditModal && (
         <EditModalComponent
           isOpen={openEditModal}
           onClose={() => setOpenEditModal(false)}
           data={product}
-          setReload={() => {}} // optional noop; pass real setter if available
+          setReload={() => {}}
         />
       )}
     </div>
