@@ -30,14 +30,15 @@ function Admin() {
 
     setIsLoading(true);
     try {
-      const res = await LoginServices.LoginOperationalGuy({
+      const res = await LoginServices.LoginAdminGuy({
         email: formData.email,
         password: formData.password,
       });
       if (res.success) {
         notifySuccess(res.message);
         Cookies.set("EspazeCookie", res.token);
-        navigate("/");
+        Cookies.set("EspazeRole", "admin"); 
+        navigate("/admin/dashboard");  
       }
     } catch (err) {
       notifyError(err?.response?.data?.message || err.message);

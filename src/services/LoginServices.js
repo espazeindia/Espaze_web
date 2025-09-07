@@ -5,6 +5,10 @@ const LoginServices = {
     return requests.post("/login/operational_guy/login", body);
   },
 
+  LoginAdminGuy: async (body) => {
+    return requests.post("/login/admin/login", body);
+  },
+
   GetOtp: async (param) => {
     return requests.get("/login/seller/getOTP", { params: param });
   },

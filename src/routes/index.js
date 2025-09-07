@@ -10,6 +10,9 @@ const Inventory = lazy(() => import("../pages/Inventory"));
 const ProductDetails = lazy(() => import("../pages/ProductDetails"));
 const UserProfile = lazy(() => import("../pages/UserProfile"));
 const WarehouseServices = lazy(() => import("../pages/WarehouseServices"));
+const operationsonboardingform = lazy(() => import("../pages/OperationGuyOnboarding"));
+const AdminDashboard = lazy(() => import("../pages/AdminDashboard"));
+
 
 const routes = [
   {
@@ -61,6 +64,11 @@ const routes = [
     path: "/warehouse-services",
     component: WarehouseServices,
     access: ["admin","operations","seller"]
+  },
+  {
+    path: "/operationsonboardingform",
+    component: operationsonboardingform,
+    access: ["admin"]
   },
 ];
 

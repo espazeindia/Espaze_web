@@ -146,23 +146,23 @@ function Operations({ showSeller, onAdminLogin }) {
           </button>
 
           {/* Forgot password link and Login as Admin button */}
-          <div className="flex justify-between items-center">
+          <div className="flex flex-col items-center gap-1 mt-2">
             <Link
-              className={`text-sm font-medium transition-colors hover:underline ${
-                theme ? "text-violet-600 hover:text-violet-700" : "text-violet-400 hover:text-violet-300"
-              }`}
-              to="/forgot-password"
+            className={`text-sm font-medium transition-colors hover:underline ${
+              theme ? "text-violet-600 hover:text-violet-700" : "text-violet-400 hover:text-violet-300"
+            }`}
+            to="/forgot-password"
             >
               Forgot Password?
-            </Link>
-            <button
+              </Link>
+              <button
               type="button"
               className={`text-sm font-medium transition-colors hover:underline ${
                 theme ? "text-violet-600 hover:text-violet-700" : "text-violet-400 hover:text-violet-300"
               }`}
               onClick={onAdminLogin}
-            >
-              Login as Admin
+              >
+                Login as Admin
             </button>
           </div>
         </div>

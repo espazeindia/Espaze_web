@@ -336,25 +336,27 @@ function Seller({ onAdminLogin }) {
           </button>
 
           {/* Additional actions */}
-          <div className="flex justify-between items-center">
+          <div className="flex flex-col items-center gap-1 mt-2">
             <button
-              type="button"
-              className={`text-sm font-medium transition-colors hover:underline ${
-                theme
-                  ? "text-violet-600 hover:text-violet-700"
-                  : "text-violet-400 hover:text-violet-300"
-              }`}
-            >
+             type="button"
+             className={`text-sm font-medium transition-colors hover:underline ${
+              theme
+              ? "text-violet-600 hover:text-violet-700"
+              : "text-violet-400 hover:text-violet-300"
+             }`}
+             >
               {loginVia === "pin" ? "Forgot PIN?" : "Resend OTP"}
             </button>
             <button
-              type="button"
-              className={`text-sm font-medium transition-colors hover:underline ${
-                theme ? "text-violet-600 hover:text-violet-700" : "text-violet-400 hover:text-violet-300"
-              }`}
-              onClick={onAdminLogin}
-            >
-              Login as Admin
+             type="button"
+             className={`text-sm font-medium transition-colors hover:underline ${
+             theme
+             ? "text-violet-600 hover:text-violet-700"
+             : "text-violet-400 hover:text-violet-300"
+             }`}
+             onClick={onAdminLogin}
+             >
+             Login as Admin
             </button>
           </div>
         </div>
