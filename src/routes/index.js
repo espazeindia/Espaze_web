@@ -1,5 +1,5 @@
 import { lazy } from "react";
-import { GridView, Inventory2Outlined, SupervisorAccountOutlined, ShoppingCart, Storefront, Warehouse } from "@mui/icons-material";
+import { GridView, Inventory2Outlined, SupervisorAccountOutlined, ShoppingCart, Storefront, Warehouse, PlaylistAddCheck, Category, AssignmentTurnedIn } from "@mui/icons-material";
 const ProductOnboarding = lazy(() => import("../pages/ProductOnboarding"));
 const CategoriesPage = lazy(() => import("../pages/CategoriesPage"));
 const Dashboard = lazy(() => import("../pages/Dashboard"));
@@ -10,15 +10,13 @@ const Inventory = lazy(() => import("../pages/Inventory"));
 const ProductDetails = lazy(() => import("../pages/ProductDetails"));
 const UserProfile = lazy(() => import("../pages/UserProfile"));
 const WarehouseServices = lazy(() => import("../pages/WarehouseServices"));
-const operationsonboardingform = lazy(() => import("../pages/OperationGuyOnboarding"));
-const AdminDashboard = lazy(() => import("../pages/AdminDashboard"));
-
+const OperationsOnboardingForm = lazy(() => import("../pages/OperationsOnboardingForm"));
 
 const routes = [
   {
     path: "/dashboard",
     component: Dashboard,
-    access: ["admin", "seller"]
+    access: ["seller"]
   },
   {
     path: "/product-details/:id",
@@ -28,22 +26,22 @@ const routes = [
   {
     path: "/inventory",
     component: Inventory,
-    access: ["admin", "seller"]
+    access: ["seller"]
   },
   {
     path: "/products",
     component: Products,
-    access: ["admin", "seller"]
+    access: ["seller"]
   },
   {
     path: "/customers",
     component: Customers,
-    access: ["admin", "seller"]
+    access: ["seller"]
   },
   {
     path: "/orders",
     component: Orders,
-    access: ["admin", "seller"]
+    access: ["seller"]
   },
   {
     path: "/product-onboarding",
@@ -63,11 +61,16 @@ const routes = [
   {
     path: "/warehouse-services",
     component: WarehouseServices,
-    access: ["admin","operations","seller"]
+    access: ["admin", "operations", "seller"]
+  },
+  {
+    path: "/operations-onboarding-form",
+    component: OperationsOnboardingForm,
+    access: ["admin"]
   },
   {
     path: "/operationsonboardingform",
-    component: operationsonboardingform,
+    component: OperationsOnboardingForm,
     access: ["admin"]
   },
 ];
@@ -77,41 +80,41 @@ const sidebarRoutes = [
     path: "/dashboard",
     icon: GridView,
     name: "Dashboard",
-    access: ["admin", "seller"]
+    access: ["seller"]
   },
   {
     icon: Inventory2Outlined,
     name: "Products",
     path: "/products",
-    access: ["admin", "seller"]
+    access: ["seller"]
   },
   {
     path: "/inventory",
     icon: Storefront,
     name: "Inventory",
-    access: ["admin", "seller"]
+    access: ["seller"]
   },
   {
     path: "/customers",
     icon: SupervisorAccountOutlined,
     name: "Customers",
-    access: ["admin", "seller"]
+    access: ["seller"]
   },
   {
     path: "/orders",
     icon: ShoppingCart,
     name: "Orders",
-    access: ["admin", "seller"]
+    access: ["seller"]
   },
   {
     path: "/product-onboarding",
-    icon: ShoppingCart,
+    icon: PlaylistAddCheck,
     name: "Onboarding",
     access: ["operations"]
   },
   {
     path: "/categories",
-    icon: ShoppingCart,
+    icon: Category,
     name: "Category",
     access: ["operations"]
   },
@@ -119,7 +122,13 @@ const sidebarRoutes = [
     path: "/warehouse-services",
     icon: Warehouse,
     name: "Warehouse Information",
-    access: ["operations"]
+    access: ["admin", "operations", "seller"]
+  },
+   {
+    path: "/operations-onboarding-form",
+    icon: ShoppingCart,
+    name: "Operations Onboarding Form",
+    access: ["admin"]
   },
 ];
 

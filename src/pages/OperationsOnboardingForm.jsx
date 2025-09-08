@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { notifySuccess, notifyError } from "../utils/toast";
+import OperationsOnboardingService from "../services/OperationsOnbaording"; 
 
 const OperationsOnboardingForm = () => {
   const [formData, setFormData] = useState({
@@ -84,7 +85,7 @@ const OperationsOnboardingForm = () => {
     if (errorMsg) notifyError(errorMsg);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const newErrors = {};
     Object.keys(formData).forEach((key) => {
@@ -99,22 +100,37 @@ const OperationsOnboardingForm = () => {
       return;
     }
 
-    console.log("Form Submitted: ", formData);
-    notifySuccess("✅ Operation Onboarding Successful!");
+    const payload = { ...formData };
+    let apiPayload = payload;
+    if (formData.profilePic) {
+      apiPayload = new FormData();
+      Object.keys(payload).forEach((key) => {
+        apiPayload.append(key, payload[key]);
+      });
+    }
 
-    setFormData({
-      name: "",
-      phone: "",
-      email: "",
-      flatNo: "",
-      street: "",
-      pincode: "",
-      pan: "",
-      password: "",
-      warehouse: "",
-      profilePic: null,
-    });
-    setErrors({});
+    try {
+      await OperationsOnboardingService.OperationsOnboardingForm(apiPayload);
+      notifySuccess("✅ Operation Onboarding Successful!");
+      setFormData({
+        name: "",
+        phone: "",
+        email: "",
+        flatNo: "",
+        street: "",
+        pincode: "",
+        pan: "",
+        password: "",
+        warehouse: "",
+        profilePic: null,
+      });
+      setErrors({});
+    } catch (error) {
+      notifyError(
+        error?.response?.data?.message ||
+          "Failed to submit. Please try again."
+      );
+    }
   };
 
   return (

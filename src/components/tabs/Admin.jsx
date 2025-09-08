@@ -2,13 +2,13 @@ import React, { useState } from "react";
 import { FormControl, Input } from "@mui/joy";
 import Cookies from "js-cookie";
 import LoginServices from "../../services/LoginServices";
-import { DarkMode, LightMode, Email, Lock, Visibility, VisibilityOff } from "@mui/icons-material";
+import { DarkMode, LightMode, Email, Lock, Visibility, VisibilityOff, ArrowBack } from "@mui/icons-material";
 import { useMode } from "../../contexts/themeModeContext";
 import { useNavigate } from "react-router-dom";
 import { Link, NavLink } from "react-router-dom";
 import { notifyError, notifySuccess } from "../../utils/toast";
 
-function Admin() {
+function Admin({ onBackToLogin }) {
   const navigate = useNavigate();
   const { theme, toggleTheme } = useMode();
   const [formData, setFormData] = useState({
@@ -27,26 +27,28 @@ function Admin() {
       notifyError("Invalid Email Format");
       return;
     }
-
+ // to be reviewed 
     setIsLoading(true);
     try {
-      const res = await LoginServices.LoginAdminGuy({
+      const res = await LoginServices.LoginAdmin({
         email: formData.email,
         password: formData.password,
       });
-      if (res.success) {
+
+      if (res && res.success) {
         notifySuccess(res.message);
         Cookies.set("EspazeCookie", res.token);
-        Cookies.set("EspazeRole", "admin"); 
-        navigate("/admin/dashboard");  
+        navigate("/");
+      } else {
+        notifyError(res?.message || "Login failed");
       }
     } catch (err) {
-      notifyError(err?.response?.data?.message || err.message);
+      notifyError(err?.message || "An error occurred");
     } finally {
       setIsLoading(false);
     }
   };
-
+// till here 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
