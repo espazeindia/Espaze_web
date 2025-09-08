@@ -11,43 +11,21 @@ const getValidCookie = () => {
 
 const InventoryServices = {
   AddToInventory: async (body) => {
-    const token = getValidCookie();
-    if (!token) throw new Error("cookie error");
-    // Ensure numeric fields
-    body.product_price = Number(body.product_price);
-    body.product_mrp = Number(body.product_mrp);
-    body.product_quantity = Number(body.product_quantity ?? 0);
-    return requests.post("/inventory/addInventory", body, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    return requests.post("/inventory/addInventory", body);
   },
 
   GetAllInventory: async (limit, offset, search, sort) => {
-    const token = getValidCookie();
-    if (!token) throw new Error("cookie error");
     return requests.get("/inventory/getAllInventory", {
-      headers: { Authorization: `Bearer ${token}` },
       params: { limit, offset, search, sort },
     });
   },
 
   UpdateInventory: async (body) => {
-    const token = getValidCookie();
-    if (!token) throw new Error("cookie error");
-    // Ensure numeric fields if present
-    if (body.product_price !== undefined) body.product_price = Number(body.product_price);
-    if (body.product_mrp !== undefined) body.product_mrp = Number(body.product_mrp);
-    if (body.product_quantity !== undefined) body.product_quantity = Number(body.product_quantity);
-    return requests.put("/inventory/updateInventory", body, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    return requests.put("/inventory/updateInventory", body);
   },
 
   FetchInventoryById: async (id) => {
-    const token = getValidCookie();
-    if (!token) throw new Error("cookie error");
     return requests.get("/inventory/getInventoryById", {
-      headers: { Authorization: `Bearer ${token}` },
       params: { id },
     });
   },

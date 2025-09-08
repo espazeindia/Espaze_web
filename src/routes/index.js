@@ -22,7 +22,7 @@ const ProductDetails = lazy(() => import("../pages/ProductDetails"));
 const UserProfile = lazy(() => import("../pages/UserProfile"));
 const WarehouseOnboarding = lazy(() => import("../pages/WarehouseOnboarding"));
 const OperationsOnboardingForm = lazy(() => import("../pages/OperationsOnboardingForm"));const selleronboardingform = lazy(() => import("../pages/selleronboardingform"));
-const operationsonboardingform = lazy(() => import("../pages/operationsonboardingform"));
+const operationsonboardingform = lazy(() => import("../pages/OperationsOnboardingForm"));
 
 const routes = [
   {
@@ -31,11 +31,7 @@ const routes = [
     access: ["seller"],
   },
 
-  {
-    path: "/product-details/:id",
-    component: ProductDetails,
-    access: ["operations", "seller"]
-  },
+  
   {
     path: "/inventory",
     component: Inventory,
@@ -85,6 +81,11 @@ const routes = [
     path: "/operations-onboarding-form",
     component: OperationsOnboardingForm,
     access: ["admin"],
+  },
+  {
+    path: "/product-details/:id",
+    component: ProductDetails,
+    access: ["operations", "seller"]
   },
 ];
 

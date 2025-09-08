@@ -5,7 +5,6 @@ import EditMetaData from "../modal/EditMetaData";
 import DeleteMetaData from "../modal/DeleteMetaData";
 import BottomPagination from "../pagination/BottomPagination";
 import { useNavigate } from "react-router-dom";
-import Cookies from "js-cookie";
 
 function ProductOnboardingTable({
   onboardingData,
@@ -47,53 +46,49 @@ function ProductOnboardingTable({
     >
       <div className="w-full overflow-x-auto">
         {/* Table Header */}
-        <div
-          className={`grid min-w-[1000px] border-b py-4 text-sm border-gray-300 border-dotted`}
-          style={{
-            gridTemplateColumns: userRole === "operations"
-              ? "repeat(6, 1fr) 150px" // no Product ID, Image
-              : "repeat(8, 1fr) 150px", // with Product ID, Image
-          }}
-        >
-          {userRole !== "operations" && (
-            <>
-              <div
-                className={`text-center ${theme ? "text-[#4110a2]" : "text-[#b898fa]"
-                  } font-semibold`}
-              >
-                Product ID
-              </div>
-              <div
-                className={`text-center ${theme ? "text-[#4110a2]" : "text-[#b898fa]"
-                  } font-semibold`}
-              >
-                Image
-              </div>
-            </>
-          )}
-          <div className={`text-center ${theme ? "text-[#4110a2]" : "text-[#b898fa]"} font-semibold`}>
+        <div className={`grid grid-cols-8 min-w-[1000px] border-b py-4 text-sm border-gray-300 border-dotted`}>
+          <div
+            className={`text-center ${theme ? "text-[#4110a2]" : "text-[#b898fa]"} font-semibold`}
+          >
+            Image
+          </div>
+
+          <div
+            className={`text-center ${theme ? "text-[#4110a2]" : "text-[#b898fa]"} font-semibold`}
+          >
             Product Name
           </div>
-          <div className={`text-center ${theme ? "text-[#4110a2]" : "text-[#b898fa]"} font-semibold`}>
+          <div
+            className={`text-center ${theme ? "text-[#4110a2]" : "text-[#b898fa]"} font-semibold`}
+          >
             Code
           </div>
-          <div className={`text-center ${theme ? "text-[#4110a2]" : "text-[#b898fa]"} font-semibold`}>
+          <div
+            className={`text-center ${theme ? "text-[#4110a2]" : "text-[#b898fa]"} font-semibold`}
+          >
             MRP
           </div>
-          <div className={`text-center ${theme ? "text-[#4110a2]" : "text-[#b898fa]"} font-semibold`}>
+          <div
+            className={`text-center ${theme ? "text-[#4110a2]" : "text-[#b898fa]"} font-semibold`}
+          >
             Category
           </div>
-          <div className={`text-center ${theme ? "text-[#4110a2]" : "text-[#b898fa]"} font-semibold`}>
+          <div
+            className={`text-center ${theme ? "text-[#4110a2]" : "text-[#b898fa]"} font-semibold`}
+          >
             SubCategory
           </div>
-          <div className={`text-center ${theme ? "text-[#4110a2]" : "text-[#b898fa]"} font-semibold`}>
+          <div
+            className={`text-center ${theme ? "text-[#4110a2]" : "text-[#b898fa]"} font-semibold`}
+          >
             Product Description
           </div>
-          {userRole === "operations" && (
-            <div className={`text-center ${theme ? "text-[#4110a2]" : "text-[#b898fa]"} font-semibold`}>
-              Actions
-            </div>
-          )}
+
+          <div
+            className={`text-center ${theme ? "text-[#4110a2]" : "text-[#b898fa]"} font-semibold`}
+          >
+            Actions
+          </div>
         </div>
 
         {/* Table Rows */}
