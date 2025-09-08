@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useMode } from "../contexts/themeModeContext";
 import EyeOpen from "../assets/img/eye-open.svg";
 import EyeClosed from "../assets/img/eye-closed.svg";
@@ -24,6 +24,36 @@ const UserProfile = () => {
   const [showSecurityPin, setShowSecurityPin] = useState(false);
   const fileInputRef = useRef();
 
+  useEffect(() => {
+    const fetchSellerDetails = async () => {
+      try {
+        const res = await OnboardingServices.GetSellerDetails();
+
+        if (res && res.success === true && res.data) {
+          const { name, pan, gstin, companyName, address, pin } = res.data;
+
+          setFormData({
+            sellerName: name || "",
+            panNumber: pan || "",
+            gstin: gstin || "",
+            companyName: companyName || "",
+            blockNo: address?.split(", ")[0] || "",
+            areaDistrict: address?.split(", ")[1] || "",
+            state: address?.split(", ")[2] || "",
+            pincode: address?.split(", ")[3] || "",
+            securityPin: pin || "",
+          });
+        } else {
+          notifyError(res?.message || "Failed to fetch seller details");
+        }
+      } catch (error) {
+        notifyError(error?.message || "Failed to fetch seller details");
+      }
+    };
+
+    fetchSellerDetails();
+  }, []);
+
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -33,118 +63,92 @@ const UserProfile = () => {
     }
   };
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
+  const PINCODE_REGEX = /^\d*$/;
+  const PAN_REGEX = /^[A-Za-z0-9]*$/;
+  const GSTIN_REGEX = /^[A-Za-z0-9]*$/;
 
-    // if (name === "phoneNumber") {
-    //   if (!/^\d*$/.test(value)) {
-    //     notifyError("Phone number must contain digits only.");
-    //     return;
-    //   }
-    //   if (value.length > 10) {
-    //     notifyError("Phone number must be exactly 10 digits.");
-    //     return;
-    //   }
-    // }
-
-    if (name === "pincode") {
-      if (!/^\d*$/.test(value)) {
-        notifyError("Pincode must contain digits only.");
-        return;
+  const validateField = (name, value) => {
+    if (name === "pincode" || name === "securityPin") {
+      if (!PINCODE_REGEX.test(value)) {
+        return `${name === "pincode" ? "Pincode" : "Security pin"} must contain digits only.`;
       }
       if (value.length > 6) {
-        notifyError("Pincode must be exactly 6 digits.");
-        return;
-      }
-    }
-
-    if (name === "securityPin") {
-      if (!/^\d*$/.test(value)) {
-        notifyError("Security pin must contain digits only.");
-        return;
-      }
-      if (value.length > 6) {
-        notifyError("Security pin must be exactly 6 digits.");
-        return;
+        return `${name === "pincode" ? "Pincode" : "Security pin"} must be exactly 6 digits.`;
       }
     }
 
     if (name === "panNumber") {
-      if (!/^[A-Za-z0-9]*$/.test(value)) {
-        notifyError("PAN must contain only alphabets and digits.");
-        return;
+      if (!PAN_REGEX.test(value)) {
+        return "PAN must contain only alphabets and digits.";
       }
-      setFormData({ ...formData, [name]: value.toUpperCase() });
-      return;
     }
 
     if (name === "gstin") {
-      if (!/^[A-Za-z0-9]*$/.test(value)) {
-        notifyError("GSTIN must contain only alphabets and digits.");
-        return;
+      if (!GSTIN_REGEX.test(value)) {
+        return "GSTIN must contain only alphabets and digits.";
       }
       if (value.length > 15) {
-        notifyError("GSTIN must be exactly 15 characters.");
-        return;
+        return "GSTIN must be exactly 15 characters.";
       }
-      setFormData({ ...formData, [name]: value.toUpperCase() });
+    }
+
+    return null;
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    const validationError = validateField(name, value);
+
+    if (validationError) {
+      notifyError(validationError);
       return;
     }
 
-    setFormData({ ...formData, [name]: value });
+    let processedValue = value;
+    if (name === "panNumber" || name === "gstin") {
+      processedValue = value.toUpperCase();
+    }
+
+    setFormData({ ...formData, [name]: processedValue });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (
-      !formData.sellerName ||
-      !formData.panNumber ||
-      !formData.securityPin ||
-      !formData.blockNo ||
-      !formData.areaDistrict ||
-      !formData.state ||
-      !formData.pincode
-    ) {
+    const { sellerName, panNumber, securityPin, blockNo, areaDistrict, state, pincode } = formData;
+
+    if (!sellerName || !panNumber || !securityPin || !blockNo || !areaDistrict || !state || !pincode) {
       notifyError("Please complete all required fields before submitting.");
       return;
     }
-    if (formData.securityPin.length !== 6) {
-      notifyError("Security pin must be exactly 6 digits.");
+
+    const securityPinError = validateField("securityPin", securityPin);
+    const pincodeError = validateField("pincode", pincode);
+    const panNumberError = validateField("panNumber", panNumber);
+    const gstinError = validateField("gstin", formData.gstin);
+
+    if (securityPinError || pincodeError || panNumberError || gstinError) {
+      notifyError(securityPinError || pincodeError || panNumberError || gstinError);
       return;
     }
-    if (formData.pincode.length !== 6) {
-      notifyError("Pincode must be exactly 6 digits.");
-      return;
-    }
-    if (formData.panNumber.length !== 10) {
-      notifyError("PAN must be exactly 10 characters.");
-      return;
-    }
-    if (formData.gstin && formData.gstin.length !== 15) {
-      notifyError("GSTIN must be exactly 15 characters.");
-      return;
-    }
+
     setIsSubmitting(true);
     try {
+      const address = [blockNo, areaDistrict, state, pincode].filter(Boolean).join(", ");
+
       const body = {
-        name: formData.sellerName,
-        address:
-          formData.blockNo +
-          ", " +
-          formData.areaDistrict +
-          ", " +
-          formData.state +
-          ", " +
-          formData.pincode,
+        name: sellerName,
+        address: address,
         gstin: formData.gstin,
-        pan: formData.panNumber,
+        pan: panNumber,
         companyName: formData.companyName,
-        pin: Number(formData.securityPin),
+        pin: Number(securityPin),
       };
       const res = await OnboardingServices.OnboardingSeller(body);
       if (res.success === true) {
         Cookies.set("EspazeCookie", res.token);
         notifySuccess(res.message);
+      } else {
+        notifyError(res.message || "Failed to save seller details");
       }
     } catch (error) {
       notifyError(error?.response?.data?.message || error.message);
@@ -423,7 +427,7 @@ const UserProfile = () => {
               className={`w-full p-2.5 text-white font-semibold rounded-md transition-all ${
                 theme ? "bg-purple-600 hover:bg-purple-700" : "bg-purple-700 hover:bg-purple-800"
               }`}
-              // disabled={isSubmitting}
+              disabled={isSubmitting}
             >
               {isSubmitting ? "Processing..." : "Save and Continue"}
             </button>
