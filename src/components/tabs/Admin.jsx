@@ -27,7 +27,7 @@ function Admin({ onBackToLogin }) {
       notifyError("Invalid Email Format");
       return;
     }
- // to be reviewed 
+
     setIsLoading(true);
     try {
       const res = await LoginServices.LoginAdmin({
@@ -48,7 +48,7 @@ function Admin({ onBackToLogin }) {
       setIsLoading(false);
     }
   };
-// till here 
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
