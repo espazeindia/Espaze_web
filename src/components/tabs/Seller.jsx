@@ -6,8 +6,10 @@ import LoginServices from "../../services/LoginServices";
 import { notifySuccess, notifyError } from "../../utils/toast";
 import { useNavigate } from "react-router-dom";
 import { Phone, Lock, Key, Refresh } from "@mui/icons-material";
+import { useUser } from "../../contexts/userContext";
 
 function Seller({ onAdminLogin }) {
+  const {setReload}=useUser()
   const { theme } = useMode();
   const navigate = useNavigate();
   const [loginVia, setLoginVia] = useState("pin");
@@ -101,7 +103,8 @@ function Seller({ onAdminLogin }) {
         if (res.success) {
           notifySuccess(res.message);
           Cookies.set("EspazeCookie", res.token);
-          navigate("/");
+          setReload((prevData)=>!prevData)
+           navigate("/")
         }
       } catch (error) {
         notifyError(error?.response?.data?.message || error.message);
@@ -124,7 +127,8 @@ function Seller({ onAdminLogin }) {
         if (res.success) {
           notifySuccess(res.message);
           Cookies.set("EspazeCookie", res.token);
-          navigate("/");
+          setReload((prevData)=>!prevData)
+          navigate("/")
         }
       } catch (err) {
         notifyError(err?.response?.data?.message || err.message);

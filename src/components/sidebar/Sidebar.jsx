@@ -12,8 +12,10 @@ import smallLogo from "../../assets/img/logo.png";
 import smallLightLogo from "../../assets/img/logo2.png";
 import { validate } from "../../utils/jwt-verify";
 import Person from "@mui/icons-material/Person";
+import { useUser } from "../../contexts/userContext";
 
 function Sidebar() {
+  const {setReload}=useUser()
   const navigate = useNavigate();
   const location = useLocation();
   const { sidebarOpen } = useSidebar();
@@ -21,6 +23,7 @@ function Sidebar() {
 
   const handleLogOut = () => {
     Cookies.remove("EspazeCookie", { sameSite: "None", secure: true });
+    setReload((prevData)=>!prevData)
     navigate("/login");
   };
 

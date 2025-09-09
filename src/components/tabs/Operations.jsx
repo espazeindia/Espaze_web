@@ -7,8 +7,10 @@ import { useMode } from "../../contexts/themeModeContext";
 import { useNavigate } from "react-router-dom";
 import { Link, NavLink } from "react-router-dom";
 import { notifyError, notifySuccess } from "../../utils/toast";
+import { useUser } from "../../contexts/userContext";
 
 function Operations({ showSeller, onAdminLogin }) {
+  const {setReload}=useUser()
   const navigate = useNavigate();
   const { theme, toggleTheme } = useMode();
   const [formData, setFormData] = useState({
@@ -37,7 +39,8 @@ function Operations({ showSeller, onAdminLogin }) {
       if (res.success) {
         notifySuccess(res.message);
         Cookies.set("EspazeCookie", res.token);
-        navigate("/");
+        setReload((prevData)=>!prevData)
+         navigate("/")
       }
     } catch (err) {
       notifyError(err?.response?.data?.message || err.message);

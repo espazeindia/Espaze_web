@@ -10,14 +10,15 @@ import { useUser } from "../../contexts/userContext";
 
 function Header() {
   const navigate = useNavigate();
-  const {userName} = useUser();
+  const {userName,setReload} = useUser();
   const { toggleSidebar } = useSidebar();
   const { theme, toggleTheme } = useMode();
   const [openUser, setOpenUser] = useState(false);
 
   const handleLogOut = () => {
     Cookies.remove("EspazeCookie", { sameSite: "None", secure: true });
-    navigate("/login");
+    setReload((prevData)=>!prevData)
+    navigate("/login")
   };
 
   return (
@@ -51,17 +52,17 @@ function Header() {
               openUser ? "block" : "hidden" 
             }`}
           >
-            <Link to="/dashboard" className={` ${theme ? "hover:bg-zinc-300":"hover:bg-zinc-800"} block w-full px-2 py-1 rounded-lg flex items-center gap-2`}>
+            <Link to="/dashboard" className={` ${theme ? "hover:bg-zinc-300":"hover:bg-zinc-800"} w-full px-2 py-1 rounded-lg flex items-center gap-2`}>
               <GridView fontSize="small" />
               Dashboard
             </Link>
-            <Link to="/profile" className={` ${theme ? "hover:bg-zinc-300":"hover:bg-zinc-800"} block w-full px-2 py-1 rounded-lg flex items-center gap-2`}>
+            <Link to="/profile" className={` ${theme ? "hover:bg-zinc-300":"hover:bg-zinc-800"}w-full px-2 py-1 rounded-lg flex items-center gap-2`}>
               <Person fontSize="small" />
               User Profile
             </Link>
             <button
               onClick={handleLogOut}
-              className={` ${theme ? "hover:bg-zinc-300":"hover:bg-zinc-800"} block w-full px-2 py-1 rounded-lg text-left flex items-center gap-2`}>
+              className={` ${theme ? "hover:bg-zinc-300":"hover:bg-zinc-800"} w-full px-2 py-1 rounded-lg text-left flex items-center gap-2`}>
               <LogoutOutlined fontSize="small" />
               Log Out
             </button>

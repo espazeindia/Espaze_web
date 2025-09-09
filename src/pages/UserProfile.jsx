@@ -5,8 +5,13 @@ import EyeClosed from "../assets/img/eye-closed.svg";
 import { notifyError, notifySuccess } from "../utils/toast";
 import OnboardingServices from "../services/OnboardingServices";
 import Cookies from "js-cookie";
+import { ArrowBack } from "@mui/icons-material";
+import { useUser } from "../contexts/userContext";
+import {  useNavigate } from "react-router-dom";
 
 const UserProfile = () => {
+  const {setReload,isOnboarded, loading}=useUser()
+  const navigate=useNavigate()
   const [profileImage, setProfileImage] = useState(null);
   const [formData, setFormData] = useState({
     sellerName: "",
@@ -23,6 +28,12 @@ const UserProfile = () => {
   const { theme } = useMode();
   const [showSecurityPin, setShowSecurityPin] = useState(false);
   const fileInputRef = useRef();
+
+  const handleLogout = () => {
+      Cookies.remove("EspazeCookie", { sameSite: "None", secure: true });
+      setReload((prevData)=>!prevData)
+      navigate(false)
+    };
 
   useEffect(() => {
     const fetchSellerDetails = async () => {
@@ -50,9 +61,11 @@ const UserProfile = () => {
         notifyError(error?.message || "Failed to fetch seller details");
       }
     };
-
-    fetchSellerDetails();
-  }, []);
+    console.log(isOnboarded)
+    if(!loading && isOnboarded){
+      fetchSellerDetails();
+    }
+  }, [isOnboarded, loading]);
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -164,8 +177,11 @@ const UserProfile = () => {
       }`}
       style={{ height: "93vh" }}
     >
+      {!isOnboarded && <button className=" cursor-pointer ml-20 mr-auto" onClick={handleLogout}><ArrowBack/></button>}
       {/* Header */}
       <div className="text-center mb-2">
+        
+
         <h1 className={`text-2xl font-bold mb-3 ${theme ? "text-gray-800" : "text-white"}`}>
           User Profile
         </h1>

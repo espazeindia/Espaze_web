@@ -60,11 +60,7 @@ const routes = [
     component: CategoriesPage,
     access: ["operations"],
   },
-  {
-    path: "/profile",
-    component: UserProfile,
-    access: ["seller"],
-  },
+  
   {
     path: "/product-details/:id",
     component: ProductDetails,
@@ -79,6 +75,11 @@ const routes = [
     path: "/operations-onboarding-form",
     component: OperationsOnboardingForm,
     access: ["admin"],
+  },
+  {
+    path: "/profile",
+    component: UserProfile,
+    access: ["seller","admin","operations"],
   },
 ];
 

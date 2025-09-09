@@ -7,9 +7,11 @@ import { useMode } from "../../contexts/themeModeContext";
 import { useNavigate } from "react-router-dom";
 import { Link, NavLink } from "react-router-dom";
 import { notifyError, notifySuccess } from "../../utils/toast";
+import {useUser} from "../../contexts/userContext"
 
 function Admin({ onBackToLogin }) {
   const navigate = useNavigate();
+  const {setReload}=useUser()
   const { theme, toggleTheme } = useMode();
   const [formData, setFormData] = useState({
     email: "",
@@ -38,7 +40,8 @@ function Admin({ onBackToLogin }) {
       if (res && res.success) {
         notifySuccess(res.message);
         Cookies.set("EspazeCookie", res.token);
-        navigate("/");
+        setReload((prevData)=>!prevData)
+         navigate("/")
       } else {
         notifyError(res?.message || "Login failed");
       }
