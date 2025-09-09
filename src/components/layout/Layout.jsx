@@ -2,12 +2,14 @@ import React, { lazy, useEffect, useState } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import { validate } from "../../utils/jwt-verify";
+import {UserProvider,useUser} from "../../contexts/userContext"
 
 // Internal imports
 import { routes } from "../../routes/index";
 import Sidebar from "../sidebar/Sidebar";
 import Header from "../header/Header";
 import { useSidebar } from "../../contexts/sidebarContext";
+
 
 const Page404 = lazy(() => import("../../pages/Page404"));
 
@@ -36,6 +38,7 @@ const Layout = () => {
   if (loading) return <div>Loading...</div>;
 
   return (
+    <UserProvider>
     <div className="flex h-screen overflow-scroll sideBarNone">
       <Sidebar />
 
@@ -58,6 +61,7 @@ const Layout = () => {
         </div>
       </div>
     </div>
+    </UserProvider>
   );
 };
 

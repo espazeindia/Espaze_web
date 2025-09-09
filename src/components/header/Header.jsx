@@ -6,26 +6,14 @@ import { DarkMode, LightMode, Notifications, Person, GridView, LogoutOutlined } 
 import { validate } from "../../utils/jwt-verify";
 import Cookies from "js-cookie";
 import { Link, useNavigate } from "react-router-dom";
+import { useUser } from "../../contexts/userContext";
 
 function Header() {
   const navigate = useNavigate();
+  const {userName} = useUser();
   const { toggleSidebar } = useSidebar();
   const { theme, toggleTheme } = useMode();
-  const [user, setUser] = useState("");
   const [openUser, setOpenUser] = useState(false);
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      const cookie = Cookies.get("EspazeCookie");
-      const payload = await validate(cookie);
-      console.log("nameuser",payload)
-      if (payload) {
-        setUser(payload.name);
-        
-      }
-    };
-    fetchUser();
-  }, []);
 
   const handleLogOut = () => {
     Cookies.remove("EspazeCookie", { sameSite: "None", secure: true });
@@ -57,7 +45,7 @@ function Header() {
           <button className="hover:cursor-pointer text-white bg-amber-500 w-8 h-8 flex items-center justify-center rounded-full">
             <Person />
           </button>
-          <span className="text-sm relative top-0.5 font-medium">{user}</span>
+          <span className="text-sm relative top-0.5 font-medium">{userName}</span>
           <div
             className={`absolute top-[115%] right-0 w-36 rounded-lg p-2 border ${theme ? "bg-white border-zinc-500":"border-zinc-600 bg-neutral-900"} ${
               openUser ? "block" : "hidden" 
