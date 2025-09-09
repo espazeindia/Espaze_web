@@ -1,41 +1,135 @@
 import React, { useState } from "react";
+import { notifySuccess, notifyError } from "../utils/toast";
 
 const OperationsOnboardingForm = () => {
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
     email: "",
-    addressLine1: "",
-    addressLine2: "",
-    addressLine3: "",
+    flatNo: "",
+    street: "",
+    pincode: "",
     pan: "",
     password: "",
     warehouse: "",
     profilePic: null,
   });
 
+  const [errors, setErrors] = useState({});
+  const [showPasswordHint, setShowPasswordHint] = useState(false);
+
+  const validatePassword = (password) => {
+    const minLength = /.{8,}/;
+    const uppercase = /[A-Z]/;
+    const lowercase = /[a-z]/;
+    const number = /[0-9]/;
+    const specialChar = /[!@#$%^&*]/;
+
+    if (!minLength.test(password)) return "At least 8 characters";
+    if (!uppercase.test(password)) return "Include 1 uppercase letter";
+    if (!lowercase.test(password)) return "Include 1 lowercase letter";
+    if (!number.test(password)) return "Include 1 number";
+    if (!specialChar.test(password)) return "Include 1 special character (!@#$%^&*)";
+    return "";
+  };
+
+  const validateField = (name, value) => {
+    if (!value && name !== "profilePic") return `${name} is required`;
+
+    switch (name) {
+      case "name":
+        if (!/^[A-Za-z\s]+$/.test(value)) return "Name can contain only letters and spaces";
+        return "";
+      case "phone":
+        if (!/^[0-9]{10}$/.test(value)) return "Phone must be 10 digits";
+        return "";
+      case "email":
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value))
+          return "Enter a valid email (e.g., user@example.com)";
+        return "";
+      case "pincode":
+        if (!/^[0-9]{6}$/.test(value)) return "Pin code must be 6 digits";
+        return "";
+      case "pan":
+        if (!/^[A-Z]{5}[0-9]{4}[A-Z]$/.test(value.toUpperCase()))
+          return "PAN must be like ABCDE1234F";
+        return "";
+      case "password":
+        return validatePassword(value);
+      case "warehouse":
+        if (!value) return "Please select a warehouse";
+        return "";
+      default:
+        return "";
+    }
+  };
+
   const handleChange = (e) => {
     const { name, value, files } = e.target;
+    let updatedValue = value;
+
     if (name === "profilePic") {
       setFormData({ ...formData, profilePic: files[0] });
-    } else {
-      setFormData({ ...formData, [name]: value });
+      return;
     }
+
+    if (name === "pan") {
+      updatedValue = value.toUpperCase();
+    }
+
+    setFormData({ ...formData, [name]: updatedValue });
+
+    const errorMsg = validateField(name, updatedValue);
+    setErrors((prev) => ({ ...prev, [name]: errorMsg }));
+    if (errorMsg) notifyError(errorMsg);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    const newErrors = {};
+    Object.keys(formData).forEach((key) => {
+      if (key === "profilePic") return;
+      const err = validateField(key, formData[key]);
+      if (err) newErrors[key] = err;
+    });
+    setErrors(newErrors);
+
+    if (Object.keys(newErrors).length > 0) {
+      notifyError("Please fix the errors before submitting");
+      return;
+    }
+
     console.log("Form Submitted: ", formData);
-    alert("Operations Onboarding Successful!");
+    notifySuccess("✅ Operation Onboarding Successful!");
+
+    setFormData({
+      name: "",
+      phone: "",
+      email: "",
+      flatNo: "",
+      street: "",
+      pincode: "",
+      pan: "",
+      password: "",
+      warehouse: "",
+      profilePic: null,
+    });
+    setErrors({});
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-purple-600 via-indigo-500 to-blue-500 p-6">
-      <div className="bg-white shadow-2xl rounded-2xl w-full max-w-4xl p-10 flex flex-col md:flex-row gap-10">
-        
-        {/* Left Side - Profile Pic Upload */}
-        <div className="flex flex-col items-center justify-center w-full md:w-1/3">
-          <label className="w-32 h-32 rounded-full bg-purple-100 flex items-center justify-center border-4 border-purple-400 shadow-md cursor-pointer overflow-hidden hover:scale-105 transition">
+    <div className="h-screen flex items-center justify-center bg-gray-100 px-2">
+      <div className="bg-white shadow-lg rounded-xl w-full max-w-4xl p-6">
+        <h2 className="text-2xl font-bold text-gray-800 text-center mb-1">
+          Operations Onboarding
+        </h2>
+        <p className="text-gray-500 text-center mb-6">
+          Complete your profile information
+        </p>
+
+        {/* Profile Pic */}
+        <div className="flex justify-center mb-6">
+          <label className="w-24 h-24 rounded-full bg-gray-100 flex items-center justify-center border-2 border-dashed border-gray-400 cursor-pointer overflow-hidden hover:border-purple-500 transition">
             {formData.profilePic ? (
               <img
                 src={URL.createObjectURL(formData.profilePic)}
@@ -43,7 +137,7 @@ const OperationsOnboardingForm = () => {
                 className="w-full h-full object-cover"
               />
             ) : (
-              <span className="text-purple-600 font-semibold">Upload Pic</span>
+              <span className="text-2xl text-gray-400">+</span>
             )}
             <input
               type="file"
@@ -53,76 +147,155 @@ const OperationsOnboardingForm = () => {
               className="hidden"
             />
           </label>
-          <p className="mt-3 text-sm text-gray-600">Profile Picture</p>
         </div>
 
-        {/* Right Side - Form */}
-        <form onSubmit={handleSubmit} className="w-full md:w-2/3 space-y-5">
-          <h2 className="text-2xl font-bold text-purple-700 mb-6">
-            Operations Onboarding
-          </h2>
+        <form onSubmit={handleSubmit} className="space-y-6 overflow-hidden">
+          {/* Name, Phone, PAN */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+              <input
+                type="text"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                placeholder="Enter full name"
+                className={`px-3 py-2 rounded-lg border w-full focus:ring-2 focus:ring-purple-400 ${
+                  errors.name ? "border-red-500" : "border-gray-300"
+                }`}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+              <input
+                type="tel"
+                name="phone"
+                value={formData.phone}
+                onChange={handleChange}
+                placeholder="10-digit number"
+                maxLength={10}
+                className={`px-3 py-2 rounded-lg border w-full focus:ring-2 focus:ring-purple-400 ${
+                  errors.phone ? "border-red-500" : "border-gray-300"
+                }`}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">PAN Number</label>
+              <input
+                type="text"
+                name="pan"
+                value={formData.pan}
+                onChange={handleChange}
+                placeholder="ABCDE1234F"
+                maxLength={10}
+                className={`px-3 py-2 rounded-lg border w-full focus:ring-2 focus:ring-purple-400 uppercase ${
+                  errors.pan ? "border-red-500" : "border-gray-300"
+                }`}
+              />
+            </div>
+          </div>
 
-          {/* Name */}
-          <input
-            type="text"
-            name="name"
-            placeholder="Full Name"
-            value={formData.name}
-            onChange={handleChange}
-            required
-            className="w-full p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-purple-400"
-          />
-
-          {/* Phone */}
-          <input
-            type="tel"
-            name="phone"
-            placeholder="Phone Number"
-            value={formData.phone}
-            onChange={handleChange}
-            pattern="[0-9]{10}"
-            required
-            className="w-full p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-purple-400"
-          />
-
-          {/* Email */}
-          <input
-            type="email"
-            name="email"
-            placeholder="Email ID"
-            value={formData.email}
-            onChange={handleChange}
-            required
-            className="w-full p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-purple-400"
-          />
+          {/* Email & Password */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Email ID</label>
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                placeholder="user@example.com"
+                className={`px-3 py-2 rounded-lg border w-full focus:ring-2 focus:ring-purple-400 ${
+                  errors.email ? "border-red-500" : "border-gray-300"
+                }`}
+              />
+            </div>
+            <div className="relative">
+              <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+              <input
+                type="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                className={`px-3 py-2 rounded-lg border w-full focus:ring-2 focus:ring-purple-400 ${
+                  errors.password ? "border-red-500" : "border-gray-300"
+                }`}
+                onFocus={() => setShowPasswordHint(true)}
+                onBlur={() => setShowPasswordHint(false)}
+              />
+              {showPasswordHint && (
+                <div className="absolute top-full left-0 mt-1 w-full bg-white border border-gray-200 rounded-lg p-2 text-xs text-gray-700 shadow-lg z-10">
+                  <p className="font-semibold mb-1">Password must include:</p>
+                  <ul className="list-disc pl-4 space-y-0.5 text-gray-600">
+                    <li>At least 8 characters</li>
+                    <li>One uppercase letter</li>
+                    <li>One lowercase letter</li>
+                    <li>One number</li>
+                    <li>One special character (!@#$%^&*)</li>
+                  </ul>
+                </div>
+              )}
+            </div>
+          </div>
 
           {/* Address */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            <input
-              type="text"
-              name="addressLine1"
-              placeholder="Address Line 1"
-              value={formData.addressLine1}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Flat / House No.</label>
+              <input
+                type="text"
+                name="flatNo"
+                value={formData.flatNo}
+                onChange={handleChange}
+                placeholder="E.g. A-102"
+                className={`px-3 py-2 rounded-lg border w-full focus:ring-2 focus:ring-purple-400 ${
+                  errors.flatNo ? "border-red-500" : "border-gray-300"
+                }`}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Block / Street</label>
+              <input
+                type="text"
+                name="street"
+                value={formData.street}
+                onChange={handleChange}
+                placeholder="E.g. MG Road"
+                className="px-3 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-400 w-full"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Pin Code</label>
+              <input
+                type="text"
+                name="pincode"
+                value={formData.pincode}
+                onChange={handleChange}
+                maxLength={6}
+                placeholder="E.g. 110001"
+                className={`px-3 py-2 rounded-lg border w-full focus:ring-2 focus:ring-purple-400 ${
+                  errors.pincode ? "border-red-500" : "border-gray-300"
+                }`}
+              />
+            </div>
+          </div>
+
+          {/* Warehouse */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Select Warehouse</label>
+            <select
+              name="warehouse"
+              value={formData.warehouse}
               onChange={handleChange}
-              required
-              className="w-full p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-purple-400"
-            />
-            <input
-              type="text"
-              name="addressLine2"
-              placeholder="Address Line 2"
-              value={formData.addressLine2}
-              onChange={handleChange}
-              className="w-full p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-purple-400"
-            />
-            <input
-              type="text"
-              name="addressLine3"
-              placeholder="Address Line 3"
-              value={formData.addressLine3}
-              onChange={handleChange}
-              className="w-full p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-purple-400"
-            />
+              className={`w-full px-4 py-3 rounded-lg border focus:ring-2 focus:ring-purple-400 bg-white select-with-chevron ${
+                errors.warehouse ? "border-red-500" : "border-gray-300"
+              }`}
+            >
+              <option value="">Select Warehouse</option>
+              <option value="Warehouse A">Warehouse A</option>
+              <option value="Warehouse B">Warehouse B</option>
+              <option value="Warehouse C">Warehouse C</option>
+            </select>
           </div>
 
           {/* PAN */}
@@ -162,12 +335,11 @@ const OperationsOnboardingForm = () => {
             <option value="Warehouse C">Warehouse C</option>
           </select>
 
-          {/* Submit Button */}
           <button
             type="submit"
-            className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 rounded-xl shadow-md transition transform hover:scale-105"
+            className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 rounded-lg shadow-md transition"
           >
-            Submit
+            Save and Continue
           </button>
         </form>
       </div>

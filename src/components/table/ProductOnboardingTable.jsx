@@ -5,7 +5,6 @@ import EditMetaData from "../modal/EditMetaData";
 import DeleteMetaData from "../modal/DeleteMetaData";
 import BottomPagination from "../pagination/BottomPagination";
 import { useNavigate } from "react-router-dom";
-import ProductDetails from "../../pages/ProductDetails";
 
 function ProductOnboardingTable({
   onboardingData,
@@ -24,81 +23,86 @@ function ProductOnboardingTable({
   const [currentProduct, setCurrentProduct] = useState({});
   const [deleteProduct, setDeleteProduct] = useState(-1);
   const [deleteModal, setDeleteModal] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState("");
 
   const handleProduct = (data) => {
-    setSelectedProduct(data);
     navigate(`/product-details/metadata_${data.id}`);
-  }
+  };
 
   const handleDelete = (id) => {
     setDeleteProduct(id);
     setDeleteModal(true);
   };
+
   const handleEdit = (data) => {
     setCurrentProduct(data);
     setEditModal(true);
   };
+
   return (
     <div
-      className={`mt-10 p-2 rounded-lg w-full  sideBarNone ${theme ? "bg-white" : "bg-zinc-800"} ${loading && "animate-pulse"
-        }`}
+      className={`mt-10 p-2 rounded-lg w-full  sideBarNone ${theme ? "bg-white" : "bg-zinc-800"} ${
+        loading && "animate-pulse"
+      }`}
     >
-      <div className="w-full">
-        <div className="grid grid-cols-8 border-b py-4 text-sm border-gray-300 border-dotted">
+      <div className="w-full overflow-x-auto">
+        {/* Table Header */}
+        <div className={`grid grid-cols-8 min-w-[1000px] border-b py-4 text-sm border-gray-300 border-dotted`}>
           <div
-            className={`text-center ${theme ? "text-[#4110a2]" : "text-[#b898fa]"}  font-semibold`}
+            className={`text-center ${theme ? "text-[#4110a2]" : "text-[#b898fa]"} font-semibold`}
           >
             Image
           </div>
+
           <div
-            className={`text-center ${theme ? "text-[#4110a2]" : "text-[#b898fa]"}  font-semibold`}
+            className={`text-center ${theme ? "text-[#4110a2]" : "text-[#b898fa]"} font-semibold`}
           >
             Product Name
           </div>
           <div
-            className={`text-center ${theme ? "text-[#4110a2]" : "text-[#b898fa]"}  font-semibold`}
+            className={`text-center ${theme ? "text-[#4110a2]" : "text-[#b898fa]"} font-semibold`}
           >
             Code
           </div>
           <div
-            className={`text-center ${theme ? "text-[#4110a2]" : "text-[#b898fa]"}  font-semibold`}
+            className={`text-center ${theme ? "text-[#4110a2]" : "text-[#b898fa]"} font-semibold`}
           >
             MRP
           </div>
           <div
-            className={`text-center ${theme ? "text-[#4110a2]" : "text-[#b898fa]"}  font-semibold`}
+            className={`text-center ${theme ? "text-[#4110a2]" : "text-[#b898fa]"} font-semibold`}
           >
             Category
           </div>
           <div
-            className={`text-center ${theme ? "text-[#4110a2]" : "text-[#b898fa]"}  font-semibold`}
+            className={`text-center ${theme ? "text-[#4110a2]" : "text-[#b898fa]"} font-semibold`}
           >
             SubCategory
           </div>
           <div
-            className={`text-center ${theme ? "text-[#4110a2]" : "text-[#b898fa]"}  font-semibold`}
+            className={`text-center ${theme ? "text-[#4110a2]" : "text-[#b898fa]"} font-semibold`}
           >
             Product Description
           </div>
+
           <div
-            className={`text-center ${theme ? "text-[#4110a2]" : "text-[#b898fa]"}  font-semibold`}
+            className={`text-center ${theme ? "text-[#4110a2]" : "text-[#b898fa]"} font-semibold`}
           >
             Actions
           </div>
         </div>
-        <div className=" h-[50vh] overflow-scroll sideBarNone">
+
+        {/* Table Rows */}
+        <div className="h-[50vh] overflow-y-auto">
           {!loading ? (
             onboardingData.length > 0 ? (
               onboardingData.map((data, index) => (
                 <div
                   key={index}
-                  onClick={()=>{
-                    handleProduct(data)
+                  onClick={() => {
+                    handleProduct(data);
                   }}
                   className="grid grid-cols-8 items-center text-sm border-b py-4 border-gray-300 border-dotted cursor-pointer hover:bg-zinc-100"
                 >
-
                   <div
                     className={`text-center font-medium ${theme ? "text-zinc-800" : "text-white"}`}
                   >
@@ -109,30 +113,27 @@ function ProductOnboardingTable({
                   >
                     {data.productName}
                   </div>
-                  <div
-                    className={`text-center font-medium ${theme ? "text-zinc-800" : "text-white"}`}
-                  >
-                    {data.code}
+
+                  {/* Product Code */}
+                  <div className={`text-center ${theme ? "text-zinc-800" : "text-white"}`}>
+                    {data.code || ""}
                   </div>
-                  <div
-                    className={`text-center font-medium ${theme ? "text-zinc-800" : "text-white"}`}
-                  >
-                    {data.mrp}
+
+                  <div className={`text-center ${theme ? "text-zinc-800" : "text-white"}`}>
+                    {data.mrp ?? "N/A"}
                   </div>
-                  <div
-                    className={`text-center font-medium ${theme ? "text-zinc-800" : "text-white"}`}
-                  >
-                    {data.category_name}
+                  <div className={`text-center ${theme ? "text-zinc-800" : "text-white"}`}>
+                    {data.category_name || "N/A"}
                   </div>
-                  <div
-                    className={`text-center font-medium ${theme ? "text-zinc-800" : "text-white"}`}
-                  >
-                    {data.subcategory_name}
+                  <div className={`text-center ${theme ? "text-zinc-800" : "text-white"}`}>
+                    {data.subcategory_name || "N/A"}
                   </div>
-                  <div
-                    className={`text-center font-medium ${theme ? "text-zinc-800" : "text-white"}`}
-                  >
-                    {data.productDescription}
+                  <div className={`text-center ${theme ? "text-zinc-800" : "text-white"}`}>
+                    {data.description
+                      ? data.description.length > 25
+                        ? `${data.description.substring(0, 25)}...`
+                        : data.description
+                      : "N/A"}
                   </div>
 
                   <div
@@ -140,23 +141,25 @@ function ProductOnboardingTable({
                     ${theme ? "text-black" : "text-white"}`}
                   >
                     <button
-                      className={`cursor-pointer ${theme
+                      className={`cursor-pointer ${
+                        theme
                           ? "text-green-600 hover:text-green-700"
                           : "text-green-400 hover:text-green-700"
-                        }`}
+                      }`}
                       onClick={(e) => {
-                        e.stopPropagation()
+                        e.stopPropagation();
                         handleEdit(data);
                       }}
                     >
                       <Edit />
                     </button>
                     <button
-                      className={` hover:text-red-600 cursor-pointer ${theme ? "text-red-500" : "text-red-500"}`}
+                      className={` hover:text-red-600 cursor-pointer ${
+                        theme ? "text-red-500" : "text-red-500"
+                      }`}
                       onClick={(e) => {
-                        e.stopPropagation()
+                        e.stopPropagation();
                         handleDelete(data.id);
-      
                       }}
                     >
                       <Delete />
@@ -165,23 +168,24 @@ function ProductOnboardingTable({
                 </div>
               ))
             ) : (
-              <div className=" w-full h-[48vh] flex justify-center items-center text-2xl font-semibold"> No Metadata Found</div>
+              <div className=" w-full h-[48vh] flex justify-center items-center text-2xl font-semibold">
+                {" "}
+                No Metadata Found
+              </div>
             )
           ) : (
-            Array.from({ length: limit }).map((_, index) => (
-              <div key={index} className="border-b h-14 border-gray-300 border-dotted w-full"></div>
-            ))
+            <div className="text-center mt-10">Loading...</div>
           )}
         </div>
       </div>
+
+      {/* Pagination */}
       <BottomPagination
         page={page}
         setPage={setPage}
-        limit={limit}
         setLimit={setLimit}
+        limit={limit}
         totalDetails={totalDetails}
-        loading={loading}
-        textSize="base"
       />
       <EditMetaData
         isOpen={editModal}
@@ -189,7 +193,7 @@ function ProductOnboardingTable({
           setEditModal(false);
         }}
         currentProduct={currentProduct}
-        setOnboardingData={setOnboardingData}
+        setReload={setReload}
       />
       <DeleteMetaData
         isOpen={deleteModal}

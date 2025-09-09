@@ -1,8 +1,6 @@
 import { Checkbox } from "@mui/joy";
-import { Add } from "@mui/icons-material";
+import { Add, Visibility } from "@mui/icons-material";
 import { useState, useEffect } from "react";
-import ViewModalComponent from "../modal/ViewProductModal";
-import { Visibility } from "@mui/icons-material";
 import { useMode } from "../../contexts/themeModeContext";
 import BottomPagination from "../pagination/BottomPagination";
 import { useNavigate } from "react-router-dom";
@@ -18,9 +16,12 @@ function ProductTable({
   checkedIds,
   setCheckedIds,
   handleAddToInventory,
+  isOperations = false, // ✅ role flag
+  handleEditProduct,
+  handleDeleteProduct,
 }) {
   const { theme } = useMode();
-  const navigate =useNavigate()
+  const navigate = useNavigate();
   const [checkedBox, setCheckedBox] = useState(false);
 
   const handleProductView = (id) => {
@@ -29,10 +30,7 @@ function ProductTable({
 
   const handleMainCheckboxChange = (value) => {
     if (value) {
-      const allIds = products.map((product) => {
-        return product.id;
-      });
-      setCheckedIds(allIds);
+      setCheckedIds(products.map((p) => p.id));
       setCheckedBox(true);
     } else {
       setCheckedIds([]);
@@ -42,45 +40,37 @@ function ProductTable({
 
   const handleCheckedIdsChange = (id) => {
     if (checkedIds.includes(id)) {
-      setCheckedIds((prevData) => prevData.filter((checked_id) => checked_id != id));
+      setCheckedIds((prev) => prev.filter((cid) => cid !== id));
     } else {
-      setCheckedIds((prevData) => [...prevData, id]);
+      setCheckedIds((prev) => [...prev, id]);
     }
   };
 
-
- 
-
   useEffect(() => {
-    if (products.length === 0) {
-      setCheckedBox(false);
-      return;
-    }
-
-    const allSelected = products.every((product) => checkedIds.includes(product.id));
-    setCheckedBox(allSelected);
+    setCheckedBox(
+      products.length > 0 && products.every((p) => checkedIds.includes(p.id))
+    );
   }, [products, checkedIds]);
 
   return (
-    <>
-      <div
-        className={`px-2 rounded-lg w-full mt-8  sideBarNone ${
-          theme ? "bg-white" : "bg-zinc-800"
-        } ${loading && "animate-pulse"}`}
-      >
-        <div className="w-full">
+    <div className="px-2 mt-8 w-full sideBarNone">
+      <div className="overflow-x-auto">
+        <div
+          className={`min-w-[1200px] rounded-lg ${
+            theme ? "bg-white" : "bg-zinc-800"
+          } ${loading ? "animate-pulse" : ""}`}
+        >
+          {/* Table Head */}
           <div className="grid grid-cols-[1fr_2fr_5fr_3fr_1fr_4fr_3fr_6fr_2fr] border-b py-4 text-sm border-gray-300 border-dotted">
             <Checkbox
               checked={checkedBox}
-              onChange={(e) => {
-                handleMainCheckboxChange(e.target.checked);
-              }}
+              onChange={(e) => handleMainCheckboxChange(e.target.checked)}
               size="sm"
               sx={
                 theme
                   ? {
                       "&.Mui-checked .MuiSvgIcon-root": {
-                        backgroundColor: "#825dcf", // Ensures the icon background changes
+                        backgroundColor: "#825dcf",
                       },
                     }
                   : {
@@ -90,190 +80,193 @@ function ProductTable({
                     }
               }
             />
-            <div
-              className={`text-center ${
-                theme ? "text-[#4110a2]" : "text-[#b898fa]"
-              }  font-semibold`}
-            >
-              Image
-            </div>
-            <div
-              className={`text-center ${
-                theme ? "text-[#4110a2]" : "text-[#b898fa]"
-              }  font-semibold`}
-            >
-              Product Name
-            </div>
-            <div
-              className={`text-center ${
-                theme ? "text-[#4110a2]" : "text-[#b898fa]"
-              }  font-semibold`}
-            >
-              Code
-            </div>
-            <div
-              className={`text-center ${
-                theme ? "text-[#4110a2]" : "text-[#b898fa]"
-              }  font-semibold`}
-            >
-              MRP
-            </div>
-            <div
-              className={`text-center ${
-                theme ? "text-[#4110a2]" : "text-[#b898fa]"
-              }  font-semibold`}
-            >
-              Category
-            </div>
-            <div
-              className={`text-center ${
-                theme ? "text-[#4110a2]" : "text-[#b898fa]"
-              }  font-semibold`}
-            >
-              SubCategory
-            </div>
-            <div
-              className={`text-center ${
-                theme ? "text-[#4110a2]" : "text-[#b898fa]"
-              }  font-semibold`}
-            >
-              Product Description
-            </div>
-            <div
-              className={`text-center ${
-                theme ? "text-[#4110a2]" : "text-[#b898fa]"
-              }  font-semibold`}
-            >
-              Actions
-            </div>
-          </div>
-        </div>
-        <div className=" h-[50vh] overflow-scroll sideBarNone">
-          {!loading ? (
-            products.length > 0 ? (
-              products.map((data, index) => (
-                <div
-                onClick={()=>{handleProductView(data.id)}}
-                  key={index}
-                  className=" grid grid-cols-[1fr_2fr_5fr_3fr_1fr_4fr_3fr_6fr_2fr] items-center  text-sm border-b py-4 border-gray-300 border-dotted"
-                >
-                  <div onClick={(e)=>{e.stopPropagation()}}>
-                  <Checkbox
-                    checked={checkedIds.includes(data.id)}
-                    onChange={() => {
-                      handleCheckedIdsChange(data.id);
-                    }}
-                    type="checkbox"
-                    size="sm"
-                    className="relative top-[3px] left-2"
-                    sx={
-                      theme
-                        ? {
-                            "&.Mui-checked .MuiSvgIcon-root": {
-                              backgroundColor: "#825dcf", // Ensures the icon background changes
-                            },
-                          }
-                        : {
-                            "&.Mui-checked .MuiSvgIcon-root": {
-                              backgroundColor: "#b898fa",
-                            },
-                          }
-                    }
-                  />
-                  </div>
-                  <div
-                    className={`text-center font-medium ${theme ? "text-zinc-800" : "text-white"}`}
-                  >
-                    {data.image}
-                  </div>
-                  <div
-                    className={`text-center font-medium ${theme ? "text-zinc-800" : "text-white"}`}
-                  >
-                    {data.productName}
-                  </div>
-                  <div
-                    className={`text-center font-medium ${theme ? "text-zinc-800" : "text-white"}`}
-                  >
-                    {data.code}
-                  </div>
-                  <div
-                    className={`text-center font-medium ${theme ? "text-zinc-800" : "text-white"}`}
-                  >
-                    {data.mrp}
-                  </div>
-                  <div
-                    className={`text-center font-medium ${theme ? "text-zinc-800" : "text-white"}`}
-                  >
-                    {data.category_name}
-                  </div>
-                  <div
-                    className={`text-center font-medium ${theme ? "text-zinc-800" : "text-white"}`}
-                  >
-                    {data.subcategory_name}
-                  </div>
-                  <div
-                    className={`text-center font-medium ${theme ? "text-zinc-800" : "text-white"}`}
-                  >
-                    {data.productDescription}
-                  </div>
-
-                  <div
-                    className={`text-center flex items-center justify-center gap-3 font-medium 
-                    ${theme ? "text-black" : "text-white"}`}
-                  >
-                    <div
-                      className={`hover:cursor-pointer ${
-                        theme
-                          ? "text-green-600 hover:text-green-700"
-                          : "text-green-400 hover:text-green-700"
-                      } `}
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        handleProductView(data.id);
-                      }}
-                    >
-                      <Visibility fontSize="small" />
-                    </div>
-                    <button
-                      className={`hover:cursor-pointer ml-3 ${
-                        theme
-                          ? "text-green-600 hover:text-green-700"
-                          : "text-green-400 hover:text-green-700"
-                      } `}
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        handleAddToInventory([data.id])
-                      }}
-                    >
-                      <Add fontSize="small" />
-                    </button>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div className=" w-full h-[48vh] flex justify-center items-center text-2xl font-semibold">
-                {" "}
-                No Metadata Found
+            {[
+              "Image",
+              "Product Name",
+              "Code",
+              "MRP",
+              "Category",
+              "SubCategory",
+              "Product Description",
+              "Actions",
+            ].map((title, i) => (
+              <div
+                key={i}
+                className={`text-center font-semibold ${
+                  theme ? "text-[#4110a2]" : "text-[#b898fa]"
+                }`}
+              >
+                {title}
               </div>
-            )
-          ) : (
-            Array.from({ length: limit }).map((_, index) => (
-              <div key={index} className="border-b h-14 border-gray-300 border-dotted w-full"></div>
-            ))
-          )}
-        </div>
-        <BottomPagination
-          page={page}
-          setPage={setPage}
-          limit={limit}
-          setLimit={setLimit}
-          totalDetails={totalDetails}
-          loading={loading}
-          textSize="base"
-        />
-      </div>
+            ))}
+          </div>
 
-    </>
+          {/* Table Body */}
+          <div className="h-[50vh] overflow-y-auto overflow-x-hidden">
+            {!loading ? (
+              products.length > 0 ? (
+                products.map((data) => (
+                  <div
+                    key={data.id}
+                    className="grid grid-cols-[1fr_2fr_5fr_3fr_1fr_4fr_3fr_6fr_2fr] items-center text-sm border-b py-4 border-gray-300 border-dotted cursor-pointer"
+                    onClick={() => handleProductView(data.id)}
+                  >
+                    {/* Checkbox */}
+                    <div onClick={(e) => e.stopPropagation()}>
+                      <Checkbox
+                        checked={checkedIds.includes(data.id)}
+                        onChange={() => handleCheckedIdsChange(data.id)}
+                        size="sm"
+                        className="relative top-[3px] left-2"
+                        sx={
+                          theme
+                            ? {
+                                "&.Mui-checked .MuiSvgIcon-root": {
+                                  backgroundColor: "#825dcf",
+                                },
+                              }
+                            : {
+                                "&.Mui-checked .MuiSvgIcon-root": {
+                                  backgroundColor: "#b898fa",
+                                },
+                              }
+                        }
+                      />
+                    </div>
+
+                    {/* Data Columns */}
+                    <div
+                      className={`text-center font-medium ${
+                        theme ? "text-zinc-800" : "text-white"
+                      }`}
+                    >
+                      {data.image}
+                    </div>
+                    <div
+                      className={`text-center font-medium ${
+                        theme ? "text-zinc-800" : "text-white"
+                      }`}
+                    >
+                      {data.productName}
+                    </div>
+                    <div
+                      className={`text-center font-medium ${
+                        theme ? "text-zinc-800" : "text-white"
+                      }`}
+                    >
+                      {data.code}
+                    </div>
+                    <div
+                      className={`text-center font-medium ${
+                        theme ? "text-zinc-800" : "text-white"
+                      }`}
+                    >
+                      {data.mrp}
+                    </div>
+                    <div
+                      className={`text-center font-medium ${
+                        theme ? "text-zinc-800" : "text-white"
+                      }`}
+                    >
+                      {data.category_name}
+                    </div>
+                    <div
+                      className={`text-center font-medium ${
+                        theme ? "text-zinc-800" : "text-white"
+                      }`}
+                    >
+                      {data.subcategory_name}
+                    </div>
+                    <div
+                      className={`text-center font-medium ${
+                        theme ? "text-zinc-800" : "text-white"
+                      }`}
+                    >
+                      {data.productDescription}
+                    </div>
+
+                    {/* Actions */}
+                    <div
+                      className={`text-center flex items-center justify-center gap-3 font-medium ${
+                        theme ? "text-black" : "text-white"
+                      }`}
+                    >
+                      {/* Seller view => View + Add */}
+                      {!isOperations && (
+                        <>
+                          <Visibility
+                            fontSize="small"
+                            className="hover:cursor-pointer text-green-600 hover:text-green-700"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleProductView(data.id);
+                            }}
+                          />
+                          <Add
+                            fontSize="small"
+                            className="hover:cursor-pointer ml-3 text-green-600 hover:text-green-700"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleAddToInventory([data.id]);
+                            }}
+                          />
+                        </>
+                      )}
+
+                      {/* Operations view => Edit + Delete */}
+                      {isOperations && (
+                        <div className="flex gap-3">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleEditProduct?.(data.id);
+                            }}
+                            className="px-3 py-1 border border-green-600 text-green-600 rounded-md text-sm font-medium transition hover:bg-green-600 hover:text-white"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeleteProduct?.(data.id);
+                            }}
+                            className="px-3 py-1 border border-red-600 text-red-600 rounded-md text-sm font-medium transition hover:bg-red-600 hover:text-white"
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="w-full h-[48vh] flex justify-center items-center text-2xl font-semibold">
+                  No Metadata Found
+                </div>
+              )
+            ) : (
+              Array.from({ length: limit }).map((_, index) => (
+                <div
+                  key={index}
+                  className="border-b h-14 border-gray-300 border-dotted w-full"
+                ></div>
+              ))
+            )}
+          </div>
+
+          {/* Pagination */}
+          <BottomPagination
+            page={page}
+            setPage={setPage}
+            limit={limit}
+            setLimit={setLimit}
+            totalDetails={totalDetails}
+            loading={loading}
+            textSize="base"
+          />
+        </div>
+      </div>
+    </div>
   );
 }
 

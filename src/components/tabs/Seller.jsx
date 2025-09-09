@@ -7,7 +7,7 @@ import { notifySuccess, notifyError } from "../../utils/toast";
 import { useNavigate } from "react-router-dom";
 import { Phone, Lock, Key, Refresh } from "@mui/icons-material";
 
-function Seller() {
+function Seller({ onAdminLogin }) {
   const { theme } = useMode();
   const navigate = useNavigate();
   const [loginVia, setLoginVia] = useState("pin");
@@ -101,6 +101,10 @@ function Seller() {
         if (res.success) {
           notifySuccess(res.message);
           Cookies.set("EspazeCookie", res.token);
+
+          // ✅ set role here
+          localStorage.setItem("userRole", "seller");
+
           navigate("/");
         }
       } catch (error) {
@@ -124,6 +128,10 @@ function Seller() {
         if (res.success) {
           notifySuccess(res.message);
           Cookies.set("EspazeCookie", res.token);
+
+          // ✅ set role here
+          localStorage.setItem("userRole", "seller");
+
           navigate("/");
         }
       } catch (err) {
@@ -156,9 +164,6 @@ function Seller() {
           >
             Choose Login Method
           </h3>
-          {/* <p className={`text-xs ${theme ? "text-gray-600" : "text-gray-300"}`}>
-            Select how you'd like to authenticate
-          </p> */}
         </div>
 
         <div
@@ -324,7 +329,7 @@ function Seller() {
             }
             className={`w-full py-2.5 rounded-xl font-semibold text-white text-lg transition-all duration-300 transform ${
               (loginVia === "pin" ? isPinComplete : isOtpComplete) && !isLoading
-                ? "bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 shadow-lg hover:shadow-xl hover:scale-[1.02]"
+                ? "bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 shadow-lg hover:shadow-xl transform hover:scale-105"
                 : "bg-gray-300 text-gray-500 cursor-not-allowed"
             } flex items-center justify-center gap-2`}
           >
@@ -339,7 +344,7 @@ function Seller() {
           </button>
 
           {/* Additional actions */}
-          <div className="text-center">
+          <div className="flex justify-between items-center">
             <button
               type="button"
               className={`text-sm font-medium transition-colors hover:underline ${
@@ -349,6 +354,15 @@ function Seller() {
               }`}
             >
               {loginVia === "pin" ? "Forgot PIN?" : "Resend OTP"}
+            </button>
+            <button
+              type="button"
+              className={`text-sm font-medium transition-colors hover:underline ${
+                theme ? "text-violet-600 hover:text-violet-700" : "text-violet-400 hover:text-violet-300"
+              }`}
+              onClick={onAdminLogin}
+            >
+              Login as Admin
             </button>
           </div>
         </div>
