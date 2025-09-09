@@ -19,6 +19,8 @@ const Customers = lazy(() => import("../pages/Customers"));
 const Orders = lazy(() => import("../pages/Orders"));
 const Inventory = lazy(() => import("../pages/Inventory"));
 const ProductDetails = lazy(() => import("../pages/ProductDetails"));
+const CategorySelection = lazy(() => import("../components/CategorySelection"));
+const OnboardingRack = lazy(() => import("../pages/OnboardingRack"));
 const UserProfile = lazy(() => import("../pages/UserProfile"));
 const WarehouseOnboarding = lazy(() => import("../pages/WarehouseOnboarding"));
 const OperationsOnboardingForm = lazy(() => import("../pages/OperationsOnboardingForm"));
@@ -59,6 +61,16 @@ const routes = [
     path: "/categories",
     component: CategoriesPage,
     access: ["operations"],
+  },
+  {
+    path: "/categoryselection",
+    component: CategorySelection,
+    access: ["seller"]
+  },
+ {
+    path: "/OnboardingRack",
+    component: OnboardingRack,
+    access: ["operations"]
   },
   
   {
@@ -138,6 +150,18 @@ const sidebarRoutes = [
     name: "Operations Onboarding Form",
     access: ["admin"],
   },
+{
+  path: "/categoryselection",
+  icon: ShoppingCart,
+  name : "CategorySelection",
+  access: ["seller"]  
+},
+ {
+  path: "/OnboardingRack",
+  icon: ShoppingCart,
+  name : "OnboardingRack",
+  access: ["operations"]  
+},
 ];
 
 export { routes, sidebarRoutes };
