@@ -37,10 +37,10 @@ const UserProfile = () => {
             panNumber: pan || "",
             gstin: gstin || "",
             companyName: companyName || "",
-            blockNo: address?.split(", ")[0] || "",
-            areaDistrict: address?.split(", ")[1] || "",
-            state: address?.split(", ")[2] || "",
-            pincode: address?.split(", ")[3] || "",
+            blockNo: address?.split("&%$#")[0] || "",
+            areaDistrict: address?.split("&%$#")[1] || "",
+            state: address?.split("&%$#")[2] || "",
+            pincode: address?.split("&%$#")[3] || "",
             securityPin: pin || "",
           });
         } else {
@@ -133,7 +133,7 @@ const UserProfile = () => {
 
     setIsSubmitting(true);
     try {
-      const address = [blockNo, areaDistrict, state, pincode].filter(Boolean).join(", ");
+      const address = [blockNo, areaDistrict, state, pincode].filter(Boolean).join("&%$#");
 
       const body = {
         name: sellerName,
