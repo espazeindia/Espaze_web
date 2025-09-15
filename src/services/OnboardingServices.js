@@ -6,6 +6,10 @@ const OnboardingServices = {
   OnboardingSeller: (body) => {
     return requests.post("/onboarding/seller/addBasicDetail", body);
   },
+
+  EditSellerBasicDetails: (body) => {
+    return requests.put("/onboarding/seller/editBasicDetails", body);
+  },
 };
 
 export default OnboardingServices;

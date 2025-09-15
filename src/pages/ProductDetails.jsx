@@ -8,19 +8,28 @@ import { useMode } from "../contexts/themeModeContext";
 import MetaDataServices from "../services/MetaDataServices";
 import InventoryServices from "../services/InventoryServices";
 import Cookies from "js-cookie";
+
+// Modals for both roles
 import EditModalComponent from "../components/modal/UpdateInventory";
+import EditMetaData from "../components/modal/EditMetaData";
+import DeleteMetaData from "../components/modal/DeleteMetaData";
 
 function ProductDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { theme } = useMode();
-
   const userRole = Cookies.get("userRole") || "seller";
 
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isFromInventory, setIsFromInventory] = useState(false);
+
+  // Inventory modal
   const [openEditModal, setOpenEditModal] = useState(false);
+
+  // Operations modals
+  const [editModal, setEditModal] = useState(false);
+  const [deleteModal, setDeleteModal] = useState(false);
 
   const transformProduct = (d, isInventory = false) => ({
     id: isInventory ? d.inventory_product_id : d.id,
@@ -32,9 +41,9 @@ function ProductDetails() {
     subcategory_name: isInventory ? d.metadata_subcategory_name : d.subcategory_name,
     total_stars: isInventory ? d.metadata_total_stars ?? 0 : d.total_stars ?? 0,
     total_reviews: isInventory ? d.metadata_total_reviews ?? 0 : d.total_reviews ?? 0,
-    visible: isInventory ? (d.product_visibility || "hidden") : d.visible || "hidden",
-    quantity: isInventory ? (d.product_quantity ?? 0) : undefined,
-    price: isInventory ? (d.product_price ?? 0) : d.price ?? 0,
+    visible: isInventory ? d.product_visibility || "hidden" : d.visible || "hidden",
+    quantity: isInventory ? d.product_quantity ?? 0 : undefined,
+    price: isInventory ? d.product_price ?? 0 : d.price ?? 0,
     mrp: isInventory
       ? d.product_mrp && d.product_mrp > 0
         ? d.product_mrp
@@ -192,12 +201,13 @@ function ProductDetails() {
                             "--Switch-trackWidth": "36px",
                             "--Switch-trackHeight": "18px",
                             "--Switch-thumbSize": "12px",
-                            "&.Mui-checked": { "--Switch-trackBackground": "#16a34a" },
+                            "&.Mui-checked": {
+                              "--Switch-trackBackground": "#16a34a",
+                            },
                           }}
                         />
                       </div>
                     )}
-
                     {isFromInventory && (
                       <Badge
                         className={
@@ -209,7 +219,6 @@ function ProductDetails() {
                         {product.quantity === 0 ? "Out of Stock" : "In Stock"}
                       </Badge>
                     )}
-
                     {product.hsn_code && (
                       <Badge className="bg-indigo-100 text-indigo-700 border-indigo-200">
                         HSN: {product.hsn_code}
@@ -248,56 +257,53 @@ function ProductDetails() {
             <div className={`rounded-xl border ${borderClr} p-5`}>
               <h3 className="font-bold mb-4 text-xl">More Details</h3>
               <div className={`grid md:grid-cols-2 gap-6 text-sm ${subText}`}>
-                {userRole === "operations" && (
-                  <p>
-                    <span className="font-semibold">Product ID: </span>
-                    {product.id}
-                  </p>
-                )}
+                {/* Product ID removed for both roles */}
                 <p>
-                  <span className="font-semibold">HSN Code: </span>
+                  <span className="font-semibold">HSN Code: </span>{" "}
                   {product.hsn_code || "N/A"}
                 </p>
                 <p>
-                  <span className="font-semibold">Category: </span>
+                  <span className="font-semibold">Category: </span>{" "}
                   {product.category_name || "N/A"}
                 </p>
                 <p>
-                  <span className="font-semibold">Subcategory: </span>
+                  <span className="font-semibold">Subcategory: </span>{" "}
                   {product.subcategory_name || "N/A"}
                 </p>
                 <p>
                   <span className="font-semibold">MRP: </span>₹{product.mrp}
                 </p>
+
                 {isFromInventory && (
                   <>
                     <p>
                       <span className="font-semibold">Price: </span>₹{product.price}
                     </p>
                     <p>
-                      <span className="font-semibold">Manufacturing: </span>
+                      <span className="font-semibold">Manufacturing: </span>{" "}
                       {formatDate(product.m_date)}
                     </p>
                     <p>
-                      <span className="font-semibold">Expiry: </span>
+                      <span className="font-semibold">Expiry: </span>{" "}
                       {formatDate(product.e_date)}
                     </p>
                     <p>
-                      <span className="font-semibold">Quantity: </span>
+                      <span className="font-semibold">Quantity: </span>{" "}
                       {product.quantity}
                     </p>
                     <p>
-                      <span className="font-semibold">Visibility: </span>
+                      <span className="font-semibold">Visibility: </span>{" "}
                       {product.visible}
                     </p>
                   </>
                 )}
+
                 <p>
-                  <span className="font-semibold">Total Stars: </span>
+                  <span className="font-semibold">Total Stars: </span>{" "}
                   {product.total_stars}
                 </p>
                 <p>
-                  <span className="font-semibold">Total Reviews: </span>
+                  <span className="font-semibold">Total Reviews: </span>{" "}
                   {product.total_reviews}
                 </p>
               </div>
@@ -306,8 +312,8 @@ function ProductDetails() {
         )}
       </div>
 
-      {/* Inventory Pencil Button */}
-      {isFromInventory && (
+      {/* Inventory Pencil Button → Only seller */}
+      {isFromInventory && userRole === "seller" && (
         <button
           onClick={() => setOpenEditModal(true)}
           className="fixed bottom-6 right-6 bg-green-600 hover:bg-green-700 text-white p-3 rounded-full shadow-lg transition"
@@ -321,13 +327,13 @@ function ProductDetails() {
       {userRole === "operations" && product && (
         <div className="fixed bottom-6 right-6 flex gap-3">
           <button
-            onClick={() => setOpenEditModal(true)}
+            onClick={() => setEditModal(true)}
             className="px-4 py-2 rounded-lg border border-green-600 text-green-600 hover:bg-green-600 hover:text-white transition font-medium"
           >
             Edit
           </button>
           <button
-            onClick={() => alert("Delete logic here")}
+            onClick={() => setDeleteModal(true)}
             className="px-4 py-2 rounded-lg border border-red-600 text-red-600 hover:bg-red-600 hover:text-white transition font-medium"
           >
             Delete
@@ -335,12 +341,31 @@ function ProductDetails() {
         </div>
       )}
 
-      {/* Update Product Modal */}
+      {/* Inventory Modal */}
       {openEditModal && (
         <EditModalComponent
           isOpen={openEditModal}
           onClose={() => setOpenEditModal(false)}
           data={product}
+          setReload={() => {}}
+        />
+      )}
+
+      {/* Operations Modals */}
+      {editModal && (
+        <EditMetaData
+          isOpen={editModal}
+          onClose={() => setEditModal(false)}
+          currentProduct={product}
+          setReload={() => {}}
+        />
+      )}
+
+      {deleteModal && (
+        <DeleteMetaData
+          isOpen={deleteModal}
+          onClose={() => setDeleteModal(false)}
+          deleteProduct={product?.id}
           setReload={() => {}}
         />
       )}
