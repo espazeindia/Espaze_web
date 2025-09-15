@@ -18,6 +18,7 @@ const OperationsOnboardingForm = () => {
 
   const [errors, setErrors] = useState({});
   const [showPasswordHint, setShowPasswordHint] = useState(false);
+  const [showPassword, setShowPassword] = useState(false); // Add this state
 
   const validatePassword = (password) => {
     const minLength = /.{8,}/;
@@ -76,6 +77,21 @@ const OperationsOnboardingForm = () => {
 
     if (name === "pan") {
       updatedValue = value.toUpperCase();
+    }
+
+    // Restrict name to letters and spaces only
+    if (name === "name") {
+      updatedValue = value.replace(/[^A-Za-z\s]/g, "");
+    }
+
+    // Restrict phone to numbers only
+    if (name === "phone") {
+      updatedValue = value.replace(/[^0-9]/g, "");
+    }
+
+    // Restrict pincode to numbers only (already handled in onInput, but keep for consistency)
+    if (name === "pincode") {
+      updatedValue = value.replace(/[^0-9]/g, "");
     }
 
     setFormData({ ...formData, [name]: updatedValue });
@@ -229,28 +245,35 @@ const OperationsOnboardingForm = () => {
             <div className="relative">
               <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
                 className={`px-3 py-2 rounded-lg border w-full focus:ring-2 focus:ring-purple-400 ${
                   errors.password ? "border-red-500" : "border-gray-300"
                 }`}
-                onFocus={() => setShowPasswordHint(true)}
-                onBlur={() => setShowPasswordHint(false)}
               />
-              {showPasswordHint && (
-                <div className="absolute top-full left-0 mt-1 w-full bg-white border border-gray-200 rounded-lg p-2 text-xs text-gray-700 shadow-lg z-10">
-                  <p className="font-semibold mb-1">Password must include:</p>
-                  <ul className="list-disc pl-4 space-y-0.5 text-gray-600">
-                    <li>At least 8 characters</li>
-                    <li>One uppercase letter</li>
-                    <li>One lowercase letter</li>
-                    <li>One number</li>
-                    <li>One special character (!@#$%^&*)</li>
-                  </ul>
-                </div>
-              )}
+              <button
+                type="button"
+                onClick={() => setShowPassword((prev) => !prev)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none"
+                tabIndex={-1}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? (
+                  // Eye open SVG
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                  </svg>
+                ) : (
+                  // Eye closed SVG
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.477 0-8.268-2.943-9.542-7a9.956 9.956 0 012.442-4.362M6.634 6.634A9.956 9.956 0 0112 5c4.477 0 8.268 2.943 9.542 7a9.956 9.956 0 01-4.132 5.255M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3l18 18" />
+                  </svg>
+                )}
+              </button>
             </div>
           </div>
 
@@ -287,6 +310,9 @@ const OperationsOnboardingForm = () => {
                 name="pincode"
                 value={formData.pincode}
                 onChange={handleChange}
+                onInput={e => {
+                  e.target.value = e.target.value.replace(/[^0-9]/g, "");
+                }}
                 maxLength={6}
                 placeholder="E.g. 110001"
                 className={`px-3 py-2 rounded-lg border w-full focus:ring-2 focus:ring-purple-400 ${
