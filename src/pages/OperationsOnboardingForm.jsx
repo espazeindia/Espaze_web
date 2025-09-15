@@ -79,10 +79,6 @@ const OperationsOnboardingForm = () => {
     }
 
     setFormData({ ...formData, [name]: updatedValue });
-
-    const errorMsg = validateField(name, updatedValue);
-    setErrors((prev) => ({ ...prev, [name]: errorMsg }));
-    if (errorMsg) notifyError(errorMsg);
   };
 
   const handleSubmit = async (e) => {
@@ -96,6 +92,10 @@ const OperationsOnboardingForm = () => {
     setErrors(newErrors);
 
     if (Object.keys(newErrors).length > 0) {
+      // Show notification for each error field
+      Object.entries(newErrors).forEach(([field, errorMsg]) => {
+        notifyError(`${field}: ${errorMsg}`);
+      });
       notifyError("Please fix the errors before submitting");
       return;
     }
