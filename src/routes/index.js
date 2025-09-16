@@ -6,11 +6,10 @@ import {
   ShoppingCart,
   Storefront,
   Warehouse,
-  PlaylistAddCheck,
-  Category,
-  AssignmentTurnedIn,
   Person,
+  Lock, // ✅ Added for Change Password icon
 } from "@mui/icons-material";
+
 const ProductOnboarding = lazy(() => import("../pages/ProductOnboarding"));
 const CategoriesPage = lazy(() => import("../pages/CategoriesPage"));
 const Dashboard = lazy(() => import("../pages/Dashboard"));
@@ -22,6 +21,7 @@ const ProductDetails = lazy(() => import("../pages/ProductDetails"));
 const UserProfile = lazy(() => import("../pages/UserProfile"));
 const WarehouseOnboarding = lazy(() => import("../pages/WarehouseOnboarding"));
 const OperationsOnboardingForm = lazy(() => import("../pages/OperationsOnboardingForm"));
+const ChangePassword = lazy(() => import("../pages/ChangePassword")); // ✅ New page
 
 const routes = [
   {
@@ -29,7 +29,6 @@ const routes = [
     component: Dashboard,
     access: ["seller"],
   },
-
   {
     path: "/inventory",
     component: Inventory,
@@ -38,7 +37,7 @@ const routes = [
   {
     path: "/products",
     component: Products,
-    access: [ "seller"],
+    access: ["seller"],
   },
   {
     path: "/customers",
@@ -60,7 +59,6 @@ const routes = [
     component: CategoriesPage,
     access: ["operations"],
   },
-  
   {
     path: "/product-details/:id",
     component: ProductDetails,
@@ -79,7 +77,12 @@ const routes = [
   {
     path: "/profile",
     component: UserProfile,
-    access: ["seller","admin","operations"],
+    access: ["seller", "admin", "operations"],
+  },
+  {
+    path: "/change-password",
+    component: ChangePassword,
+    access: ["operations" , "admin"], 
   },
 ];
 
@@ -137,6 +140,13 @@ const sidebarRoutes = [
     icon: Person,
     name: "Operations Onboarding Form",
     access: ["admin"],
+  },
+  // ✅ New sidebar menu entry for Change Password
+  {
+    path: "/change-password",
+    icon: Lock,
+    name: "ChangePassword",
+    access: ["operations", "admin"],
   },
 ];
 
