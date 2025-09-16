@@ -1,8 +1,11 @@
 import React, { useState } from "react";
 import { notifyError, notifySuccess } from "../utils/toast";
 import LoginServices from "../services/LoginServices";
+import { useUser } from "../contexts/UserContext"; 
 
 function ChangePassword() {
+    const { role } = useUser(); // ← fetch role from context
+
     const [formData, setFormData] = useState({
         oldPassword: "",
         newPassword: "",
@@ -23,6 +26,7 @@ function ChangePassword() {
 
         try {
             let res;
+
             if (role === "operations") {
                 res = await LoginServices.ChangeOperationalGuyPassword({
                     oldPassword: formData.oldPassword,
@@ -33,6 +37,9 @@ function ChangePassword() {
                     oldPassword: formData.oldPassword,
                     newPassword: formData.newPassword,
                 });
+            } else {
+                notifyError("User role not recognized");
+                return;
             }
 
             if (res?.success) {

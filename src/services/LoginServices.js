@@ -28,6 +28,11 @@ const LoginServices = {
   ChangeOperationalGuyPassword: (body) => {
     return requests.post("/login/operational_guy/change-password", body);
   },
+
+   // ✅ Add this function to change admin password
+  ChangeAdminPassword: (body) => {
+    return requests.post("/login/admin/change-password", body);
+  },
 };
 
 export default LoginServices;
