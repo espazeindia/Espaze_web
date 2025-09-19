@@ -188,24 +188,6 @@ function ProductDetails() {
                         >
                           {product.visible === "hidden" ? "Hidden" : "Visible"}
                         </Badge>
-                        <Switch
-                          checked={product.visible !== "hidden"}
-                          onChange={(e) =>
-                            setProduct((prev) => ({
-                              ...prev,
-                              visible: e.target.checked ? "visible" : "hidden",
-                            }))
-                          }
-                          sx={{
-                            "--Switch-trackRadius": "13px",
-                            "--Switch-trackWidth": "36px",
-                            "--Switch-trackHeight": "18px",
-                            "--Switch-thumbSize": "12px",
-                            "&.Mui-checked": {
-                              "--Switch-trackBackground": "#16a34a",
-                            },
-                          }}
-                        />
                       </div>
                     )}
                     {isFromInventory && (

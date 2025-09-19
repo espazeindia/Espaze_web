@@ -19,8 +19,8 @@ function UpdateInventory({ isOpen, onClose, data, setReload }) {
   const [visible, setVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    price: 0,
-    quantity: 0,
+    price: "0",
+    quantity: "0",
     manufacturingDate: "",
     expiryDate: "",
   });
@@ -28,61 +28,76 @@ function UpdateInventory({ isOpen, onClose, data, setReload }) {
   useEffect(() => {
     if (isOpen && data) {
       setFormData({
-        price: data.price,
-        quantity: data.quantity,
-        manufacturingDate: data.m_date.split(" ")[0],
-        expiryDate: data.e_date.split(" ")[0],
+        price: data.price !== undefined ? String(data.price) : "0",
+        quantity: data.quantity !== undefined ? String(data.quantity) : "0",
+        manufacturingDate: data.manufacturingDate ?? "",
+        expiryDate: data.expiryDate ?? "",
       });
-      setVisible(data.visible);
+      setVisible(data.visible === "visible");
     }
   }, [isOpen, data]);
 
+  // Remove spinner arrows from number inputs using CSS
   useEffect(() => {
-    console.log(formData);
-  }, [formData]);
+    const style = document.createElement("style");
+    style.innerHTML = `
+      input[type=number]::-webkit-inner-spin-button, 
+      input[type=number]::-webkit-outer-spin-button { 
+        -webkit-appearance: none; 
+        margin: 0; 
+      }
+      input[type=number] { -moz-appearance: textfield; }
+    `;
+    document.head.appendChild(style);
+    return () => {
+      document.head.removeChild(style);
+    };
+  }, []);
 
+  // Handle input change
   const handleChange = (e) => {
     const { name, value } = e.target;
-
-    // Ensure price cannot be negative
-    const updatedValue = name === "price" || "quantity" ? Math.max(0, value) : value;
-
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: updatedValue,
-    }));
+    if (name === "price" || name === "quantity") {
+      // Only allow numbers, remove leading zeros except for "0"
+      let val = value.replace(/[^0-9]/g, "");
+      if (val.length > 1) val = val.replace(/^0+/, "");
+      if (val === "") val = "0";
+      setFormData((prev) => ({
+        ...prev,
+        [name]: val,
+      }));
+    } else if (name === "manufacturingDate" || name === "expiryDate") {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+    }
   };
 
+  // Handle submit
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
       const body = {
-        inventory_product_id: data.id,
-        product_visibility: visible,
-        product_price: formData.price,
-        product_manufacturing_date: formData.manufacturingDate,
-        product_expiry_date: formData.expiryDate,
-        product_quantity:formData.quantity
+        ...data,
+        price: parseInt(formData.price, 10),
+        quantity: parseInt(formData.quantity, 10),
+        manufacturingDate: formData.manufacturingDate, // YYYY-MM-DD
+        expiryDate: formData.expiryDate, // YYYY-MM-DD
+        visible: visible ? "visible" : "hidden",
       };
-      const res = await InventoryServices.UpdateInventory(body);
-      if (res.success === true) {
-        setReload((prevData) => !prevData);
-        notifySuccess(res.message);
-      }
+      await InventoryServices.UpdateInventory(body);
+      notifySuccess("Inventory updated successfully!");
+      setReload((prev) => !prev);
+      onClose();
     } catch (err) {
-      if (err === "cookie error") {
-        Cookies.remove("EspazeCookie");
-        router("/login");
-        notifyError("Cookie error, please relogin and try again");
-      } else {
-        notifyError(err?.response?.data?.message || err.message);
-      }
+      notifyError("Failed to update inventory.");
     }
-
     setLoading(false);
-    onClose();
   };
+
+  if (!isOpen) return null;
 
   return (
     <Modal open={isOpen} onClose={onClose}>
@@ -121,6 +136,7 @@ function UpdateInventory({ isOpen, onClose, data, setReload }) {
                   required
                   size="lg"
                   placeholder="Enter Product Price"
+                  inputMode="numeric"
                 />
               </FormControl>
 
@@ -143,6 +159,7 @@ function UpdateInventory({ isOpen, onClose, data, setReload }) {
                   required
                   size="lg"
                   placeholder="Enter Product Quantity"
+                  inputMode="numeric"
                 />
               </FormControl>
 
