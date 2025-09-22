@@ -186,13 +186,14 @@ function ProductOnboardingTable({
         loading={loading}
         textSize="base"
       />
-      <EditMetaData
+      <EditMetaData //Edited Meta data Modal 
         isOpen={editModal}
         onClose={() => {
           setEditModal(false);
         }}
         currentProduct={currentProduct}
         setReload={setReload}
+
       />
       <DeleteMetaData
         isOpen={deleteModal}
