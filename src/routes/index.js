@@ -22,6 +22,7 @@ const ProductDetails = lazy(() => import("../pages/ProductDetails"));
 const UserProfile = lazy(() => import("../pages/UserProfile"));
 const WarehouseOnboarding = lazy(() => import("../pages/WarehouseOnboarding"));
 const OperationsOnboardingForm = lazy(() => import("../pages/OperationsOnboardingForm"));
+const CategoriesAndSubcategories = lazy(() => import("../pages/CategoryAndSubcategory"));
 
 const routes = [
   {
@@ -60,7 +61,11 @@ const routes = [
     component: CategoriesPage,
     access: ["operations"],
   },
-  
+  {
+    path: "/categories-and-subcategories",
+    component: CategoriesAndSubcategories,
+    access: ["operations"],
+  },
   {
     path: "/product-details/:id",
     component: ProductDetails,
@@ -124,6 +129,12 @@ const sidebarRoutes = [
     path: "/categories",
     icon: ShoppingCart,
     name: "Category",
+    access: ["operations"],
+  },
+  {
+    path: "/categories-and-subcategories",
+    icon: Category,
+    name: "Categories & Subcategories",
     access: ["operations"],
   },
   {

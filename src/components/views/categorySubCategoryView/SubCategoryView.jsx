@@ -32,7 +32,7 @@ const SubcategoryModal = ({ category }) => {
     const getSubcategory = async () => {
       setLoading(true);
       try {
-        const res = await CategoryServices.FetchSubcategory(limit, page, debounce, category.id);
+        const res = await CategoryServices.FetchSubcategory(limit, page, debounce, category?.id);
         if (res.success === true) {
           const { sub_category, total, total_pages } = res.data;
           let transSubcategory = [];
@@ -63,7 +63,7 @@ const SubcategoryModal = ({ category }) => {
       }
       setLoading(false);
     };
-    if (category.id) {
+    if (category?.id) {
       getSubcategory();
     }
   }, [category, page, limit, debounce, reload]);
@@ -81,7 +81,7 @@ const SubcategoryModal = ({ category }) => {
         theme ? "bg-zinc-100 text-black" : "bg-neutral-950 text-white"
       }`}
     >
-      <h2 className="font-bold text-2xl mb-6">{category.name || "No Result for Sub-Category"}</h2>
+      <h2 className="font-bold text-2xl mb-6">{category?.name || "No Result for Sub-Category"}</h2> {/* Added optional chaining */}
 
       <div className="flex items-center gap-3 mb-6">
         <input
@@ -150,7 +150,7 @@ const SubcategoryModal = ({ category }) => {
               </div>
             ))
           ) : (
-            <div className=" w-full h-[50vh] flex justify-center items-center text-xl font-semibold">
+            <div className=" w-full h-[30vh] flex justify-center items-center text-xl font-semibold">
               No Sub-Categories Found, Try Adding One
             </div>
           )

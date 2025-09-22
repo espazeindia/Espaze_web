@@ -159,7 +159,7 @@ const CategoriesPage = ({ categories, setCategories, selectedCategory, setSelect
               </div>
             ))
           ) : (
-            <div className=" w-full h-[50vh] flex justify-center items-center text-xl font-semibold">
+            <div className=" w-full h-[30vh] flex justify-center items-center text-xl font-semibold">
               No Categories Found,Try Adding One
             </div>
           )

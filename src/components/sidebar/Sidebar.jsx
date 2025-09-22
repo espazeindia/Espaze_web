@@ -79,14 +79,16 @@ function Sidebar() {
         </div>
 
         <div className={`mt-5 space-y-1 flex justify-center flex-col  px-3`}>
-          {filteredRoutes.map((route, index) => (
-            <Link
-              key={index}
-              to={route.path}
-              className={`flex items-center text-base rounded-md px-2 
-                ${sidebarOpen ? "" : "justify-center"}
-               py-2   ${
-                 location.pathname.includes(route.path)
+          {filteredRoutes.map((route, index) => {
+            const isActive = location.pathname === route.path;
+            return (
+              <Link
+                key={index}
+                to={route.path}
+                className={`flex items-center text-base rounded-md px-2 
+                  ${sidebarOpen ? "" : "justify-center"}
+                 py-2   ${
+                   isActive
                    ? theme
                      ? "bg-violet-200 text-violet-800 font-medium"
                      : "bg-zinc-800 text-[#b490fc] font-medium"
@@ -94,17 +96,18 @@ function Sidebar() {
                    ? "text-zinc-600 hover:text-black font-medium"
                    : "text-zinc-400 hover:text-white font-medium"
                }`}
-            >
-              <route.icon className="text-lg" />
-              <span
-                className={`ml-3 transition-all duration-150 ${
-                  sidebarOpen ? " inline" : "hidden"
-                }`}
               >
-                {route.name}
-              </span>
-            </Link>
-          ))}
+                <route.icon className="text-lg" />
+                <span
+                  className={`ml-3 transition-all duration-150 ${
+                    sidebarOpen ? " inline" : "hidden"
+                  }`}
+                >
+                  {route.name}
+                </span>
+              </Link>
+            );
+          })}
         </div>
       </div>
 
