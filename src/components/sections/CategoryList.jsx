@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
-import { ArrowLeft, Search, X, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowLeft, Search, X } from "lucide-react";
 import CategoryServices from "../../services/CategoryServices";
 import { notifyError } from "../../utils/toast";
 import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
 import { useMode } from "../../contexts/themeModeContext";
+import BottomPagination from "../pagination/BottomPagination";
+import { handleChangeDebounce } from "../../utils/useDebounce";
 
 async function saveSelectionToBackend({ categoryIds = [], subcategoryNames = [] }) {
   if (CategoryServices?.SaveSellerSelection) {
@@ -50,17 +52,21 @@ const CategoryView = React.memo(({
   theme,
 }) => {
   const router = useNavigate();
-  const [catPage, setCatPage] = useState(0);
-  const catLimit = 4;
+  const [page, setPage] = useState(0);
+  const [limit, setLimit] = useState(10);
+  const [search, setSearch] = useState("");
+  const debounce = handleChangeDebounce(search);
+  const [totalDetails, setTotalDetails] = useState(0);
 
   useEffect(() => {
     const getCategories = async () => {
       try {
         setLoadingCats(true);
 
-        const res = await CategoryServices.FetchCategory(50, 0, "");
+        const res = await CategoryServices.FetchCategory(limit, page, debounce);
+        console.log("Categories fetched successfully", res.data);
         if (res?.success === true) {
-          const { category } = res.data || {};
+          const { category, total } = res.data || {};
           const transformedCategories = await Promise.all(
             (category || []).map(async (cat) => {
               const subRes = await CategoryServices.FetchSubcategory(50, 0, "", cat.id);
@@ -75,6 +81,7 @@ const CategoryView = React.memo(({
             })
           );
           setCategories(transformedCategories);
+          setTotalDetails(total);
         }
       } catch (err) {
         if (err === "cookie error") {
@@ -89,17 +96,13 @@ const CategoryView = React.memo(({
       }
     };
     getCategories();
-  }, [router, setCategories, setLoadingCats]);
+  }, [router, setCategories, setLoadingCats, limit, page, debounce]);
 
   const toggleCheckbox = useCallback((id) => {
     setCheckedCategories((prev) =>
       prev.includes(id) ? prev.filter((catId) => catId !== id) : [...prev, id]
     );
   }, [setCheckedCategories]);
-
-  const pagedCats = useMemo(() => {
-    return categories.slice(catPage * catLimit, catPage * catLimit + catLimit);
-  }, [categories, catPage, catLimit]);
 
   return (
     <div className={`w-full p-4 border-r flex flex-col ${theme ? "bg-white border-gray-200" : "bg-neutral-950 border-neutral-700"}`}>
@@ -126,6 +129,8 @@ const CategoryView = React.memo(({
         <input
           type="text"
           placeholder="Search categories..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
           className={`w-full pl-10 pr-4 py-2 border rounded-md focus:outline-none focus:ring-1 focus:ring-green-300 ${theme ? "border-gray-300 text-gray-600 placeholder-gray-400 bg-white" : "border-neutral-600 text-neutral-300 placeholder-neutral-500 bg-zinc-800"}`}
         />
       </div>
@@ -140,17 +145,15 @@ const CategoryView = React.memo(({
         </div>
 
         {/* Rows */}
-        {loadingCats ? (
-          <div className={`p-4 ${theme ? "text-gray-400" : "text-neutral-400"}`}>Loading categories...</div>
-        ) : pagedCats.length > 0 ? (
-          pagedCats.map((cat) => (
+        {categories.length > 0 ? (
+          categories.map((cat) => (
             <div
               key={cat.id}
               onClick={() => {
                 setSelectedCategory(cat);
               }}
-              className={`grid grid-cols-[1fr_8fr_1fr] items-center px-4 py-2 border-b cursor-pointer transition ${theme ? "border-gray-200" : "border-neutral-700"} ${
-                selectedCategory?.id === cat.id ? (theme ? "bg-violet-200" : "bg-[#7e50da] text-white") : (theme ? "hover:bg-gray-50" : "hover:bg-neutral-700 hover:text-white")
+              className={`grid grid-cols-[1fr_8fr_1fr] items-center px-4 py-2 border-b cursor-pointer transition ${theme ? "border-gray-100" : "border-neutral-800"} ${
+                selectedCategory?.id === cat.id ? (theme ? "bg-violet-200" : "bg-[#7e50da] text-white") : (theme ? "hover:bg-violet-100" : "hover:bg-neutral-700 hover:text-white")
               }`}
             >
               {/* Image */}
@@ -189,37 +192,14 @@ const CategoryView = React.memo(({
           <div className={`p-4 ${theme ? "text-gray-400" : "text-neutral-400"}`}>No categories found</div>
         )}
         {/* Pagination controls */}
-        {categories.length > 0 && (
-          <div className={`flex items-center justify-end gap-2 px-3 py-2 ${theme ? "bg-white" : "bg-zinc-800"}`}>
-            <button
-              className={`p-1 rounded disabled:opacity-50 ${theme ? "hover:bg-gray-100" : "hover:bg-neutral-700"}`}
-              onClick={() => setCatPage((p) => Math.max(0, p - 1))}
-              disabled={loadingCats || categories.length === 0 || catPage <= 0}
-              aria-label="Previous"
-            >
-              <ChevronLeft size={18} className={`${theme ? "text-black" : "text-white"}`} />
-            </button>
-            <div className={`text-sm ${theme ? "text-gray-600" : "text-neutral-300"}`}>
-              {catPage + 1} / {Math.max(1, Math.ceil(categories.length / catLimit))}
-            </div>
-            <button
-              className={`p-1 rounded disabled:opacity-50 ${theme ? "hover:bg-gray-100" : "hover:bg-neutral-700"}`}
-              onClick={() =>
-                setCatPage((p) =>
-                  Math.min(Math.max(0, Math.ceil(categories.length / catLimit) - 1), p + 1)
-                )
-              }
-              disabled={
-                loadingCats ||
-                categories.length === 0 ||
-                catPage >= Math.max(0, Math.ceil(categories.length / catLimit) - 1)
-              }
-              aria-label="Next"
-            >
-              <ChevronRight size={18} className={`${theme ? "text-black" : "text-white"}`} />
-            </button>
-          </div>
-        )}
+        <BottomPagination
+          page={page}
+          setPage={setPage}
+          limit={limit}
+          setLimit={setLimit}
+          totalDetails={totalDetails}
+          loading={loadingCats}
+        />
       </div>
     </div>
   );

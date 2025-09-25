@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
-import { Search, ChevronLeft, ChevronRight } from "lucide-react";
+import { Search } from "lucide-react";
 import CategoryServices from "../../services/CategoryServices";
-import { notifyError } from "../../utils/toast";
+import { notifyError, notifySuccess } from "../../utils/toast";
 import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
+import BottomPagination from "../pagination/BottomPagination";
+import { handleChangeDebounce } from "../../utils/useDebounce";
 
 const SubCategoryView = React.memo(({
   selectedCategory,
@@ -17,31 +19,24 @@ const SubCategoryView = React.memo(({
   const [loadingSubs, setLoadingSubs] = useState(false);
   const router = useNavigate();
   const [subSearch, setSubSearch] = useState("");
-  const [subPage, setSubPage] = useState(0);
-  const subLimit = 4;
-
-  const filteredSubs = useMemo(() => {
-    return subcategories.filter((sub) =>
-      sub.name.toLowerCase().includes(subSearch.toLowerCase())
-    );
-  }, [subcategories, subSearch]);
-
-  const totalSubPages = Math.max(1, Math.ceil(filteredSubs.length / subLimit));
-  const pagedSubs = useMemo(() => {
-    return filteredSubs.slice(subPage * subLimit, subPage * subLimit + subLimit);
-  }, [filteredSubs, subPage, subLimit]);
+  const [page, setPage] = useState(0);
+  const [limit, setLimit] = useState(10);
+  const debounce = handleChangeDebounce(subSearch);
+  const [totalDetails, setTotalDetails] = useState(0);
 
   useEffect(() => {
     const getSubcategories = async () => {
       if (!selectedCategory?.id) {
         setSubcategories([]);
+        setLoadingSubs(false);
         return;
       }
       try {
         setLoadingSubs(true);
-        const res = await CategoryServices.FetchSubcategory(50, 0, "", selectedCategory.id);
+        const res = await CategoryServices.FetchSubcategory(limit, page, debounce, selectedCategory.id);
+        console.log("Subcategories fetched successfully", res.data);
         if (res?.success === true) {
-          const { sub_category } = res.data || {};
+          const { sub_category, total } = res.data || {};
           const mapped = (sub_category || []).map((sub) => ({
             id: sub.id,
             name: sub.subcategory_name,
@@ -49,6 +44,7 @@ const SubCategoryView = React.memo(({
             categoryOfSub: sub.category_id,
           }));
           setSubcategories(mapped);
+          setTotalDetails(total);
         } else {
           setSubcategories([]);
         }
@@ -65,7 +61,7 @@ const SubCategoryView = React.memo(({
       }
     };
     getSubcategories();
-  }, [selectedCategory, router]);
+  }, [selectedCategory, router, limit, page, debounce]);
 
   const toggleSubcategoryCheckbox = useCallback((subName) => {
     setCheckedSubcategories((prev) =>
@@ -81,6 +77,7 @@ const SubCategoryView = React.memo(({
       return Array.from(newSelected);
     });
     setCheckedSubcategories([]);
+    notifySuccess("Subcategories added to selection");
   }, [onSelectionChange, checkedSubcategories]);
 
   const headerText = selectedCategory?.name ? selectedCategory.name : "Subcategories";
@@ -106,7 +103,7 @@ const SubCategoryView = React.memo(({
           value={subSearch}
           onChange={(e) => {
             setSubSearch(e.target.value);
-            setSubPage(0);
+            setPage(0);
           }}
         />
       </div>
@@ -117,18 +114,16 @@ const SubCategoryView = React.memo(({
           <div>Subcategory Name</div>
           <div></div>
         </div>
-        {loadingSubs ? (
-          <div className={`p-4 ${theme ? "text-gray-400" : "text-neutral-400"}`}>Loading subcategories...</div>
-        ) : pagedSubs.length > 0 ? (
+        {subcategories.length > 0 ? (
           <div>
-            {pagedSubs.map((sub) => {
+            {subcategories.map((sub) => {
               const isChecked = checkedSubcategories.includes(sub.name);
               const isAlreadyAdded = selectedSubcategoryNames.includes(sub.name);
               return (
                 <div
                   key={sub.id}
-                  className={`grid grid-cols-[1fr_8fr_1.5fr] items-center px-4 py-2 border-b ${theme ? "border-gray-200" : "border-neutral-700"} ${
-                    isAlreadyAdded ? (theme ? "bg-gray-100" : "bg-neutral-700") : (theme ? "hover:bg-gray-50" : "hover:bg-neutral-700 hover:text-white")
+                  className={`grid grid-cols-[1fr_8fr_1.5fr] items-center px-4 py-2 border-b ${theme ? "border-gray-100" : "border-neutral-800"} ${
+                    isAlreadyAdded ? (theme ? "bg-gray-100" : "bg-neutral-700") : (theme ? "hover:bg-violet-100" : "hover:bg-neutral-700 hover:text-white")
                   }`}
                 >
                   <div className={`w-8 h-8 rounded-sm flex items-center justify-center text-xs ${theme ? "bg-gray-200 text-gray-500" : "bg-neutral-700 text-neutral-400"}`}>
@@ -152,29 +147,14 @@ const SubCategoryView = React.memo(({
           <div className={`p-4 ${theme ? "text-gray-400" : "text-neutral-400"}`}>Select a category to view subcategories</div>
         )}
         {/* Pagination controls */}
-        {filteredSubs.length > 0 && (
-          <div className={`flex items-center justify-end gap-2 px-3 py-2 ${theme ? "bg-white" : "bg-zinc-800"}`}>
-            <button
-              className={`p-1 rounded disabled:opacity-50 ${theme ? "hover:bg-gray-100" : "hover:bg-neutral-700"}`}
-              onClick={() => setSubPage((p) => Math.max(0, p - 1))}
-              disabled={subPage <= 0}
-              aria-label="Previous"
-            >
-              <ChevronLeft size={18} className={`${theme ? "text-black" : "text-white"}`} />
-            </button>
-            <div className={`text-sm ${theme ? "text-gray-600" : "text-neutral-300"}`}>
-              {subPage + 1} / {totalSubPages}
-            </div>
-            <button
-              className={`p-1 rounded disabled:opacity-50 ${theme ? "hover:bg-gray-100" : "hover:bg-neutral-700"}`}
-              onClick={() => setSubPage((p) => Math.min(totalSubPages - 1, p + 1))}
-              disabled={subPage >= totalSubPages - 1}
-              aria-label="Next"
-            >
-              <ChevronRight size={18} className={`${theme ? "text-black" : "text-white"}`} />
-            </button>
-          </div>
-        )}
+        <BottomPagination
+          page={page}
+          setPage={setPage}
+          limit={limit}
+          setLimit={setLimit}
+          totalDetails={totalDetails}
+          loading={loadingSubs}
+        />
       </div>
     </div>
   );

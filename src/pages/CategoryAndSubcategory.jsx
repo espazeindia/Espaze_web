@@ -1,6 +1,6 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import CategoryServices from "../services/CategoryServices";
-import { notifyError } from "../utils/toast";
+import { notifyError, notifySuccess } from "../utils/toast";
 import Cookies from "js-cookie";
 import { useMode } from "../contexts/themeModeContext";
 import CategoryView from "../components/sections/CategoryList";
@@ -42,9 +42,15 @@ const CategoriesAndSubcategories = () => {
   const [categories, setCategories] = useState([]);
   const [checkedCategories, setCheckedCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
-  const [loadingCats, setLoadingCats] = useState(false);
+  const [loadingCats, setLoadingCats] = useState(true);
   const [saving, setSaving] = useState(false);
   const [selectedSubcategoryNames, setSelectedSubcategoryNames] = useState([]);
+
+  useEffect(() => {
+    if (categories.length > 0 && !selectedCategory) {
+      setSelectedCategory(categories[0]);
+    }
+  }, [categories, selectedCategory]);
 
   const handleAdd = useCallback(async () => {
     if (checkedCategories.length === 0) return;
@@ -73,6 +79,7 @@ const CategoriesAndSubcategories = () => {
       });
   
       setCheckedCategories([]);
+      notifySuccess("Subcategories added to selection");
     } finally {
       setSaving(false); // Reset saving state
     }
@@ -116,9 +123,9 @@ const CategoriesAndSubcategories = () => {
   }, []);
 
   return (
-    <div className={`flex flex-col h-full overflow-hidden ${theme ? "bg-zinc-100 text-black" : "bg-neutral-950 text-white"}`}>
+    <div className={`flex flex-col h-full overflow-hidden ${theme ? "bg-white text-black" : "bg-neutral-950 text-white"}`}>
       <div className="flex">
-        <div className="w-1/2 border-r border-gray-200">
+        <div className="w-1/2 border-r border-gray-100">
           <CategoryView
             categories={categories}
             setCategories={setCategories}
@@ -144,7 +151,7 @@ const CategoriesAndSubcategories = () => {
         </div>
       </div>
 
-      <div className="border-t border-gray-200 mt-4"></div>
+      <div className="border-t border-gray-100 mt-4"></div>
       <SelectedSubcategoriesDisplay
         selectedSubcategoryNames={selectedSubcategoryNames}
         handleRemoveSubcategory={handleRemoveSubcategory}
