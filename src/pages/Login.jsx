@@ -106,16 +106,17 @@ function Login() {
             {!isAdmin && (
               <div className="mb-6">
                 <div className="grid grid-cols-2 gap-3">
-                  <button
-                    onClick={() => setUser("seller")}
-                    className={`relative p-4 rounded-xl border-2 transition-all duration-300 transform hover:scale-105 ${
-                      user === "seller"
-                        ? "border-violet-700 bg-gradient-to-br from-violet-100 to-purple-100 shadow-lg"
-                        : theme
-                        ? "border-gray-200 bg-white hover:border-violet-300 hover:shadow-md"
-                        : "border-gray-600 bg-gray-800 hover:border-violet-400 hover:shadow-md"
-                    }`}
-                  >
+               <button
+                onClick={() => setUser("seller")}
+  className={`relative p-4 rounded-xl border-2 transition-all duration-300 cursor-pointer ${
+    user === "seller"
+      ? "border-violet-700 bg-gradient-to-br from-violet-100 to-purple-100 shadow-lg"
+      : theme
+      ? "border-gray-200 bg-white"
+      : "border-gray-600 bg-gray-800"
+  }`}
+>
+
                     <div className="text-center space-y-2">
                       <div
                         className={`w-10 h-10 mx-auto rounded-full flex items-center justify-center ${
@@ -147,16 +148,17 @@ function Login() {
                     )}
                   </button>
 
-                  <button
-                    onClick={() => setUser("operations")}
-                    className={`relative p-4 rounded-xl border-2 transition-all duration-300 transform hover:scale-105 ${
-                      user === "operations"
-                        ? "border-violet-700 bg-gradient-to-br from-violet-100 to-purple-100 shadow-lg"
-                        : theme
-                        ? "border-gray-200 bg-white hover:border-violet-300 hover:shadow-md"
-                        : "border-gray-600 bg-gray-800 hover:border-violet-400 hover:shadow-md"
-                    }`}
-                  >
+                <button
+  onClick={() => setUser("operations")}
+  className={`relative p-4 rounded-xl border-2 transition-all duration-300 cursor-pointer ${
+    user === "operations"
+      ? "border-violet-700 bg-gradient-to-br from-violet-100 to-purple-100 shadow-lg"
+      : theme
+      ? "border-gray-200 bg-white"
+      : "border-gray-600 bg-gray-800"
+  }`}
+>
+
                     <div className="text-center space-y-2">
                       <div
                         className={`w-10 h-10 mx-auto rounded-full flex items-center justify-center ${

@@ -9,7 +9,7 @@ import { Phone, Lock, Key, Refresh } from "@mui/icons-material";
 import { useUser } from "../../contexts/userContext";
 
 function Seller({ onAdminLogin }) {
-  const {setReload}=useUser()
+  const { setReload } = useUser();
   const { theme } = useMode();
   const navigate = useNavigate();
   const [loginVia, setLoginVia] = useState("pin");
@@ -19,14 +19,17 @@ function Seller({ onAdminLogin }) {
   const [showOtpError, setShowOtpError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isOtpLoading, setIsOtpLoading] = useState(false);
+  const [phoneError, setPhoneError] = useState(false); // ✅ new state
 
   const handleGetOtp = async (e) => {
     e.preventDefault();
     if (!phone || phone.length < 10) {
       notifyError("Please enter a valid phone number");
+      setPhoneError(true);
       return;
     }
 
+    setPhoneError(false);
     setIsOtpLoading(true);
     try {
       const res = await LoginServices.GetOtp({ phonenumber: phone });
@@ -44,11 +47,9 @@ function Seller({ onAdminLogin }) {
 
   const handleOtpChange = (index, value) => {
     if (!/^[0-9]?$/.test(value)) return;
-
     const newOtp = [...otp];
     newOtp[index] = value;
     setOtp(newOtp);
-
     if (value && index < 5) {
       otpRefs[index + 1].current.focus();
     }
@@ -66,11 +67,9 @@ function Seller({ onAdminLogin }) {
 
   const handlePinChange = (index, value) => {
     if (!/^[0-9]?$/.test(value)) return;
-
     const newPin = [...pin];
     newPin[index] = value;
     setPin(newPin);
-
     if (value && index < 5) {
       pinRefs[index + 1].current.focus();
     }
@@ -92,6 +91,13 @@ function Seller({ onAdminLogin }) {
 
   const handleLoginByOtp = async (e) => {
     e.preventDefault();
+    if (phone.length < 10) {
+      setPhoneError(true);
+      notifyError("Please enter a valid phone number");
+      return;
+    }
+    setPhoneError(false);
+
     if (isOtpComplete) {
       setIsLoading(true);
       const enteredOtp = otp.join("");
@@ -103,8 +109,8 @@ function Seller({ onAdminLogin }) {
         if (res.success) {
           notifySuccess(res.message);
           Cookies.set("EspazeCookie", res.token);
-          setReload((prevData)=>!prevData)
-           navigate("/")
+          setReload((prevData) => !prevData);
+          navigate("/");
         }
       } catch (error) {
         notifyError(error?.response?.data?.message || error.message);
@@ -116,6 +122,13 @@ function Seller({ onAdminLogin }) {
 
   const handleLoginByPin = async (e) => {
     e.preventDefault();
+    if (phone.length < 10) {
+      setPhoneError(true);
+      notifyError("Please enter a valid phone number");
+      return;
+    }
+    setPhoneError(false);
+
     if (isPinComplete) {
       setIsLoading(true);
       const enteredPin = pin.join("");
@@ -127,8 +140,8 @@ function Seller({ onAdminLogin }) {
         if (res.success) {
           notifySuccess(res.message);
           Cookies.set("EspazeCookie", res.token);
-          setReload((prevData)=>!prevData)
-          navigate("/")
+          setReload((prevData) => !prevData);
+          navigate("/");
         }
       } catch (err) {
         notifyError(err?.response?.data?.message || err.message);
@@ -168,7 +181,7 @@ function Seller({ onAdminLogin }) {
           }`}
         >
           <button
-            className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2 ${
+            className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer ${
               loginVia === "pin"
                 ? theme
                   ? "bg-white text-violet-600 shadow-sm"
@@ -187,7 +200,7 @@ function Seller({ onAdminLogin }) {
           </button>
 
           <button
-            className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2 ${
+            className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer ${
               loginVia === "otp"
                 ? theme
                   ? "bg-white text-violet-600 shadow-sm"
@@ -229,11 +242,16 @@ function Seller({ onAdminLogin }) {
             <Input
               name="phone"
               value={phone}
-              onChange={(e) => setPhone(e.target.value)}
+              onChange={(e) => {
+                const value = e.target.value.replace(/\D/g, "").slice(0, 10);
+                setPhone(value);
+              }}
               required
               fullWidth
               size="lg"
               placeholder="Enter your phone number"
+              inputMode="numeric"
+              maxLength={10}
               className={`transition-all duration-300 ${
                 theme
                   ? "bg-white border-gray-200 focus:border-violet-500 focus:ring-violet-500/20"
@@ -244,9 +262,9 @@ function Seller({ onAdminLogin }) {
               <button
                 type="button"
                 onClick={handleGetOtp}
-                disabled={isOtpLoading || !phone || phone.length < 10}
-                className={`px-3 py-2 rounded-lg font-semibold text-sm transition-all duration-300 flex items-center gap-2 ${
-                  isOtpLoading || !phone || phone.length < 10
+                disabled={isOtpLoading || phone.length < 10}
+                className={`px-3 py-2 rounded-lg font-semibold text-sm transition-all duration-300 flex items-center gap-2 cursor-pointer ${
+                  isOtpLoading || phone.length < 10
                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                     : "bg-gradient-to-r from-violet-500 to-purple-600 text-white hover:from-violet-600 hover:to-purple-700 shadow-lg hover:shadow-xl transform hover:scale-105"
                 }`}
@@ -260,6 +278,13 @@ function Seller({ onAdminLogin }) {
               </button>
             )}
           </div>
+
+          {/* Show error only when login/OTP attempted */}
+          {phoneError && phone.length < 10 && (
+            <p className="text-red-500 text-sm mt-1">
+              Please enter a valid 10-digit phone number
+            </p>
+          )}
         </div>
 
         {/* PIN/OTP input */}
@@ -294,6 +319,7 @@ function Seller({ onAdminLogin }) {
                     ? handlePinKeyDown(e, index)
                     : handleOtpKeyDown(e, index)
                 }
+                disabled={phone.length < 10}
                 className={`w-11 h-11 text-center border-2 rounded-lg text-lg font-semibold transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
                   theme
                     ? "bg-white border-gray-200 focus:border-violet-500 focus:ring-violet-500/20 text-gray-900"
@@ -302,7 +328,7 @@ function Seller({ onAdminLogin }) {
                   digit
                     ? "border-violet-500 bg-violet-50 dark:bg-violet-900/20"
                     : ""
-                }`}
+                } ${phone.length < 10 ? "opacity-50 cursor-not-allowed" : ""}`}
                 inputMode="numeric"
                 type={loginVia === "pin" ? "password" : "text"}
               />
@@ -323,7 +349,7 @@ function Seller({ onAdminLogin }) {
             disabled={
               loginVia === "pin" ? !isPinComplete : !isOtpComplete || isLoading
             }
-            className={`w-full py-2.5 rounded-xl font-semibold text-white text-lg transition-all duration-300 transform ${
+            className={`w-full py-2.5 rounded-xl font-semibold text-white text-lg transition-all duration-300 transform cursor-pointer ${
               (loginVia === "pin" ? isPinComplete : isOtpComplete) && !isLoading
                 ? "bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 shadow-lg hover:shadow-xl transform hover:scale-105"
                 : "bg-gray-300 text-gray-500 cursor-not-allowed"
@@ -343,18 +369,27 @@ function Seller({ onAdminLogin }) {
           <div className="flex justify-between items-center">
             <button
               type="button"
-              className={`text-sm font-medium transition-colors hover:underline ${
+              onClick={loginVia === "otp" ? handleGetOtp : undefined}
+              disabled={loginVia === "otp" && (isOtpLoading || phone.length < 10)}
+              className={`text-sm font-medium transition-colors hover:underline cursor-pointer ${
                 theme
                   ? "text-violet-600 hover:text-violet-700"
                   : "text-violet-400 hover:text-violet-300"
+              } ${
+                loginVia === "otp" && (isOtpLoading || phone.length < 10)
+                  ? "opacity-50 cursor-not-allowed"
+                  : ""
               }`}
             >
               {loginVia === "pin" ? "Forgot PIN?" : "Resend OTP"}
             </button>
+
             <button
               type="button"
-              className={`text-sm font-medium transition-colors hover:underline ${
-                theme ? "text-violet-600 hover:text-violet-700" : "text-violet-400 hover:text-violet-300"
+              className={`text-sm font-medium transition-colors hover:underline cursor-pointer ${
+                theme
+                  ? "text-violet-600 hover:text-violet-700"
+                  : "text-violet-400 hover:text-violet-300"
               }`}
               onClick={onAdminLogin}
             >
