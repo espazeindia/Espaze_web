@@ -38,8 +38,14 @@ function Operations({ showSeller, onAdminLogin }) {
       });
       if (res.success) {
         notifySuccess(res.message);
+
+        // Save token
         Cookies.set("EspazeCookie", res.token);
-        setReload((prevData)=>!prevData)
+
+        // ✅ Save role so ProductDetails can check it
+        Cookies.set("userRole", "operations");
+
+        setReload((prevData) => !prevData);
          navigate("/")
       }
     } catch (err) {

@@ -29,6 +29,7 @@ function DeleteProductModal({ isOpen, onClose, deleteProduct, setOnboardingData,
   };
 
   const { theme } = useMode();
+  if (!isOpen) return null;
   return (
     <Modal open={isOpen} onClose={onClose}>
       <ModalDialog

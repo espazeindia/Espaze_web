@@ -137,6 +137,7 @@ function EditMetaData({ isOpen, onClose, currentProduct, setReload }) {
     onClose();
   };
 
+  if (!isOpen) return null;
   return (
     <Modal open={isOpen} onClose={onClose}>
       <ModalDialog

@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa";
 import { Image as ImageIcon, Star, Pencil } from "lucide-react";
-import { Switch } from "@mui/joy";
 import { notifyError } from "../utils/toast";
 import { useMode } from "../contexts/themeModeContext";
 import MetaDataServices from "../services/MetaDataServices";
@@ -14,7 +13,7 @@ import EditModalComponent from "../components/modal/UpdateInventory";
 import EditMetaData from "../components/modal/EditMetaData";
 import DeleteMetaData from "../components/modal/DeleteMetaData";
 
-function ProductDetails() {
+function ProductDetails(props) {
   const { id } = useParams();
   const navigate = useNavigate();
   const { theme } = useMode();
@@ -128,6 +127,19 @@ function ProductDetails() {
     </div>
   ));
 
+  const [currentProduct, setCurrentProduct] = useState({});
+  const [deleteProduct, setDeleteProduct] = useState(-1);
+
+  const handleEdit = () => {
+    setCurrentProduct(product);
+    setEditModal(true);
+  };
+
+  const handleDelete = () => {
+    setDeleteProduct(product.id);
+    setDeleteModal(true);
+  };
+
   return (
     <div className={`p-5 min-h-full flex flex-col ${containerBG}`}>
       {/* Header */}
@@ -176,36 +188,58 @@ function ProductDetails() {
                       <p className="text-lg font-semibold mt-1">Price: ₹{product.price}</p>
                     )}
                   </div>
-                  <div className="flex flex-wrap gap-2 items-center">
-                    {isFromInventory && (
-                      <div className="flex items-center gap-2">
+                  <div className="flex flex-col items-end gap-2">
+                    <div className="flex flex-wrap gap-2 items-center">
+                      {isFromInventory && (
+                        <div className="flex items-center gap-2">
+                          <Badge
+                            className={
+                              product.visible === "hidden"
+                                ? "bg-red-100 text-red-700 border-red-200"
+                                : "bg-green-100 text-green-700 border-green-200"
+                            }
+                          >
+                            {product.visible === "hidden" ? "Hidden" : "Visible"}
+                          </Badge>
+                        </div>
+                      )}
+                      {isFromInventory && (
                         <Badge
                           className={
-                            product.visible === "hidden"
-                              ? "bg-red-100 text-red-700 border-red-200"
+                            product.quantity === 0
+                              ? "bg-pink-100 text-pink-700 border-pink-200"
                               : "bg-green-100 text-green-700 border-green-200"
                           }
                         >
-                          {product.visible === "hidden" ? "Hidden" : "Visible"}
+                          {product.quantity === 0 ? "Out of Stock" : "In Stock"}
                         </Badge>
-                      </div>
-                    )}
-                    {isFromInventory && (
-                      <Badge
-                        className={
-                          product.quantity === 0
-                            ? "bg-pink-100 text-pink-700 border-pink-200"
-                            : "bg-green-100 text-green-700 border-green-200"
-                        }
-                      >
-                        {product.quantity === 0 ? "Out of Stock" : "In Stock"}
-                      </Badge>
-                    )}
-                    {product.hsn_code && (
-                      <Badge className="bg-indigo-100 text-indigo-700 border-indigo-200">
-                        HSN: {product.hsn_code}
-                      </Badge>
-                    )}
+                      )}
+                      {product.hsn_code && (
+                        <div className="flex flex-col items-end">
+                          <Badge className="bg-indigo-100 text-indigo-700 border-indigo-200">
+                            HSN: {product.hsn_code}
+                          </Badge>
+
+                          {/* ✅ Operations Edit/Delete Buttons under HSN */}
+                          {userRole === "operations" && (
+                            <div className="flex gap-2 mt-2">
+                              <button
+                                onClick={handleEdit}
+                                className="px-4 py-1 text-xs font-semibold bg-green-100 text-green-700 rounded-full hover:bg-green-200 transition"
+                              >
+                                Edit
+                              </button>
+                              <button
+                                onClick={handleDelete}
+                                className="px-4 py-1 text-xs font-semibold bg-red-100 text-red-700 rounded-full hover:bg-red-200 transition"
+                              >
+                                Delete
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
 
@@ -239,7 +273,6 @@ function ProductDetails() {
             <div className={`rounded-xl border ${borderClr} p-5`}>
               <h3 className="font-bold mb-4 text-xl">More Details</h3>
               <div className={`grid md:grid-cols-2 gap-6 text-sm ${subText}`}>
-                {/* Product ID removed for both roles */}
                 <p>
                   <span className="font-semibold">HSN Code: </span>{" "}
                   {product.hsn_code || "N/A"}
@@ -305,24 +338,6 @@ function ProductDetails() {
         </button>
       )}
 
-      {/* Operations Edit + Delete Buttons */}
-      {userRole === "operations" && product && (
-        <div className="fixed bottom-6 right-6 flex gap-3">
-          <button
-            onClick={() => setEditModal(true)}
-            className="px-4 py-2 rounded-lg border border-green-600 text-green-600 hover:bg-green-600 hover:text-white transition font-medium"
-          >
-            Edit
-          </button>
-          <button
-            onClick={() => setDeleteModal(true)}
-            className="px-4 py-2 rounded-lg border border-red-600 text-red-600 hover:bg-red-600 hover:text-white transition font-medium"
-          >
-            Delete
-          </button>
-        </div>
-      )}
-
       {/* Inventory Modal */}
       {openEditModal && (
         <EditModalComponent
@@ -338,19 +353,18 @@ function ProductDetails() {
         <EditMetaData
           isOpen={editModal}
           onClose={() => setEditModal(false)}
-          currentProduct={product}
+          currentProduct={currentProduct}
           setReload={() => {}}
         />
       )}
 
-      {deleteModal && (
-        <DeleteMetaData
-          isOpen={deleteModal}
-          onClose={() => setDeleteModal(false)}
-          deleteProduct={product?.id}
-          setReload={() => {}}
-        />
-      )}
+      <DeleteMetaData
+        isOpen={deleteModal}
+        onClose={() => setDeleteModal(false)}
+        deleteProduct={product?.id}
+        setOnboardingData={() => {}}
+        setReload={() => {}}
+      />
     </div>
   );
 }
