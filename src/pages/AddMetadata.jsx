@@ -6,7 +6,7 @@ import { notifyError } from "../utils/toast";
 import { useNavigate } from "react-router-dom";
 import MetaDataServices from "../services/MetaDataServices";
 
-function ProductOnboarding() {
+function AddMetadata() {
   const router = useNavigate();
   const { theme } = useMode();
 
@@ -145,4 +145,4 @@ function ProductOnboarding() {
   );
 }
 
-export default ProductOnboarding;
+export default AddMetaData;

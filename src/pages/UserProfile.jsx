@@ -61,7 +61,6 @@ const UserProfile = () => {
         notifyError(error?.message || "Failed to fetch seller details");
       }
     };
-    console.log(isOnboarded)
     if(!loading && isOnboarded){
       fetchSellerDetails();
     }

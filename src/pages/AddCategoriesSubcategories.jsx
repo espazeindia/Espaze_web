@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import CategoryView from "../components/views/categorySubCategoryView/CategoryView";
 import SubCategoryView from "../components/views/categorySubCategoryView/SubCategoryView";
 
-function CategoriesPage() {
+function AddCategoriesSubcategories() {
   const [selectedCategory, setSelectedCategory] = useState("");
   const [categories, setCategories] = useState([]);
 
@@ -29,4 +29,4 @@ function CategoriesPage() {
   );
 }
 
-export default CategoriesPage;
+export default AddCategoriesSubcategories;

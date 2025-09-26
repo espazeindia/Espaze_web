@@ -7,37 +7,9 @@ import CategoryView from "../components/sections/CategoryList";
 import SubCategoryView from "../components/sections/SubCategoryList";
 import SelectedSubcategoriesDisplay from "../components/sections/SelectedSubCategory";
 
-async function saveSelectionToBackend({ categoryIds = [], subcategoryNames = [] }) {
-  if (CategoryServices?.SaveSellerSelection) {
-    return await CategoryServices.SaveSellerSelection({
-      categories: categoryIds,
-      subcategories: subcategoryNames,
-    });
-  }
-  if (CategoryServices?.SaveSelectedCategories) {
-    return await CategoryServices.SaveSelectedCategories({
-      categories: categoryIds,
-      subcategories: subcategoryNames,
-    });
-  }
 
-  const res = await fetch("/api/seller/selected-categories", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    credentials: "include",
-    body: JSON.stringify({
-      categories: categoryIds,
-      subcategories: subcategoryNames,
-    }),
-  });
-  if (!res.ok) {
-    const text = await res.text().catch(() => "");
-    throw new Error(text || "Failed to save selection");
-  }
-  return res.json().catch(() => ({}));
-}
 
-const CategoriesAndSubcategories = () => {
+const CategorySubcategoryAssortment = () => {
   const { theme } = useMode();
   const [categories, setCategories] = useState([]);
   const [checkedCategories, setCheckedCategories] = useState([]);
@@ -163,4 +135,4 @@ const CategoriesAndSubcategories = () => {
   );
 };
 
-export default CategoriesAndSubcategories;
+export default CategorySubcategoryAssortment;
