@@ -5,6 +5,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate, useLocat
 import { SidebarProvider } from "./contexts/sidebarContext";
 import { ModeProvider } from "./contexts/themeModeContext";
 import { useUser } from "./contexts/userContext";
+import ChangePassword from "./pages/ChangePassword";
 
 const Login = lazy(() => import("./pages/Login"));
 const ForgetPassword = lazy(() => import("./pages/ForgetPassword"));
@@ -33,6 +34,9 @@ function App() {
     } else if (isLoggedIn && role==="seller" && !isOnboarded ) {
       navigate("/profile", { replace: true });
     } 
+     else if (isLoggedIn && (role==="admin" || role==="operations") && !isOnboarded ) {
+      navigate("/change-password", { replace: true });
+    } 
   }, [isLoggedIn, isOnboarded, loading, location.pathname, navigate]);
 
   if (loading) {
@@ -50,6 +54,8 @@ function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/forgot-password" element={<ForgetPassword />} />
               {!isOnboarded && role==="seller" && <Route path="/profile" element={<Profile />} />}
+              {!isOnboarded && (role==="admin" || role==="operations") && <Route path="/change-password" element={<ChangePassword />} />}
+
               <Route path="/*" element={<Layout />} />
               <Route path="*" element={<Page404 />} />
             </Routes>

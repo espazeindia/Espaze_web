@@ -4,10 +4,14 @@ import LoginServices from "../services/LoginServices";
 import { useUser } from "../contexts/userContext";
 import { useMode } from "../contexts/themeModeContext";
 import { Eye, EyeOff } from "lucide-react";
+import { ArrowBack } from "@mui/icons-material";
+import Cookies from "js-cookie";
+import { useNavigate } from "react-router-dom";
 
 function ChangePassword() {
-  const { role } = useUser();
+  const { role, isOnboarded, setReload, setIsOnboarded } = useUser();
   const { theme } = useMode();
+  const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
     oldPassword: "",
@@ -20,6 +24,12 @@ function ChangePassword() {
     new: false,
     confirm: false,
   });
+
+  const handleLogout = () => {
+    Cookies.remove("EspazeCookie", { sameSite: "None", secure: true });
+    setReload((prevData) => !prevData);
+    navigate(false);
+  };
 
   const togglePassword = (field) => {
     setShowPassword((prev) => ({ ...prev, [field]: !prev[field] }));
@@ -38,28 +48,39 @@ function ChangePassword() {
     }
 
     try {
-      let res;
-
       if (role === "operations") {
-        res = await LoginServices.ChangeOperationalGuyPassword({
-          oldPassword: formData.oldPassword,
-          newPassword: formData.newPassword,
+        const res = await LoginServices.ChangeOperationalGuyPassword({
+          old_password: formData.oldPassword,
+          new_password: formData.newPassword,
         });
+        if (res.success) {
+          notifySuccess(res.message);
+          if (res.token) {
+            Cookies.set("EspazeCookie", res.token);
+            setIsOnboarded(true);
+          }
+          setFormData({ oldPassword: "", newPassword: "", confirmPassword: "" });
+        } else {
+          notifyError(res?.message || "Failed to change password");
+        }
       } else if (role === "admin") {
-        res = await LoginServices.ChangeAdminPassword({
-          oldPassword: formData.oldPassword,
-          newPassword: formData.newPassword,
+        const res = await LoginServices.ChangeAdminPassword({
+          old_password: formData.oldPassword,
+          new_password: formData.newPassword,
         });
+        if (res.success) {
+          notifySuccess(res.message);
+          if (res.token) {
+            Cookies.set("EspazeCookie", res.token);
+            setIsOnboarded(true);
+          }
+          setFormData({ oldPassword: "", newPassword: "", confirmPassword: "" });
+        } else {
+          notifyError(res?.message || "Failed to change password");
+        }
       } else {
         notifyError("User role not recognized");
         return;
-      }
-
-      if (res?.success) {
-        notifySuccess("Password changed successfully!");
-        setFormData({ oldPassword: "", newPassword: "", confirmPassword: "" });
-      } else {
-        notifyError(res?.message || "Failed to change password");
       }
     } catch (err) {
       notifyError(err?.response?.data?.message || err.message);
@@ -73,6 +94,11 @@ function ChangePassword() {
       }`}
       style={{ height: "93vh" }}
     >
+      {!isOnboarded && (
+        <button className=" cursor-pointer ml-20 mr-auto" onClick={handleLogout}>
+          <ArrowBack />
+        </button>
+      )}
       {/* Card */}
       <div
         className={`rounded-xl p-6 shadow-md border w-full max-w-md transition-colors duration-200 ${
@@ -191,9 +217,7 @@ function ChangePassword() {
           <button
             type="submit"
             className={`w-full p-2.5 text-white font-semibold rounded-md transition-all duration-200 ${
-              theme
-                ? "bg-purple-600 hover:bg-purple-700"
-                : "bg-purple-700 hover:bg-purple-800"
+              theme ? "bg-purple-600 hover:bg-purple-700" : "bg-purple-700 hover:bg-purple-800"
             }`}
           >
             Submit

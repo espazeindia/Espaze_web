@@ -145,4 +145,4 @@ function AddMetadata() {
   );
 }
 
-export default AddMetaData;
+export default AddMetadata;

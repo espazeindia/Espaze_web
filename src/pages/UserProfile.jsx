@@ -7,11 +7,11 @@ import OnboardingServices from "../services/OnboardingServices";
 import Cookies from "js-cookie";
 import { ArrowBack } from "@mui/icons-material";
 import { useUser } from "../contexts/userContext";
-import {  useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const UserProfile = () => {
-  const {setReload,isOnboarded, loading}=useUser()
-  const navigate=useNavigate()
+  const { setReload, isOnboarded, loading } = useUser();
+  const navigate = useNavigate();
   const [profileImage, setProfileImage] = useState(null);
   const [formData, setFormData] = useState({
     sellerName: "",
@@ -30,10 +30,10 @@ const UserProfile = () => {
   const fileInputRef = useRef();
 
   const handleLogout = () => {
-      Cookies.remove("EspazeCookie", { sameSite: "None", secure: true });
-      setReload((prevData)=>!prevData)
-      navigate(false)
-    };
+    Cookies.remove("EspazeCookie", { sameSite: "None", secure: true });
+    setReload((prevData) => !prevData);
+    navigate(false);
+  };
 
   useEffect(() => {
     const fetchSellerDetails = async () => {
@@ -61,7 +61,7 @@ const UserProfile = () => {
         notifyError(error?.message || "Failed to fetch seller details");
       }
     };
-    if(!loading && isOnboarded){
+    if (!loading && isOnboarded) {
       fetchSellerDetails();
     }
   }, [isOnboarded, loading]);
@@ -128,7 +128,15 @@ const UserProfile = () => {
     e.preventDefault();
     const { sellerName, panNumber, securityPin, blockNo, areaDistrict, state, pincode } = formData;
 
-    if (!sellerName || !panNumber || !securityPin || !blockNo || !areaDistrict || !state || !pincode) {
+    if (
+      !sellerName ||
+      !panNumber ||
+      !securityPin ||
+      !blockNo ||
+      !areaDistrict ||
+      !state ||
+      !pincode
+    ) {
       notifyError("Please complete all required fields before submitting.");
       return;
     }
@@ -176,11 +184,13 @@ const UserProfile = () => {
       }`}
       style={{ height: "93vh" }}
     >
-      {!isOnboarded && <button className=" cursor-pointer ml-20 mr-auto" onClick={handleLogout}><ArrowBack/></button>}
+      {!isOnboarded && (
+        <button className=" cursor-pointer ml-20 mr-auto" onClick={handleLogout}>
+          <ArrowBack />
+        </button>
+      )}
       {/* Header */}
       <div className="text-center mb-2">
-        
-
         <h1 className={`text-2xl font-bold mb-3 ${theme ? "text-gray-800" : "text-white"}`}>
           User Profile
         </h1>
