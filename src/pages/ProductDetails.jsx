@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa";
 import { Image as ImageIcon, Star, Pencil } from "lucide-react";
+import { Switch } from "@mui/joy";
 import { notifyError } from "../utils/toast";
 import { useMode } from "../contexts/themeModeContext";
 import MetaDataServices from "../services/MetaDataServices";
@@ -140,6 +141,11 @@ function ProductDetails(props) {
     setDeleteModal(true);
   };
 
+  // Simple, theme-aware skeleton helper classes
+  const skeletonBase = theme ? "bg-zinc-200/70" : "bg-zinc-700/60";
+  const skeletonPill = theme ? "bg-indigo-200/80" : "bg-indigo-700/30";
+  const skeletonAccent = theme ? "bg-green-200/80" : "bg-green-700/30";
+
   return (
     <div className={`p-5 min-h-full flex flex-col ${containerBG}`}>
       {/* Header */}
@@ -156,9 +162,98 @@ function ProductDetails(props) {
 
       {/* Content Card */}
       <div className={`rounded-2xl p-6 flex-1 ${cardBG} border ${borderClr} shadow-md`}>
-        {!product ? (
+        {loading ? (
+          // -------------------------
+          // SKELETON LOADER (while loading)
+          // -------------------------
+          <>
+            <div className="flex flex-col lg:flex-row gap-6">
+              {/* Image skeleton */}
+              <div className="lg:w-1/3 w-full">
+                <div
+                  className={`rounded-2xl border ${borderClr} p-3 ${theme ? "bg-zinc-50" : "bg-zinc-900"} h-60 flex items-center justify-center`}
+                >
+                  <div className="w-full h-full rounded-xl overflow-hidden">
+                    <div className={`w-full h-full ${skeletonBase} animate-pulse`} />
+                  </div>
+                </div>
+              </div>
+
+              {/* Info skeleton */}
+              <div className="lg:w-2/3 w-full">
+                <div className="flex items-start justify-between">
+                  <div className="w-full">
+                    <div className={`h-7 ${skeletonBase} w-3/4 rounded-md animate-pulse`} />
+                    {isFromInventory && (
+                      <div className={`mt-2 h-5 ${skeletonBase} w-1/4 rounded-md animate-pulse`} />
+                    )}
+                  </div>
+
+                  <div className="flex flex-col items-end gap-2">
+                    <div className="flex items-center gap-2">
+                      <div className={`${skeletonBase} w-20 h-6 rounded-full animate-pulse`} />
+                      <div className={`${skeletonBase} w-16 h-6 rounded-full animate-pulse`} />
+                    </div>
+
+                    {/* HSN pill skeleton + pill-buttons skeleton */}
+                    <div className="flex flex-col items-end mt-2">
+                      <div className={`${skeletonPill} w-28 h-8 rounded-full animate-pulse`} />
+                      <div className="flex gap-2 mt-2">
+                        <div className={`${skeletonAccent} w-20 h-8 rounded-full animate-pulse`} />
+                        <div className={`${"bg-red-200/80"} w-20 h-8 rounded-full animate-pulse`} />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Stars + reviews skeleton */}
+                <div className="flex items-center gap-2 mt-4">
+                  <div className="flex gap-1">
+                    {[...Array(5)].map((_, i) => (
+                      <div
+                        key={i}
+                        className={`${theme ? "bg-yellow-200/90" : "bg-yellow-700/30"} w-4 h-4 rounded-full animate-pulse`}
+                      />
+                    ))}
+                  </div>
+                  <div className={`ml-2 h-4 ${skeletonBase} w-12 rounded-md animate-pulse`} />
+                </div>
+
+                {/* category/subcategory pills skeleton */}
+                <div className="flex items-center gap-2 mt-3">
+                  <div className={`${skeletonBase} w-28 h-6 rounded-full animate-pulse`} />
+                  <div className={`${skeletonBase} w-28 h-6 rounded-full animate-pulse`} />
+                </div>
+
+                {/* description skeleton */}
+                <div className="mt-4 space-y-2">
+                  <div className={`${skeletonBase} h-4 w-full rounded animate-pulse`} />
+                  <div className={`${skeletonBase} h-4 w-5/6 rounded animate-pulse`} />
+                  <div className={`${skeletonBase} h-4 w-2/3 rounded animate-pulse`} />
+                </div>
+              </div>
+            </div>
+
+            <div className={`my-6 border-t ${borderClr}`} />
+
+            {/* More Details skeleton */}
+            <div className={`rounded-xl border ${borderClr} p-5`}>
+              <h3 className="font-bold mb-4 text-xl">
+                <div className={`${skeletonBase} h-6 w-40 rounded animate-pulse`} />
+              </h3>
+              <div className={`grid md:grid-cols-2 gap-6 text-sm ${subText}`}>
+                {[...Array(8)].map((_, idx) => (
+                  <div key={idx} className={`${skeletonBase} h-4 w-full rounded animate-pulse`} />
+                ))}
+              </div>
+            </div>
+          </>
+        ) : !product ? (
           <div className={`text-center py-16 ${muted}`}>No product found</div>
         ) : (
+          // -------------------------
+          // ACTUAL PRODUCT UI (when loaded)
+          // -------------------------
           <>
             <div className="flex flex-col lg:flex-row gap-6">
               {/* Image */}
@@ -362,8 +457,8 @@ function ProductDetails(props) {
         isOpen={deleteModal}
         onClose={() => setDeleteModal(false)}
         deleteProduct={product?.id}
-        setOnboardingData={() => {}}
-        setReload={() => {}}
+        setOnboardingData={() => {}} // Pass actual function if needed
+        setReload={() => {}} // Pass actual function if needed
       />
     </div>
   );
