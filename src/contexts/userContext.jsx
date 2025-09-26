@@ -20,7 +20,6 @@ export function UserProvider({ children }) {
       if (token) {
         const payload = await validate(token);
         if (payload) {
-          console.log(payload);
           setIsLoggedIn(true);
           setIsOnboarded(payload.isOnboarded);
           setUserName(payload.name);

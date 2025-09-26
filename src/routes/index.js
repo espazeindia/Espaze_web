@@ -11,6 +11,7 @@ import {
   AssignmentTurnedIn,
   Person,
 } from "@mui/icons-material";
+import { Lock } from "lucide-react";
 const ProductOnboarding = lazy(() => import("../pages/ProductOnboarding"));
 const CategoriesPage = lazy(() => import("../pages/CategoriesPage"));
 const Dashboard = lazy(() => import("../pages/Dashboard"));
@@ -22,6 +23,8 @@ const ProductDetails = lazy(() => import("../pages/ProductDetails"));
 const UserProfile = lazy(() => import("../pages/UserProfile"));
 const WarehouseOnboarding = lazy(() => import("../pages/WarehouseOnboarding"));
 const OperationsOnboardingForm = lazy(() => import("../pages/OperationsOnboardingForm"));
+const CategoriesAndSubcategories = lazy(() => import("../pages/CategoryAndSubcategory"));
+const ChangePassword = lazy(() => import("../pages/ChangePassword"));
 
 const routes = [
   {
@@ -81,6 +84,16 @@ const routes = [
     component: UserProfile,
     access: ["seller","admin","operations"],
   },
+   {
+    path: "/categories-and-subcategories",
+    component: CategoriesAndSubcategories,
+    access: ["seller"],
+  },
+   {
+    path: "/change-password",
+    component: ChangePassword,
+    access: ["operations" , "admin"], 
+  },
 ];
 
 const sidebarRoutes = [
@@ -137,6 +150,18 @@ const sidebarRoutes = [
     icon: Person,
     name: "Operations Onboarding Form",
     access: ["admin"],
+  },
+  {
+    path: "/categories-and-subcategories",
+    icon: Category,
+    name: "Categories & Subcategories",
+    access: ["seller"],
+  },
+   {
+    path: "/change-password",
+    icon: Lock,
+    name: "ChangePassword",
+    access: ["operations", "admin"],
   },
 ];
 
