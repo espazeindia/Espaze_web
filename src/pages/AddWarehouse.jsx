@@ -147,14 +147,6 @@ const AddWarehouse = () => {
     <div className="min-h-screen bg-gray-50 p-4 md:p-6">
       {/* Header row */}
       <div className="flex items-center gap-3 mb-4">
-        <button
-          onClick={() => navigate("/dashboard")}
-          className="inline-flex items-center hover:opacity-80 transition"
-          aria-label="Back to dashboard"
-          disabled={status !== "idle"}
-        >
-          <ArrowLeft size={24} className="text-gray-900" />
-        </button>
         <h1 className="text-xl md:text-2xl font-semibold text-gray-900">Add Warehouse</h1>
       </div>
 

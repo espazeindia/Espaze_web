@@ -50,9 +50,6 @@ function Sidebar() {
     return <div>Loading...</div>;
   }
 
-  //[#5f63e8]
-  //#8c52ff
-
   return (
     <div
       className={`${

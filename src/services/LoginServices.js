@@ -23,6 +23,13 @@ const LoginServices = {
   LoginAdmin: async (body) => {
     return requests.post("/login/admin/login", body);
   },
+  ChangeOperationalGuyPassword: (body) => {
+    return requests.put("/onboarding/operational_guy/onboarding", body);
+  },
+
+  ChangeAdminPassword: (body) => {
+    return requests.post("/onboarding/admin/onboarding", body);
+  },
 };
 
 export default LoginServices;

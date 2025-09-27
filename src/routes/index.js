@@ -11,8 +11,9 @@ import {
   AssignmentTurnedIn,
   Person,
 } from "@mui/icons-material";
-const ProductOnboarding = lazy(() => import("../pages/ProductOnboarding"));
-const CategoriesPage = lazy(() => import("../pages/CategoriesPage"));
+import { ListPlus, Lock, Plus } from "lucide-react";
+const AddMetadata = lazy(() => import("../pages/AddMetadata"));
+const AddCategoriesSubcategoriesPage = lazy(() => import("../pages/AddCategoriesSubcategories"));
 const Dashboard = lazy(() => import("../pages/Dashboard"));
 const Products = lazy(() => import("../pages/Products"));
 const Customers = lazy(() => import("../pages/Customers"));
@@ -20,9 +21,11 @@ const Orders = lazy(() => import("../pages/Orders"));
 const Inventory = lazy(() => import("../pages/Inventory"));
 const ProductDetails = lazy(() => import("../pages/ProductDetails"));
 const UserProfile = lazy(() => import("../pages/UserProfile"));
-const WarehouseOnboarding = lazy(() => import("../pages/WarehouseOnboarding"));
-const OperationsOnboardingForm = lazy(() => import("../pages/OperationsOnboardingForm"));
-const CategoriesAndSubcategories = lazy(() => import("../pages/CategoryAndSubcategory"));
+const WarehouseOnboarding = lazy(() => import("../pages/AddWarehouse"));
+const AddRacks = lazy(()=> import("../pages/AddRacks"))
+const OperationsOnboardingForm = lazy(() => import("../pages/RegisterOperations"));
+const CategoriesAndSubcategories = lazy(() => import("../pages/CategorySubcategoryAssortment"));
+const ChangePassword = lazy(() => import("../pages/ChangePassword"));
 
 const routes = [
   {
@@ -53,19 +56,15 @@ const routes = [
   },
   {
     path: "/product-onboarding",
-    component: ProductOnboarding,
+    component: AddMetadata,
     access: ["operations"],
   },
   {
     path: "/categories",
-    component: CategoriesPage,
+    component: AddCategoriesSubcategoriesPage,
     access: ["operations"],
   },
-  {
-    path: "/categories-and-subcategories",
-    component: CategoriesAndSubcategories,
-    access: ["operations"],
-  },
+  
   {
     path: "/product-details/:id",
     component: ProductDetails,
@@ -86,6 +85,21 @@ const routes = [
     component: UserProfile,
     access: ["seller","admin","operations"],
   },
+   {
+    path: "/categories-and-subcategories",
+    component: CategoriesAndSubcategories,
+    access: ["seller"],
+  },
+   {
+    path: "/change-password",
+    component: ChangePassword,
+    access: ["operations" , "admin"], 
+  },
+  {
+    path : "/AddRacks",
+    component : AddRacks,
+    access : ["admin"],
+  }
 ];
 
 const sidebarRoutes = [
@@ -121,33 +135,45 @@ const sidebarRoutes = [
   },
   {
     path: "/product-onboarding",
-    icon: ShoppingCart,
-    name: "Onboarding",
+    icon: ListPlus,
+    name: "Add Metadata",
     access: ["operations"],
   },
   {
     path: "/categories",
-    icon: ShoppingCart,
-    name: "Category",
-    access: ["operations"],
-  },
-  {
-    path: "/categories-and-subcategories",
-    icon: Category,
-    name: "Categories & Subcategories",
+    icon: Plus,
+    name: "Add Category",
     access: ["operations"],
   },
   {
     path: "/warehouse-onboarding",
     icon: Warehouse,
-    name: "Warehouse Information",
+    name: "Add Warehouse",
     access: ["admin"],
   },
   {
+    path : "/AddRacks",
+    icon : ListPlus,
+    name : "Add Racks",
+    access : ["admin"],
+  },
+  {
     path: "/operations-onboarding-form",
-    icon: Person,
-    name: "Operations Onboarding Form",
+    icon: Plus,
+    name: "Add Operational Guy",
     access: ["admin"],
+  },
+  {
+    path: "/categories-and-subcategories",
+    icon: Category,
+    name: "Category Assortment",
+    access: ["seller"],
+  },
+   {
+    path: "/change-password",
+    icon: Lock,
+    name: "ChangePassword",
+    access: ["operations", "admin"],
   },
 ];
 

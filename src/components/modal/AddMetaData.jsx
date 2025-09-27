@@ -120,6 +120,7 @@ function AddMetaData({ isOpen, onClose, setReload }) {
     setLoading(false);
     onClose();
   };
+  
   return (
     <Modal
       open={isOpen}

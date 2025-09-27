@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { notifySuccess, notifyError } from "../utils/toast";
 
-const OperationsOnboardingForm = () => {
+const RegisterOperations = () => {
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
@@ -310,4 +310,4 @@ const OperationsOnboardingForm = () => {
   );
 };
 
-export default OperationsOnboardingForm;
+export default RegisterOperations;
