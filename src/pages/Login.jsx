@@ -68,9 +68,7 @@ function Login() {
             {/* Logo and header */}
             <div className="text-center mb-4">
               <div className="flex justify-center mb-2">
-                <div
-                  className={`p-2 rounded-xl ${theme ? "bg-violet-100" : "bg-purple-900/50"}`}
-                >
+                <div className={`p-2 rounded-xl ${theme ? "bg-violet-100" : "bg-purple-900/50"}`}>
                   {theme ? (
                     <img src={Logo} className="w-10 h-10 object-contain" alt="Logo" />
                   ) : (
@@ -79,24 +77,14 @@ function Login() {
                 </div>
               </div>
 
-              <h1
-                className={`text-2xl font-bold mb-1 ${theme ? "text-gray-900" : "text-white"}`}
-              >
+              <h1 className={`text-2xl font-bold mb-1 ${theme ? "text-gray-900" : "text-white"}`}>
                 Welcome Back
               </h1>
 
-              {isAdmin && (
-                <p
-                  className={`text-xl font-bold text-black`}
-                >
-                  Login As Admin
-                </p>
-              )}
+              {isAdmin && <p className={`text-xl font-bold text-black`}>Login As Admin</p>}
 
               {!isAdmin && (
-                <p
-                  className={`text-xs ${theme ? "text-gray-600" : "text-gray-300"}`}
-                >
+                <p className={`text-xs ${theme ? "text-gray-600" : "text-gray-300"}`}>
                   Choose your account type to continue
                 </p>
               )}
@@ -106,17 +94,16 @@ function Login() {
             {!isAdmin && (
               <div className="mb-6">
                 <div className="grid grid-cols-2 gap-3">
-               <button
-                onClick={() => setUser("seller")}
-  className={`relative p-4 rounded-xl border-2 transition-all duration-300 cursor-pointer ${
-    user === "seller"
-      ? "border-violet-700 bg-gradient-to-br from-violet-100 to-purple-100 shadow-lg"
-      : theme
-      ? "border-gray-200 bg-white"
-      : "border-gray-600 bg-gray-800"
-  }`}
->
-
+                  <button
+                    onClick={() => setUser("seller")}
+                    className={`relative p-4 rounded-xl border-2 transition-all duration-300 cursor-pointer ${
+                      user === "seller"
+                        ? "border-violet-700 bg-gradient-to-br from-violet-100 to-purple-100 shadow-lg"
+                        : theme
+                        ? "border-gray-200 bg-white"
+                        : "border-gray-600 bg-gray-800"
+                    }`}
+                  >
                     <div className="text-center space-y-2">
                       <div
                         className={`w-10 h-10 mx-auto rounded-full flex items-center justify-center ${
@@ -148,17 +135,16 @@ function Login() {
                     )}
                   </button>
 
-                <button
-  onClick={() => setUser("operations")}
-  className={`relative p-4 rounded-xl border-2 transition-all duration-300 cursor-pointer ${
-    user === "operations"
-      ? "border-violet-700 bg-gradient-to-br from-violet-100 to-purple-100 shadow-lg"
-      : theme
-      ? "border-gray-200 bg-white"
-      : "border-gray-600 bg-gray-800"
-  }`}
->
-
+                  <button
+                    onClick={() => setUser("operations")}
+                    className={`relative p-4 rounded-xl border-2 transition-all duration-300 cursor-pointer ${
+                      user === "operations"
+                        ? "border-violet-700 bg-gradient-to-br from-violet-100 to-purple-100 shadow-lg"
+                        : theme
+                        ? "border-gray-200 bg-white"
+                        : "border-gray-600 bg-gray-800"
+                    }`}
+                  >
                     <div className="text-center space-y-2">
                       <div
                         className={`w-10 h-10 mx-auto rounded-full flex items-center justify-center ${

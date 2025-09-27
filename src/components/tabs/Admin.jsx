@@ -2,16 +2,24 @@ import React, { useState } from "react";
 import { FormControl, Input } from "@mui/joy";
 import Cookies from "js-cookie";
 import LoginServices from "../../services/LoginServices";
-import { DarkMode, LightMode, Email, Lock, Visibility, VisibilityOff, ArrowBack } from "@mui/icons-material";
+import {
+  DarkMode,
+  LightMode,
+  Email,
+  Lock,
+  Visibility,
+  VisibilityOff,
+  ArrowBack,
+} from "@mui/icons-material";
 import { useMode } from "../../contexts/themeModeContext";
 import { useNavigate } from "react-router-dom";
 import { Link, NavLink } from "react-router-dom";
 import { notifyError, notifySuccess } from "../../utils/toast";
-import {useUser} from "../../contexts/userContext"
+import { useUser } from "../../contexts/userContext";
 
 function Admin({ onBackToLogin }) {
   const navigate = useNavigate();
-  const {setReload}=useUser()
+  const { setReload } = useUser();
   const { theme, toggleTheme } = useMode();
   const [formData, setFormData] = useState({
     email: "",
@@ -29,7 +37,7 @@ function Admin({ onBackToLogin }) {
       notifyError("Invalid Email Format");
       return;
     }
- // to be reviewed 
+    // to be reviewed
     setIsLoading(true);
     try {
       const res = await LoginServices.LoginAdmin({
@@ -42,16 +50,14 @@ function Admin({ onBackToLogin }) {
         Cookies.set("EspazeCookie", res.token);
         setReload((prevData)=>!prevData)
          navigate("/")
-      } else {
-        notifyError(res?.message || "Login failed");
-      }
+      } 
     } catch (err) {
-      notifyError(err?.message || "An error occurred");
+      notifyError(err.response.data.message || err?.message);
     } finally {
       setIsLoading(false);
     }
   };
-// till here 
+  // till here
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
@@ -65,9 +71,11 @@ function Admin({ onBackToLogin }) {
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Email input */}
         <div className="space-y-1.5">
-          <label className={`text-sm font-semibold flex items-center gap-2 ${
-            theme ? "text-gray-700" : "text-gray-200"
-          }`}>
+          <label
+            className={`text-sm font-semibold flex items-center gap-2 ${
+              theme ? "text-gray-700" : "text-gray-200"
+            }`}
+          >
             <Email fontSize="small" />
             Email Address
           </label>
@@ -81,8 +89,8 @@ function Admin({ onBackToLogin }) {
             size="lg"
             placeholder="Enter your email address"
             className={`transition-all duration-300 ${
-              theme 
-                ? "bg-white border-gray-200 focus:border-violet-500 focus:ring-violet-500/20" 
+              theme
+                ? "bg-white border-gray-200 focus:border-violet-500 focus:ring-violet-500/20"
                 : "bg-gray-800 border-gray-600 focus:border-violet-400 focus:ring-violet-400/20"
             }`}
           />
@@ -90,17 +98,19 @@ function Admin({ onBackToLogin }) {
 
         {/* Password input */}
         <div className="space-y-1.5">
-          <label className={`text-sm font-semibold flex items-center gap-2 ${
-            theme ? "text-gray-700" : "text-gray-200"
-          }`}>
+          <label
+            className={`text-sm font-semibold flex items-center gap-2 ${
+              theme ? "text-gray-700" : "text-gray-200"
+            }`}
+          >
             <Lock fontSize="small" />
             Password
           </label>
           <div className="relative">
             <Input
               className={`transition-all duration-300 pr-12 ${
-                theme 
-                  ? "bg-white border-gray-200 focus:border-violet-500 focus:ring-violet-500/20" 
+                theme
+                  ? "bg-white border-gray-200 focus:border-violet-500 focus:ring-violet-500/20"
                   : "bg-gray-800 border-gray-600 focus:border-violet-400 focus:ring-violet-400/20"
               }`}
               type={showPassword ? "text" : "password"}
@@ -116,9 +126,7 @@ function Admin({ onBackToLogin }) {
               type="button"
               onClick={() => setShowPassword(!showPassword)}
               className={`absolute right-3 top-1/2 transform -translate-y-1/2 p-1 rounded-md transition-colors ${
-                theme 
-                  ? "text-gray-400 hover:text-gray-600" 
-                  : "text-gray-400 hover:text-gray-200"
+                theme ? "text-gray-400 hover:text-gray-600" : "text-gray-400 hover:text-gray-200"
               }`}
             >
               {showPassword ? <VisibilityOff fontSize="small" /> : <Visibility fontSize="small" />}
@@ -151,7 +159,9 @@ function Admin({ onBackToLogin }) {
           <div className="text-center">
             <Link
               className={`text-sm font-medium transition-colors hover:underline ${
-                theme ? "text-violet-600 hover:text-violet-700" : "text-violet-400 hover:text-violet-300"
+                theme
+                  ? "text-violet-600 hover:text-violet-700"
+                  : "text-violet-400 hover:text-violet-300"
               }`}
               to="/forgot-password"
             >

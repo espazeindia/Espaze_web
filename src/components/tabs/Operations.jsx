@@ -10,7 +10,7 @@ import { notifyError, notifySuccess } from "../../utils/toast";
 import { useUser } from "../../contexts/userContext";
 
 function Operations({ showSeller, onAdminLogin }) {
-  const {setReload}=useUser()
+  const { setReload } = useUser();
   const navigate = useNavigate();
   const { theme, toggleTheme } = useMode();
   const [formData, setFormData] = useState({
@@ -117,9 +117,7 @@ function Operations({ showSeller, onAdminLogin }) {
               type="button"
               onClick={() => setShowPassword(!showPassword)}
               className={`absolute right-3 top-1/2 transform -translate-y-1/2 p-1 rounded-md transition-colors ${
-                theme
-                  ? "text-gray-400 hover:text-gray-600"
-                  : "text-gray-400 hover:text-gray-200"
+                theme ? "text-gray-400 hover:text-gray-600" : "text-gray-400 hover:text-gray-200"
               }`}
             >
               {showPassword ? <VisibilityOff fontSize="small" /> : <Visibility fontSize="small" />}
@@ -152,7 +150,9 @@ function Operations({ showSeller, onAdminLogin }) {
           <div className="flex justify-between items-center">
             <Link
               className={`text-sm font-medium transition-colors hover:underline ${
-                theme ? "text-violet-600 hover:text-violet-700" : "text-violet-400 hover:text-violet-300"
+                theme
+                  ? "text-violet-600 hover:text-violet-700"
+                  : "text-violet-400 hover:text-violet-300"
               }`}
               to="/forgot-password"
             >
@@ -161,7 +161,9 @@ function Operations({ showSeller, onAdminLogin }) {
             <button
               type="button"
               className={`text-sm font-medium transition-colors hover:underline ${
-                theme ? "text-violet-600 hover:text-violet-700" : "text-violet-400 hover:text-violet-300"
+                theme
+                  ? "text-violet-600 hover:text-violet-700"
+                  : "text-violet-400 hover:text-violet-300"
               }`}
               onClick={onAdminLogin}
             >

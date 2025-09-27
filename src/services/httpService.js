@@ -29,9 +29,13 @@ const requests = {
       .then(responseBody)
       .catch((error) => {
         if (error.response?.status === 401) {
-          Cookies.remove("EspazeCookie");
-          window.location.href = "/login";
-          notifyError("User Session Expired Login Again")
+          // Don't redirect if it's a login attempt
+          const isLoginAttempt = url.includes('/login/');
+          if (!isLoginAttempt) {
+            Cookies.remove("EspazeCookie");
+            window.location.href = "/login";
+            notifyError("User Session Expired Login Again")
+          }
         }
         throw error;
       }),
@@ -42,9 +46,13 @@ const requests = {
       .then(responseBody)
       .catch((error) => {
         if (error.response?.status === 401) {
-          Cookies.remove("EspazeCookie");
-          window.location.href = "/login";
-          notifyError("User Session Expired Login Again")
+          // Don't redirect if it's a login attempt
+          const isLoginAttempt = url.includes('/login/');
+          if (!isLoginAttempt) {
+            Cookies.remove("EspazeCookie");
+            window.location.href = "/login";
+            notifyError("User Session Expired Login Again")
+          }
         }
         throw error;
       }),
@@ -55,9 +63,13 @@ const requests = {
       .then(responseBody)
       .catch((error) => {
         if (error.response?.status === 401) {
-          Cookies.remove("EspazeCookie");
-          window.location.href = "/login";
-          notifyError("User Session Expired Login Again")
+          // Don't redirect if it's a login attempt
+          const isLoginAttempt = url.includes('/login/');
+          if (!isLoginAttempt) {
+            Cookies.remove("EspazeCookie");
+            window.location.href = "/login";
+            notifyError("User Session Expired Login Again")
+          }
         }
         throw error;
       }),
@@ -68,9 +80,13 @@ const requests = {
       .then(responseBody)
       .catch((error) => {
         if (error.response?.status === 401) {
-          Cookies.remove("EspazeCookie");
-          window.location.href = "/login";
-          notifyError("User Session Expired Login Again")
+          // Don't redirect if it's a login attempt
+          const isLoginAttempt = url.includes('/login/');
+          if (!isLoginAttempt) {
+            Cookies.remove("EspazeCookie");
+            window.location.href = "/login";
+            notifyError("User Session Expired Login Again")
+          }
         }
         throw error;
       }),
@@ -81,9 +97,13 @@ const requests = {
       .then(responseBody)
       .catch((error) => {
         if (error.response?.status === 401) {
-          Cookies.remove("EspazeCookie");
-          window.location.href = "/login";
-          notifyError("User Session Expired Login Again")
+          // Don't redirect if it's a login attempt
+          const isLoginAttempt = url.includes('/login/');
+          if (!isLoginAttempt) {
+            Cookies.remove("EspazeCookie");
+            window.location.href = "/login";
+            notifyError("User Session Expired Login Again")
+          }
         }
         throw error;
       }),
