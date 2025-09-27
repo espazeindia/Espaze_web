@@ -22,6 +22,7 @@ const Inventory = lazy(() => import("../pages/Inventory"));
 const ProductDetails = lazy(() => import("../pages/ProductDetails"));
 const UserProfile = lazy(() => import("../pages/UserProfile"));
 const WarehouseOnboarding = lazy(() => import("../pages/AddWarehouse"));
+const AddRacks = lazy(()=> import("../pages/AddRacks"))
 const OperationsOnboardingForm = lazy(() => import("../pages/RegisterOperations"));
 const CategoriesAndSubcategories = lazy(() => import("../pages/CategorySubcategoryAssortment"));
 const ChangePassword = lazy(() => import("../pages/ChangePassword"));
@@ -94,6 +95,11 @@ const routes = [
     component: ChangePassword,
     access: ["operations" , "admin"], 
   },
+  {
+    path : "/AddRacks",
+    component : AddRacks,
+    access : ["admin"],
+  }
 ];
 
 const sidebarRoutes = [
@@ -144,6 +150,12 @@ const sidebarRoutes = [
     icon: Warehouse,
     name: "Add Warehouse",
     access: ["admin"],
+  },
+  {
+    path : "/AddRacks",
+    icon : ListPlus,
+    name : "Add Racks",
+    access : ["admin"],
   },
   {
     path: "/operations-onboarding-form",
