@@ -13,41 +13,33 @@ import { notifyError, notifySuccess } from "../../utils/toast";
 import CategoryServices from "../../services/CategoryServices";
 import { LoaderCircle } from "lucide-react";
 
-
 function AddSubcategoryModal({ isOpen, onClose, onAdd, category, setReload }) {
   const { theme } = useMode();
   const [subcategory, setSubcategory] = useState("");
-  const [loading,setLoading]=useState(false)
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async(e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true)
+    setLoading(true);
     try {
       const body = {
-        category_id : category.id,
-        subcategory_name : subcategory,
-        subcategory_image : "hello"
-      }
-      const res = await CategoryServices.CreateSubcategory(body)
-      if(res.success === true){
-        notifySuccess(res.message)
-        setReload((prevData)=>{
-          return !prevData
-        })
+        category_id: category.id,
+        subcategory_name: subcategory,
+        subcategory_image: "hello",
+      };
+      const res = await CategoryServices.CreateSubcategory(body);
+      if (res.success === true) {
+        notifySuccess(res.message);
+        setReload((prevData) => {
+          return !prevData;
+        });
       }
     } catch (err) {
-      if (err === "cookie error") {
-          Cookies.remove("EspazeCookie");
-          router("/login");
-          notifyError("Cookie error, please relogin and try again");
-        } else {
-          notifyError(err?.response?.data?.message || err.message);
-        }
-      
+      notifyError(err?.response?.data?.message || err.message);
     }
-      setSubcategory("");
-      setLoading(false)
-      onClose();
+    setSubcategory("");
+    setLoading(false);
+    onClose();
   };
 
   return (
@@ -60,9 +52,7 @@ function AddSubcategoryModal({ isOpen, onClose, onAdd, category, setReload }) {
             : { backgroundColor: "#18181b", border: "none" }),
         }}
       >
-        <ModalClose
-          style={{ zIndex: "10", color: "#ffffff", fontWeight: "bold" }}
-        />
+        <ModalClose style={{ zIndex: "10", color: "#ffffff", fontWeight: "bold" }} />
         <div className="p-4">
           <DialogTitle
             sx={{
@@ -78,11 +68,7 @@ function AddSubcategoryModal({ isOpen, onClose, onAdd, category, setReload }) {
             <form onSubmit={handleSubmit}>
               <div className="grid grid-cols-2 gap-7">
                 <FormControl size="lg" className="space-y-1 w-full">
-                  <label
-                    className={` text-lg mb-2 ${
-                      theme ? "text-zinc-800" : "text-zinc-300"
-                    }`}
-                  >
+                  <label className={` text-lg mb-2 ${theme ? "text-zinc-800" : "text-zinc-300"}`}>
                     Subcategory Name
                   </label>
                   <Input
@@ -107,11 +93,7 @@ function AddSubcategoryModal({ isOpen, onClose, onAdd, category, setReload }) {
                   />
                 </FormControl>
                 <FormControl size="lg" className="space-y-1">
-                  <label
-                    className={` text-lg mb-2 ${
-                      theme ? "text-zinc-800" : "text-zinc-300"
-                    }`}
-                  >
+                  <label className={` text-lg mb-2 ${theme ? "text-zinc-800" : "text-zinc-300"}`}>
                     Image
                   </label>
                   <Input

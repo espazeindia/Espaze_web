@@ -43,11 +43,9 @@ function EditCategory({ isOpen, onClose, categoryToEdit, setReload }) {
         notifySuccess(res.message);
       }
     } catch (err) {
-      if (err === "cookie error") {
-        notifyError("Cookie error, please relogin and try again");
-      } else {
+      
         notifyError(err?.response?.data?.message || err.message);
-      }
+      
     }
     setLoading(false)
     onClose();

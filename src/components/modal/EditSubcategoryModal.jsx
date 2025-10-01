@@ -32,13 +32,7 @@ function EditSubcategoryModal({ isOpen, onClose, subcategoryToEdit, onEdit, setR
           setCategories(res.data);
         }
       } catch (err) {
-        if (err === "cookie error") {
-          Cookies.remove("EspazeCookie");
-          router("/login");
-          notifyError("Cookie error, please relogin and try again");
-        } else {
-          notifyError(err?.response?.data?.message || err.message);
-        }
+        notifyError(err?.response?.data?.message || err.message);
       }
       setCategoryLoading(false);
     };
@@ -69,13 +63,7 @@ function EditSubcategoryModal({ isOpen, onClose, subcategoryToEdit, onEdit, setR
         notifySuccess(res.message);
       }
     } catch (err) {
-      if (err === "cookie error") {
-        Cookies.remove("EspazeCookie");
-        router("/login");
-        notifyError("Cookie error, please relogin and try again");
-      } else {
-        notifyError(err?.response?.data?.message || err.message);
-      }
+      notifyError(err?.response?.data?.message || err.message);
     }
     setLoading(false);
     onClose();
@@ -148,9 +136,18 @@ function EditSubcategoryModal({ isOpen, onClose, subcategoryToEdit, onEdit, setR
                     placeholder="select Image"
                   />
                 </FormControl>
-                <FormControl size="lg" className={`space-y-1 w-full ${categoryLoading ? "cursor-not-allowed": "cursor-pointer"} `}>
+                <FormControl
+                  size="lg"
+                  className={`space-y-1 w-full ${
+                    categoryLoading ? "cursor-not-allowed" : "cursor-pointer"
+                  } `}
+                >
                   <label className={theme ? "text-zinc-800" : "text-zinc-300"}>Category</label>
-                  <Select value={categoryOfSub} onChange={(_, val) => setCategoryOfSub(val)} disabled={categoryLoading}>
+                  <Select
+                    value={categoryOfSub}
+                    onChange={(_, val) => setCategoryOfSub(val)}
+                    disabled={categoryLoading}
+                  >
                     {categories.map((category) => (
                       <Option key={category.id} value={category.id} label={category.category_name}>
                         {category.category_name}

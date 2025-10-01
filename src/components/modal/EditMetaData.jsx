@@ -40,7 +40,6 @@ function EditMetaData({ isOpen, onClose, currentProduct, setReload }) {
 
   useEffect(() => {
     if (currentProduct && isOpen) {
-      console.log(currentProduct);
       setEditedData(currentProduct);
       setcategoryOfPro(currentProduct.category);
       setSubCategoryOfPro(currentProduct.subCategory);
@@ -58,10 +57,6 @@ function EditMetaData({ isOpen, onClose, currentProduct, setReload }) {
   };
 
   useEffect(() => {
-    console.log(categoryOfPro, subCategoryOfPro);
-  }, [categoryOfPro, subCategoryOfPro]);
-
-  useEffect(() => {
     const categoryCall = async () => {
       setCategoryLoading(true);
       try {
@@ -70,13 +65,9 @@ function EditMetaData({ isOpen, onClose, currentProduct, setReload }) {
           setCategories(res.data);
         }
       } catch (err) {
-        if (err === "cookie error") {
-          Cookies.remove("EspazeCookie");
-          router("/login");
-          notifyError("Cookie error, please relogin and try again");
-        } else {
+        
           notifyError(err?.response?.data?.message || err.message);
-        }
+        
       }
       setCategoryLoading(false);
     };
@@ -92,13 +83,9 @@ function EditMetaData({ isOpen, onClose, currentProduct, setReload }) {
           setSubCategories(res.data);
         }
       } catch (err) {
-        if (err === "cookie error") {
-          Cookies.remove("EspazeCookie");
-          router("/login");
-          notifyError("Cookie error, please relogin and try again");
-        } else {
+        
           notifyError(err?.response?.data?.message || err.message);
-        }
+        
       }
       setSubCategoryLoading(false);
     };
@@ -111,7 +98,6 @@ function EditMetaData({ isOpen, onClose, currentProduct, setReload }) {
     e.preventDefault();
     setLoading(true);
     try {
-      console.log(editedData);
       const body = {
         name: editedData.productName,
         description: editedData.productDescription,
@@ -127,11 +113,9 @@ function EditMetaData({ isOpen, onClose, currentProduct, setReload }) {
         notifySuccess(res.message);
       }
     } catch (err) {
-      if (err === "cookie error") {
-        notifyError("Cookie error, please relogin and try again");
-      } else {
+      
         notifyError(err?.response?.data?.message || err.message);
-      }
+      
     }
     setLoading(false);
     onClose();

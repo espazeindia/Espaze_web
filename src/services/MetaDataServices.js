@@ -29,6 +29,12 @@ const MetaDataServices = {
   FetchMetadataById: (id) => {
     return requests.get(`/metadata/getMetadata/${id}`);
   },
+
+  FetchMetadataBySubCategoryIds: (subcategoryIds) => {
+    return requests.get(`/metadata/getMetadataForSubcategories`, {
+      params: { subcategoryIds: subcategoryIds },
+    });
+  },
 };
 
 export default MetaDataServices;

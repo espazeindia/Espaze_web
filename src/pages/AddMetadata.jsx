@@ -28,7 +28,6 @@ function AddMetadata() {
     const getMetadata = async () => {
       try {
         setLoading(true);
-        console.log(limit, page, search);
         const result = await MetaDataServices.FetchMetadata(limit, page, search);
         if (result.success === true) {
           const { total_pages, metadata, total } = result.data;
@@ -44,12 +43,11 @@ function AddMetadata() {
                 mrp: data.mrp,
                 image: data.image,
                 id: data.id,
-                category_name:data.category_name,
-                subcategory_name:data.subcategory_name
+                category_name: data.category_name,
+                subcategory_name: data.subcategory_name,
               };
             });
           }
-          console.log(transformedMetadata)
 
           setTotalDetails({ total: total, total_pages: total_pages });
           setOnboardingData(transformedMetadata);
@@ -57,13 +55,8 @@ function AddMetadata() {
 
         setLoading(false);
       } catch (err) {
-        if (err === "cookie error") {
-          Cookies.remove("EspazeCookie");
-          router("/login");
-          notifyError("Cookie error, please relogin and try again");
-        } else {
-          notifyError(err?.response?.data?.message || err.message);
-        }
+        notifyError(err?.response?.data?.message || err.message);
+
         setLoading(false);
       }
     };

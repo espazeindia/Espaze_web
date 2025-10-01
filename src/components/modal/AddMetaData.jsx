@@ -54,13 +54,8 @@ function AddMetaData({ isOpen, onClose, setReload }) {
           setCategories(res.data);
         }
       } catch (err) {
-        if (err === "cookie error") {
-          Cookies.remove("EspazeCookie");
-          router("/login");
-          notifyError("Cookie error, please relogin and try again");
-        } else {
+        
           notifyError(err?.response?.data?.message || err.message);
-        }
       }
       setCategoryLoading(false);
     };
@@ -76,13 +71,8 @@ function AddMetaData({ isOpen, onClose, setReload }) {
           setSubCategories(res.data);
         }
       } catch (err) {
-        if (err === "cookie error") {
-          Cookies.remove("EspazeCookie");
-          router("/login");
-          notifyError("Cookie error, please relogin and try again");
-        } else {
+        
           notifyError(err?.response?.data?.message || err.message);
-        }
       }
       setSubCategoryLoading(false);
     };
@@ -111,11 +101,8 @@ function AddMetaData({ isOpen, onClose, setReload }) {
         setReload((prevData) => !prevData);
       }
     } catch (err) {
-      if (err === "cookie error") {
-        notifyError("Cookie error, please relogin and try again");
-      } else {
+     
         notifyError(err?.response?.data?.message || res.message);
-      }
     }
     setLoading(false);
     onClose();

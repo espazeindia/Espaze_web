@@ -1,138 +1,59 @@
-import React, { useState, useCallback, useEffect } from "react";
-import CategoryServices from "../services/CategoryServices";
-import { notifyError, notifySuccess } from "../utils/toast";
-import Cookies from "js-cookie";
-import { useMode } from "../contexts/themeModeContext";
-import CategoryView from "../components/sections/CategoryList";
-import SubCategoryView from "../components/sections/SubCategoryList";
+import React, { useState, useEffect } from "react";
+import CategoryView from "../components/views/categorySubCategoryView/CategoryView";
+import SubCategoryView from "../components/views/categorySubCategoryView/SubCategoryView";
 import SelectedSubcategoriesDisplay from "../components/sections/SelectedSubCategory";
 
-
-
-const CategorySubcategoryAssortment = () => {
-  const { theme } = useMode();
+function CategorySubcategoryAssortment() {
+  const [selectedSubcategoryIds, setSelectedSubcategoryIds] = useState([]);
+  const [selectedSubcategories, setSelectedSubcategories] = useState([]);
+  const [selectedCategoryIds, setSelectedCategoryIds] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState({});
   const [categories, setCategories] = useState([]);
-  const [checkedCategories, setCheckedCategories] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState(null);
-  const [loadingCats, setLoadingCats] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [selectedSubcategoryNames, setSelectedSubcategoryNames] = useState([]);
 
   useEffect(() => {
-    if (categories.length > 0 && !selectedCategory) {
+    if (categories.length > 0) {
       setSelectedCategory(categories[0]);
+    } else {
+      setSelectedCategory({});
     }
-  }, [categories, selectedCategory]);
+  }, [categories]);
 
-  const handleAdd = useCallback(async () => {
-    if (checkedCategories.length === 0) return;
-  
-    setSaving(true); // Indicate that an operation is in progress
-    try {
-      const fetchPromises = checkedCategories.map(async (categoryId) => {
-        try {
-          const res = await CategoryServices.FetchSubcategory(50, 0, "", categoryId);
-          if (res?.success === true) {
-            const { sub_category } = res.data || {};
-            return (sub_category || []).map((sub) => sub.subcategory_name);
-          }
-        } catch (err) {
-          notifyError(`Failed to fetch subcategories for category ID ${categoryId}`);
-        }
-        return []; // Return empty array on error to prevent Promise.all from failing
-      });
-  
-      const results = await Promise.all(fetchPromises);
-      const subcategoriesToAdd = results.flat(); // Flatten the array of arrays
-  
-      setSelectedSubcategoryNames((prev) => {
-        const newSelected = new Set([...prev, ...subcategoriesToAdd]);
-        return Array.from(newSelected);
-      });
-  
-      setCheckedCategories([]);
-      notifySuccess("Subcategories added to selection");
-    } finally {
-      setSaving(false); // Reset saving state
-    }
-  }, [checkedCategories]);
-
-  const handleSave = useCallback(async () => {
-    if (selectedSubcategoryNames.length === 0) {
-      notifyError("Please select at least one subcategory.");
-      return;
-    }
-
-    const selectedSubcategoryNamesSet = new Set(selectedSubcategoryNames);
-    const categoryIds = categories
-      .filter(cat =>
-        cat.subcategories?.some(sub => selectedSubcategoryNamesSet.has(sub.name))
-      )
-      .map(cat => cat.id);
-
-    try {
-      setSaving(true);
-      await saveSelectionToBackend({
-        categoryIds,
-        subcategoryNames: selectedSubcategoryNames,
-      });
-      // success toast here if you have it
-      // notifySuccess("Saved successfully");
-    } catch (err) {
-      if (err === "cookie error") {
-        Cookies.remove("EspazeCookie");
-        notifyError("Cookie error, please relogin and try again");
-      } else {
-        notifyError(err?.response?.data?.message || err?.message || "Failed to save");
-      }
-    } finally {
-      setSaving(false);
-    }
-  }, [categories, selectedSubcategoryNames]);
-
-  const handleRemoveSubcategory = useCallback((name) => {
-    setSelectedSubcategoryNames(prev => prev.filter(item => item !== name));
-  }, []);
+  useEffect(() => {
+    console.log(selectedSubcategoryIds, selectedSubcategories);
+  }, [selectedSubcategoryIds, selectedSubcategories]);
 
   return (
-    <div className={`flex flex-col h-full overflow-hidden ${theme ? "bg-white text-black" : "bg-neutral-950 text-white"}`}>
-      <div className="flex">
-        <div className="w-1/2 border-r border-gray-100">
-          <CategoryView
-            categories={categories}
-            setCategories={setCategories}
-            selectedCategory={selectedCategory}
-            setSelectedCategory={setSelectedCategory}
-            checkedCategories={checkedCategories}
-            setCheckedCategories={setCheckedCategories}
-            loadingCats={loadingCats}
-            setLoadingCats={setLoadingCats}
-            handleAdd={handleAdd}
-            saving={saving}
-            theme={theme}
-          />
-        </div>
-        <div className="w-1/2">
+    <div className=" h-full">
+      <div className=" h-[70vh] flex">
+        <CategoryView
+          categories={categories}
+          setCategories={setCategories}
+          selectedCategory={selectedCategory}
+          setSelectedCategory={setSelectedCategory}
+          assortment={true}
+          selectedCategoryIds={selectedCategoryIds}
+          setSelectedCategoryIds={setSelectedCategoryIds}
+        />
         <SubCategoryView
-            selectedCategory={selectedCategory}
-            selectedSubcategoryNames={selectedSubcategoryNames}
-            onSelectionChange={setSelectedSubcategoryNames}
-            saving={saving}
-            theme={theme}
-          />
-        </div>
+          key={selectedCategory?.id || "none"}
+          category={selectedCategory}
+          assortment={true}
+          selectedSubcategoryIds={selectedSubcategoryIds}
+          setSelectedSubcategoryIds={setSelectedSubcategoryIds}
+          selectedCategoryIds={selectedCategoryIds}
+          setSelectedCategoryIds={setSelectedCategoryIds}
+          setSelectedSubcategories={setSelectedSubcategories}
+        />
       </div>
-
-      <div className="border-t border-gray-100 mt-4"></div>
       <SelectedSubcategoriesDisplay
-        selectedSubcategoryNames={selectedSubcategoryNames}
-        handleRemoveSubcategory={handleRemoveSubcategory}
-        handleSave={handleSave}
-        saving={saving}
-        theme={theme}
+        selectedSubcategoryIds={selectedSubcategoryIds}
+        setSelectedSubcategoryIds={setSelectedSubcategoryIds}
+        selectedSubcategories={selectedSubcategories}
+        setSelectedSubcategories={setSelectedSubcategories}
+        setSelectedCategoryIds={setSelectedCategoryIds}
       />
     </div>
   );
-};
+}
 
 export default CategorySubcategoryAssortment;

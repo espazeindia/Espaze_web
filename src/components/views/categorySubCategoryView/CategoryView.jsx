@@ -9,7 +9,15 @@ import CategoryServices from "../../../services/CategoryServices";
 import { handleChangeDebounce } from "../../../utils/useDebounce";
 import { notifyError, notifySuccess } from "../../../utils/toast";
 
-const CategoriesPage = ({ categories, setCategories, selectedCategory, setSelectedCategory }) => {
+const CategoriesPage = ({
+  categories,
+  setCategories,
+  selectedCategory,
+  setSelectedCategory,
+  assortment = false,
+  selectedCategoryIds,
+  setSelectedCategoryIds,
+}) => {
   const { theme } = useMode();
   const [page, setPage] = useState(0);
   const [limit, setLimit] = useState(10);
@@ -59,13 +67,7 @@ const CategoriesPage = ({ categories, setCategories, selectedCategory, setSelect
           setCategories(transformedCategories);
         }
       } catch (err) {
-        if (err === "cookie error") {
-          Cookies.remove("EspazeCookie");
-          router("/login");
-          notifyError("Cookie error, please relogin and try again");
-        } else {
-          notifyError(err?.response?.data?.message || err.message);
-        }
+        notifyError(err?.response?.data?.message || err.message);
       }
       setLoading(false);
     };
@@ -79,6 +81,14 @@ const CategoriesPage = ({ categories, setCategories, selectedCategory, setSelect
 
   const openSubcategories = (category) => {
     setSelectedCategory(category);
+  };
+
+  const handleCategoryCheckbox = (id, value) => {
+    if (value && selectedCategory.id === id) {
+      setSelectedCategoryIds((prevData) => [...prevData, id]);
+    } else if(selectedCategory.id === id) {
+      setSelectedCategoryIds((prevData) => prevData.filter((categoryId) => categoryId !== id));
+    }
   };
 
   return (
@@ -99,16 +109,18 @@ const CategoriesPage = ({ categories, setCategories, selectedCategory, setSelect
             theme ? "bg-white text-zinc-700 shadow-sm" : "bg-zinc-800 text-zinc-200 shadow-sm"
           }`}
         />
-        <button
-          onClick={() => setOpenAddModal(true)}
-          className={`p-2 px-6 rounded-md font-medium  hover:bg-green-600 hover:text-white cursor-pointer ${
-            theme
-              ? "text-green-600 border border-green-600"
-              : "text-green-500 border border-green-500"
-          }`}
-        >
-          Add
-        </button>
+        {!assortment && (
+          <button
+            onClick={() => setOpenAddModal(true)}
+            className={`p-2 px-6 rounded-md font-medium  hover:bg-green-600 hover:text-white cursor-pointer ${
+              theme
+                ? "text-green-600 border border-green-600"
+                : "text-green-500 border border-green-500"
+            }`}
+          >
+            Add
+          </button>
+        )}
       </div>
 
       <div className={`rounded-lg ${theme ? "bg-white text-gray-800" : "bg-zinc-800 text-white"}`}>
@@ -138,24 +150,36 @@ const CategoriesPage = ({ categories, setCategories, selectedCategory, setSelect
               >
                 <div className=" w-8 h-8 rounded-sm bg-gray-200"></div>
                 <span className="text-sm font-semibold">{cat.name}</span>
-                <div className="text-center flex items-center gap-2 font-medium ">
-                  <button
-                    className={`${
-                      theme
-                        ? "text-green-600 hover:text-green-700"
-                        : "text-green-400 hover:text-green-700"
-                    }`}
-                    onClick={(e) => handleEdit(cat)}
-                  >
-                    <Edit />
-                  </button>
-                  <button
-                    className={` hover:text-red-600 ${theme ? "text-red-500" : "text-red-500"}`}
-                    onClick={(e) => handleDelete(cat)}
-                  >
-                    <Delete />
-                  </button>
-                </div>
+                {assortment ? (
+                  <input
+                    type="checkbox"
+                    style={{ height: "15px" }}
+                    checked={selectedCategoryIds ? selectedCategoryIds.includes(cat.id) : false}
+                    onChange={(e) => {
+                      e.stopPropagation();
+                      handleCategoryCheckbox(cat.id, e.target.checked);
+                    }}
+                  />
+                ) : (
+                  <div className="text-center flex items-center gap-2 font-medium ">
+                    <button
+                      className={`${
+                        theme
+                          ? "text-green-600 hover:text-green-700"
+                          : "text-green-400 hover:text-green-700"
+                      }`}
+                      onClick={(e) => handleEdit(cat)}
+                    >
+                      <Edit />
+                    </button>
+                    <button
+                      className={` hover:text-red-600 ${theme ? "text-red-500" : "text-red-500"}`}
+                      onClick={(e) => handleDelete(cat)}
+                    >
+                      <Delete />
+                    </button>
+                  </div>
+                )}
               </div>
             ))
           ) : (

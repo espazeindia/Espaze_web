@@ -27,7 +27,6 @@ function InventoryTable({
 
   const handleUpdateInventory = async (data) => {
     try {
-      console.log(data);
       const body = {
         inventory_product_id: data.id,
         product_visibility: data.visible ? false : true,
@@ -47,13 +46,7 @@ function InventoryTable({
         notifySuccess(res.message);
       }
     } catch (err) {
-      if (err === "cookie error") {
-        Cookies.remove("EspazeCookie");
-        router("/login");
-        notifyError("Cookie error, please relogin and try again");
-      } else {
-        notifyError(err?.response?.data?.message || err.message);
-      }
+      notifyError(err?.response?.data?.message || err.message);
     }
   };
 
@@ -172,7 +165,7 @@ function InventoryTable({
                     handleProductView(data.id);
                   }}
                   className=" grid grid-cols-[2fr_5fr_3fr_1fr_4fr_3fr_6fr_3fr_2fr_3fr_2fr_3fr_2fr_2fr] items-center  text-sm border-b py-4 border-gray-300 border-dotted"
-                > 
+                >
                   <div
                     className={`text-center font-medium ${theme ? "text-zinc-800" : "text-white"}`}
                   >
@@ -262,11 +255,16 @@ function InventoryTable({
                       </div>
                     )}
                   </div>
-                  <div className=" flex items-center justify-center" onClick={(e)=>{e.stopPropagation()}}>
+                  <div
+                    className=" flex items-center justify-center"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                    }}
+                  >
                     <Switch
                       checked={data.visible}
                       onChange={(e) => {
-                        e.stopPropagation()
+                        e.stopPropagation();
                         handleUpdateInventory(data);
                       }}
                       sx={
@@ -309,7 +307,7 @@ function InventoryTable({
                           : "text-green-400 hover:text-green-700"
                       } `}
                       onClick={(e) => {
-                        e.stopPropagation()
+                        e.stopPropagation();
                         handleProductView(data.id);
                       }}
                     >
@@ -322,7 +320,7 @@ function InventoryTable({
                           : "text-green-400 hover:text-green-700"
                       }`}
                       onClick={(e) => {
-                        e.stopPropagation()
+                        e.stopPropagation();
                         handleEdit(data);
                       }}
                     >

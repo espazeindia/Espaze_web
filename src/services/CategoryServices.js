@@ -47,8 +47,10 @@ const CategoryServices = {
     return requests.get(`/category/getAllCategories`);
   },
 
-  FetchAllSubCategory: (id) => {
-    return requests.get(`/category/getAllSubCategories/${id}`);
+  FetchAllSubCategory: (id, search = "") => {
+    return requests.get(`/category/getAllSubCategories/${id}`, {
+      params: { search: search },
+    });
   },
 };
 

@@ -18,11 +18,7 @@ function DeleteProductModal({ isOpen, onClose, deleteProduct, setOnboardingData,
         setReload((prevData) => !prevData);
       }
     } catch (err) {
-      if (err === "cookie error") {
-        notifyError("Cookie error, please relogin and try again");
-      } else {
         notifyError(err?.response?.data?.message || err.message);
-      }
     }
     setLoading(false)
     onClose();

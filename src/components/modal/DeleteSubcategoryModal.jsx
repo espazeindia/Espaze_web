@@ -19,11 +19,9 @@ function DeleteSubcategoryModal({ isOpen, onClose, data, setReload, setSelectedS
         setReload((prevData) => !prevData);
       }
     } catch (err) {
-      if (err === "cookie error") {
-        notifyError("Cookie error, please relogin and try again");
-      } else {
+      
         notifyError(err?.response?.data?.message || err.message);
-      }
+      
     }
     setSelectedSub(null);
     setLoading(false);

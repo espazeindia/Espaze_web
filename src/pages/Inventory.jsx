@@ -23,7 +23,6 @@ function Inventory() {
 
   useEffect(() => {
     const getMetadata = async () => {
-      console.log(debounce, page, limit, reload, sortOrder);
       try {
         setLoading(true);
         const result = await InventoryServices.GetAllInventory(limit, page, debounce, sortOrder);
@@ -60,13 +59,9 @@ function Inventory() {
 
         setLoading(false);
       } catch (err) {
-        if (err === "cookie error") {
-          Cookies.remove("EspazeCookie");
-          router("/login");
-          notifyError("Cookie error, please relogin and try again");
-        } else {
+        
           notifyError(err?.response?.data?.message || err.message);
-        }
+        
         setLoading(false);
       }
     };

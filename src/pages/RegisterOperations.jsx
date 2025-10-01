@@ -99,7 +99,7 @@ const RegisterOperations = () => {
       return;
     }
 
-    console.log("Form Submitted: ", formData);
+
     notifySuccess("✅ Operation Onboarding Successful!");
 
     setFormData({

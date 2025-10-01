@@ -1,30 +1,21 @@
-import React, { useEffect, useState } from "react";
-import { Edit, Delete } from "@mui/icons-material";
-import AddSubcategoryModal from "../../modal/AddSubcategoryModal";
-import EditSubcategoryModal from "../../modal/EditSubcategoryModal";
-import DeleteSubcategoryModal from "../../modal/DeleteSubcategoryModal";
+import React, { useEffect, useRef, useState } from "react";
 import { useMode } from "../../../contexts/themeModeContext";
-import BottomPagination from "../../pagination/BottomPagination";
 import CategoryServices from "../../../services/CategoryServices";
 import { notifyError } from "../../../utils/toast";
 import { handleChangeDebounce } from "../../../utils/useDebounce";
 
-const SubcategoryModal = ({ category }) => {
+const SubcategoryModal = ({
+  category,
+  selectedSubcategoryIds,
+  setSelectedSubcategoryIds,
+  selectedCategoryIds,
+  setSelectedCategoryIds,
+  setSelectedSubcategories,
+}) => {
   const { theme } = useMode();
   const [search, setSearch] = useState("");
   const [subcategories, setSubcategories] = useState([]);
-  const [page, setPage] = useState(0);
-  const [limit, setLimit] = useState(10);
-  const [totalDetails, setTotalDetails] = useState({
-    total: 0,
-    total_pages: 0,
-  });
   const [loading, setLoading] = useState(false);
-  const [reload, setReload] = useState(false);
-  const [openAddModal, setOpenAddModal] = useState(false);
-  const [openEditModal, setOpenEditModal] = useState(false);
-  const [openDeleteModal, setOpenDeleteModal] = useState(false);
-  const [selectedSub, setSelectedSub] = useState(null);
 
   const debounce = handleChangeDebounce(search);
 
@@ -32,52 +23,80 @@ const SubcategoryModal = ({ category }) => {
     const getSubcategory = async () => {
       setLoading(true);
       try {
-        const res = await CategoryServices.FetchSubcategory(limit, page, debounce, category.id);
-        if (res.success === true) {
-          const { sub_category, total, total_pages } = res.data;
-          let transSubcategory = [];
-          if (sub_category && sub_category.length > 0) {
-            transSubcategory = sub_category.map((sub) => {
-              return {
-                id: sub.id,
-                name: sub.subcategory_name,
-                image: sub.subcategory_image,
-                categoryOfSub: sub.category_id,
-              };
-            });
-          }
-          setTotalDetails({
-            total: total,
-            total_pages: total_pages,
-          });
+        const res = await CategoryServices.FetchAllSubCategory(category.id, debounce);
+        if (res.success) {
+          const transSubcategory = (res.data || []).map((sub) => ({
+            id: sub.id,
+            name: sub.subcategory_name,
+            image: sub.subcategory_image,
+            categoryOfSub: sub.category_id,
+          }));
           setSubcategories(transSubcategory);
         }
       } catch (err) {
-        if (err === "cookie error") {
-          Cookies.remove("EspazeCookie");
-          router("/login");
-          notifyError("Cookie error, please relogin and try again");
-        } else {
-          notifyError(err?.response?.data?.message || err.message);
-        }
+        notifyError(err?.response?.data?.message || err.message);
       }
       setLoading(false);
     };
-    if (category.id) {
-      getSubcategory();
-    }
-  }, [category, page, limit, debounce, reload]);
 
-  const handleEdit = (newName) => {
-    const updated = [...subcategories];
-    updated[selectedSub] = newName;
-    setSubcategories(updated);
-    setSelectedSub(null);
+    if (category.id) getSubcategory();
+  }, [category.id, debounce]);
+
+  const handleSubCategoryCheckbox = (subcategory, checked) => {
+    if (checked) {
+      setSelectedSubcategories((prevData) => [...prevData, subcategory]);
+      setSelectedSubcategoryIds((prevData) => [...prevData, subcategory.id]);
+    } else {
+      setSelectedSubcategories((prevData) =>
+        prevData.filter((subcat) => subcat.id !== subcategory.id)
+      );
+      setSelectedSubcategoryIds((prevData) => prevData.filter((subId) => subId !== subcategory.id));
+    }
   };
+
+  useEffect(() => {
+    if (selectedSubcategoryIds?.length >= 0 && subcategories?.length) {
+      const allSubCategories = subcategories.map((subcategoryId) => subcategoryId.id);
+      const allSelected = allSubCategories.every((ids) => selectedSubcategoryIds.includes(ids));
+      const categoryPresent = selectedCategoryIds.includes(category.id);
+
+      if (allSelected && !categoryPresent) {
+        setSelectedCategoryIds((prevData) => [...prevData, category.id]);
+      } else if (categoryPresent && !allSelected) {
+        setSelectedCategoryIds((prevData) => prevData.filter((id) => id !== category.id));
+      }
+    }
+  }, [selectedSubcategoryIds, category.id]);
+
+  useEffect(() => {
+    if (selectedCategoryIds?.length >= 0 && subcategories?.length) {
+      const allSubCategories = subcategories.map((subcategoryId) => subcategoryId.id);
+      const allSelected = allSubCategories.every((ids) => selectedSubcategoryIds.includes(ids));
+      const categoryPresent = selectedCategoryIds.includes(category.id);
+      console.log(allSelected, categoryPresent);
+      if (!allSelected && categoryPresent) {
+        setSelectedSubcategories((prevData) => [
+          ...prevData,
+          ...subcategories.filter((subcat) => !prevData.some((item) => item.id === subcat.id)),
+        ]);
+        setSelectedSubcategoryIds((prevData) => [
+          ...prevData,
+          ...allSubCategories.filter((id) => !prevData.includes(id)),
+        ]);
+      } else if (allSelected && !categoryPresent) {
+        setSelectedSubcategories((prevData) =>
+          prevData.filter((subcat) => !allSubCategories.includes(subcat.id))
+        );
+        setSelectedSubcategoryIds((prevData) =>
+          prevData.filter((ids) => !allSubCategories.includes(ids))
+        );
+      }
+    }
+  }, [selectedCategoryIds, category.id]);
 
   return (
     <div
-      className={` h-full w-[50%] p-4 border-r border-gray-300 ${
+      className={`h-full w-[50%] p-4 border-r border-gray-300 ${
         theme ? "bg-zinc-100 text-black" : "bg-neutral-950 text-white"
       }`}
     >
@@ -93,114 +112,49 @@ const SubcategoryModal = ({ category }) => {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
-        <button
-          onClick={() => setOpenAddModal(true)}
-          className={`p-2 px-6 rounded-md font-medium cursor-pointer  hover:bg-green-600 hover:text-white ${
-            theme
-              ? "text-green-600 border border-green-600"
-              : "text-green-500 border border-green-500"
+        
+      </div>
+
+      <div className={`rounded-lg ${theme ? "bg-white text-gray-800" : "bg-zinc-800 text-white"}`}>
+        <div
+          className={`rounded-t-lg grid px-3 py-2 text-sm font-semibold grid-cols-[1fr_8fr_1.5fr] border-b border-gray-200 last:border-b-0 items-center ${
+            theme ? "text-[#4110a2]" : "text-[#b898fa]"
           }`}
         >
-          Add
-        </button>
-      </div>
-
-      <div className={`rounded-lg  ${theme ? "bg-white text-gray-800" : "bg-zinc-800 text-white"}`}>
-        <div
-          className={`rounded-t-lg grid px-3 py-2 text-sm font-semibold grid-cols-[1fr_8fr_1.5fr] border-b border-gray-200 last:border-b-0 items-center
-            ${theme ? "text-[#4110a2]" : "text-[#b898fa]"}`}
-        >
           <div>Image</div>
-          <div>Category Name</div>
+          <div>Subcategory Name</div>
           <div>Actions</div>
         </div>
-        {!loading ? (
-          subcategories.length > 0 ? (
-            subcategories.map((sub, index) => (
-              <div
-                key={index}
-                className="grid grid-cols-[1fr_8fr_1.5fr]  items-center px-4 py-2 border-b border-gray-200 last:border-b-0"
-              >
-                <div className=" w-8 h-8 rounded-sm bg-gray-200"></div>
-                <div className="text-sm font-semibold">{sub.name}</div>
-                <div className="text-center flex items-center gap-2 font-medium ">
-                  <button
-                    className={`${
-                      theme
-                        ? "text-green-600 hover:text-green-700"
-                        : "text-green-400 hover:text-green-700"
-                    }`}
-                    onClick={() => {
-                      setSelectedSub(sub);
-                      setOpenEditModal(true);
-                    }}
-                  >
-                    <Edit />
-                  </button>
-                  <button
-                    className={` hover:text-red-600 ${theme ? "text-red-500" : "text-red-500"}`}
-                    onClick={() => {
-                      setSelectedSub(sub);
-                      setOpenDeleteModal(true);
-                    }}
-                  >
-                    <Delete />
-                  </button>
+        <div className="max-h-[40vh] overflow-y-scroll sideBarNone">
+          {!loading ? (
+            subcategories.length > 0 ? (
+              subcategories.map((sub) => (
+                <div
+                  key={sub.id}
+                  className="grid grid-cols-[1fr_8fr_1.5fr] items-center px-4 py-2 border-b border-gray-200 last:border-b-0"
+                >
+                  <div className="w-8 h-8 rounded-sm bg-gray-200"></div>
+                  <div className="text-sm font-semibold">{sub.name}</div>
+                  <input
+                    type="checkbox"
+                    style={{ height: "15px" }}
+                    onChange={(e) => handleSubCategoryCheckbox(sub, e.target.checked)}
+                    checked={selectedSubcategoryIds.includes(sub.id)}
+                  />
                 </div>
+              ))
+            ) : (
+              <div className="w-full h-[50vh] flex justify-center items-center text-xl font-semibold">
+                No Sub-Categories Found
               </div>
-            ))
+            )
           ) : (
-            <div className=" w-full h-[50vh] flex justify-center items-center text-xl font-semibold">
-              No Sub-Categories Found, Try Adding One
-            </div>
-          )
-        ) : (
-          Array.from({ length: limit }).map((_, index) => (
-            <div key={index} className="border-b h-12 border-gray-300 border-dotted w-full"></div>
-          ))
-        )}
-        <BottomPagination
-          page={page}
-          setPage={setPage}
-          limit={limit}
-          setLimit={setLimit}
-          totalDetails={totalDetails}
-          loading={loading}
-          textSize="sm"
-        />
+            Array.from({ length: 5 }).map((_, index) => (
+              <div key={index} className="border-b h-12 border-gray-300 border-dotted w-full"></div>
+            ))
+          )}
+        </div>
       </div>
-      {openAddModal && (
-        <AddSubcategoryModal
-          isOpen={openAddModal}
-          onClose={() => setOpenAddModal(false)}
-          category={category}
-          setReload={setReload}
-        />
-      )}
-
-      {openEditModal && (
-        <EditSubcategoryModal
-          isOpen={openEditModal}
-          onClose={() => {
-            setOpenEditModal(false);
-            setSelectedSub(null);
-          }}
-          subcategoryToEdit={selectedSub}
-          onEdit={handleEdit}
-          setReload={setReload}
-        />
-      )}
-
-      <DeleteSubcategoryModal
-        isOpen={openDeleteModal}
-        onClose={() => {
-          setOpenDeleteModal(false);
-          setSelectedSub(null);
-        }}
-        data={selectedSub}
-        setReload={setReload}
-        setSelectedSub={setSelectedSub}
-      />
     </div>
   );
 };

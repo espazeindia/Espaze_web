@@ -28,13 +28,7 @@ function AddToInventory({ isOpen, onClose, addedIds }) {
         navigate("/inventory");
       }
     } catch (err) {
-      if (err === "cookie error") {
-        Cookies.remove("EspazeCookie");
-        router("/login");
-        notifyError("Cookie error, please relogin and try again");
-      } else {
-        notifyError(err?.response?.data?.message || err.message);
-      }
+      notifyError(err?.response?.data?.message || err.message);
     }
     setLoading(false);
     onClose();

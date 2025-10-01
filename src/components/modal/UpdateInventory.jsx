@@ -37,10 +37,6 @@ function UpdateInventory({ isOpen, onClose, data, setReload }) {
     }
   }, [isOpen, data]);
 
-  useEffect(() => {
-    console.log(formData);
-  }, [formData]);
-
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -63,7 +59,7 @@ function UpdateInventory({ isOpen, onClose, data, setReload }) {
         product_price: formData.price,
         product_manufacturing_date: formData.manufacturingDate,
         product_expiry_date: formData.expiryDate,
-        product_quantity:formData.quantity
+        product_quantity: formData.quantity,
       };
       const res = await InventoryServices.UpdateInventory(body);
       if (res.success === true) {
@@ -71,13 +67,7 @@ function UpdateInventory({ isOpen, onClose, data, setReload }) {
         notifySuccess(res.message);
       }
     } catch (err) {
-      if (err === "cookie error") {
-        Cookies.remove("EspazeCookie");
-        router("/login");
-        notifyError("Cookie error, please relogin and try again");
-      } else {
-        notifyError(err?.response?.data?.message || err.message);
-      }
+      notifyError(err?.response?.data?.message || err.message);
     }
 
     setLoading(false);

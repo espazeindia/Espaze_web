@@ -41,7 +41,7 @@ const routes = [
   {
     path: "/products",
     component: Products,
-    access: [ "seller"],
+    access: ["seller"],
   },
   {
     path: "/customers",
@@ -63,7 +63,7 @@ const routes = [
     component: AddCategoriesSubcategoriesPage,
     access: ["operations"],
   },
-  
+
   {
     path: "/product-details/:id",
     component: ProductDetails,
@@ -82,17 +82,17 @@ const routes = [
   {
     path: "/profile",
     component: UserProfile,
-    access: ["seller","admin","operations"],
+    access: ["seller", "admin", "operations"],
   },
-   {
+  {
     path: "/categories-and-subcategories",
     component: CategoriesAndSubcategories,
     access: ["seller"],
   },
-   {
+  {
     path: "/change-password",
     component: ChangePassword,
-    access: ["operations" , "admin"], 
+    access: ["operations", "admin"],
   },
 ];
 
@@ -157,7 +157,7 @@ const sidebarRoutes = [
     name: "Category Assortment",
     access: ["seller"],
   },
-   {
+  {
     path: "/change-password",
     icon: Lock,
     name: "ChangePassword",
