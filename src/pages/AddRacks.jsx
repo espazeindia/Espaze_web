@@ -1,271 +1,289 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
-  colors,
-  DialogContent,
-  DialogTitle,
   FormControl,
   Input,
-  Modal,
-  ModalClose,
-  ModalDialog,
   Option,
   Select,
-  Textarea,
 } from "@mui/joy";
-import { useMode } from "../contexts/themeModeContext";
 import { notifyError, notifySuccess } from "../utils/toast";
-import { LoaderCircle } from "lucide-react";
 import CategoryServices from "../services/CategoryServices";
-import { Segment } from "@mui/icons-material";
+import { useMode } from "../contexts/themeModeContext";
 
-const AddRacks = ({ isOpen, onClose, setReload }) => {
+const warehouseOptions = [
+  "Main Warehouse A",
+  "Secondary Warehouse B",
+  "East-Side Storage",
+];
+
+const AddRacks = () => {
   const { theme } = useMode();
-  const [categoryOfPro, setcategoryOfPro] = useState("");
   const [categories, setCategories] = useState([]);
   const [subCategories, setSubCategories] = useState([]);
-  const [subCategoryOfPro, setSubCategoryOfPro] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [categoryLoading, setCategoryLoading] = useState(true);
-  const [subCategoryLoading, setSubCategoryLoading] = useState(true);
-  const [warehouse, setWarehouse] = useState([]);
-  const [saveData, setSaveData] = useState({
+  const [formData, setFormData] = useState({
     segment: 0,
     volume: 0.0,
+    selectedCategory: "",
+    selectedSubCategory: "",
+    selectedWarehouse: "",
   });
 
-  const warehouseOptions = [
-    "Main Warehouse A",
-    "Secondary Warehouse B",
-    "East-Side Storage",
-  ];
+  const [categoryLoading, setCategoryLoading] = useState(false);
+  const [subCategoryLoading, setSubCategoryLoading] = useState(false);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setSaveData((prevData) => {
-      return {
-        ...prevData,
-        [name]: value,
-      };
-    });
+  const commonInputStyles = useMemo(() => ({
+    '--Input-radius': '0.375rem',
+    '--Input-paddingInline': '0.75rem',
+    '--Input-minHeight': 'auto',
+    paddingBlock: '0.625rem',
+    fontSize: '0.875rem',
+    backgroundColor: theme ? '#ffffff' : '#171717',
+    border: `1px solid ${theme ? '#d1d5db' : '#404040'}`,
+    color: theme ? '#111827' : '#ffffff',
+    transition: 'border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease',
+    '&:hover': {
+      backgroundColor: theme ? '#f9fafb' : '#262626',
+    },
+    '&:focus-within': {
+      outline: 'none',
+      '--Input-focusedHighlight': 'transparent',
+      borderColor: 'transparent',
+      boxShadow: `0 0 0 2px ${theme ? '#a855f7' : '#c084fc'}`,
+    },
+    '& input::placeholder': {
+        color: '#9ca3af',
+        opacity: 1,
+    },
+  }), [theme]);
+
+
+  const fetchData = async (service, setter, loadingSetter, errorMessage) => {
+    loadingSetter(true);
+    try {
+      const res = await service();
+      if (res.success) {
+        setter(res.data);
+      } else {
+        notifyError(errorMessage);
+      }
+    } catch (err) {
+      notifyError(err?.response?.data?.message || err.message);
+    } finally {
+      loadingSetter(false);
+    }
   };
 
   useEffect(() => {
-    const categoryCall = async () => {
-      setCategoryLoading(true);
-      try {
-        const res = await CategoryServices.FetchAllCategory();
-        console.log("Categories fetched:", res.data);
-        if (res.success === true) {
-          setCategories(res.data);
-        }
-      } catch (err) {
-        if (err === "cookie error") {
-          Cookies.remove("EspazeCookie");
-          router("/login");
-          notifyError("Cookie error, please relogin and try again");
-        } else {
-          notifyError(err?.response?.data?.message || err.message);
-        }
-      }
-      setCategoryLoading(false);
-    };
-    if (isOpen) categoryCall();
-  }, [isOpen]);
+    fetchData(
+      CategoryServices.FetchAllCategory,
+      setCategories,
+      setCategoryLoading,
+      "Failed to fetch categories."
+    );
+  }, []);
 
   useEffect(() => {
-    const SubCategoryCall = async () => {
-      setSubCategoryLoading(true);
-      try {
-        const res = await CategoryServices.FetchAllSubCategory(categoryOfPro);
-        if (res.success === true) {
-          setSubCategories(res.data);
-        }
-      } catch (err) {
-        if (err === "cookie error") {
-          Cookies.remove("EspazeCookie");
-          router("/login");
-          notifyError("Cookie error, please relogin and try again");
-        } else {
-          notifyError(err?.response?.data?.message || err.message);
-        }
-      }
-      setSubCategoryLoading(false);
-    };
-    if (categoryOfPro && categoryOfPro !== "" && isOpen) {
-      setSubCategoryOfPro("");
-      SubCategoryCall();
+    if (formData.selectedCategory) {
+      fetchData(
+        () => CategoryServices.FetchAllSubCategory(formData.selectedCategory),
+        setSubCategories,
+        setSubCategoryLoading,
+        "Failed to fetch subcategories."
+      );
     }
-  }, [categoryOfPro]);
+  }, [formData.selectedCategory]);
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleSelectChange = (name, value) => {
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleCategoryChange = (_, newValue) => {
+    setFormData((prev) => ({
+        ...prev,
+        selectedCategory: newValue,
+        selectedSubCategory: "",
+    }));
+    setSubCategories([]);
+  };
+
+  const handleInputBlur = (e) => {
+    const { name, value } = e.target;
+    if (value === "") {
+        setFormData((prev) => ({
+            ...prev,
+            [name]: 0,
+        }));
+    }
+  };
+
+  const validateFormData = () => {
+    const segment = parseFloat(formData.segment);
+    if (!Number.isInteger(segment) || segment <= 0) {
+      return "Segment must be an integer greater than 0.";
+    }
+
+    const volume = parseFloat(formData.volume);
+    if (!Number.isInteger(volume) || volume <= 0) {
+      return "Volume must be an integer greater than 0.";
+    }
+
+    if (!formData.selectedCategory) {
+      return "Please select a category.";
+    }
+    if (!formData.selectedSubCategory) {
+      return "Please select a sub-category.";
+    }
+    if (!formData.selectedWarehouse) {
+      return "Please select a warehouse.";
+    }
+
+    return null;
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(false);
-    onClose();
+
+    const errorMessage = validateFormData();
+    if (errorMessage) {
+      notifyError(errorMessage);
+      return;
+    }
+
+    // TODO: Implement Add Rack API call when RackServices is available.
+    notifyError("Add rack functionality is not implemented yet.");
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 md:p-6">
-      <div className="flex-col items-center gap-6 mb-4">
-        <h1 className="text-xl md:text-2xl font-semibold text-gray-900 mb-5">
-          Add Racks
-        </h1>
-        <div className="w-full bg-white border border-gray-200 rounded-xl shadow-sm p-4 md:p-6">
-          <form onSubmit={handleSubmit}>
-            <div className="grid grid-cols-2 gap-5">
-              <FormControl size="lg" className="space-y-1">
-                <label className={theme ? "text-zinc-800" : "text-zinc-300"}>
-                  Category
-                </label>
-                <Select
-                  disabled={categoryLoading}
-                  value={categoryOfPro}
-                  placeholder={"Select Category"}
-                  required
-                  onChange={(_, val) => setcategoryOfPro(val)}
-                >
-                  {categories ? (
-                    categories.map((category) => (
-                      <Option
-                        key={category.id}
-                        value={category.id}
-                        label={category.category_name}
-                      >
+    <>
+      <div  className={`p-4 md:p-6 ${theme ? "bg-gray-50" : "bg-neutral-900"}`}
+        style={{ minHeight: '93vh' }}
+        >
+        <div className="flex-col items-center gap-6 mb-4">
+          <h1 className={`text-xl md:text-2xl font-semibold mb-5 ${theme ? "text-gray-900" : "text-white"}`}>
+            Add Racks
+          </h1>
+          <div className={`w-full border rounded-xl shadow-sm p-4 md:p-6 ${theme ? "bg-white border-gray-200" : "bg-neutral-800 border-neutral-700"}`}>
+            <form onSubmit={handleSubmit}>
+              <div className="grid grid-cols-2 gap-5">
+                <FormControl className="space-y-1.5">
+                  <label className={`text-sm font-medium ${theme ? "text-gray-700" : "text-gray-300"}`}>
+                    Category
+                  </label>
+                  <Select
+                    disabled={categoryLoading}
+                    value={formData.selectedCategory}
+                    placeholder={categoryLoading ? "Loading..." : "Select Category"}
+                    required
+                    onChange={handleCategoryChange}
+                    sx={{...commonInputStyles, minHeight: '41px', color: formData.selectedCategory ? (theme ? '#111827' : '#ffffff') : '#9ca3af'}}
+                  >
+                    {categories.map((category) => (
+                      <Option key={category.id} value={category.id}>
                         {category.category_name}
                       </Option>
-                    ))
-                  ) : (
-                    <Option> No Category Available</Option>
-                  )}
-                </Select>
-              </FormControl>
-              <FormControl
-                size="lg"
-                className={`space-y-1 ${
-                  subCategoryLoading ? " cursor-not-allowed" : " cursor-pointer"
-                }`}
-              >
-                <label className={theme ? "text-zinc-800" : "text-zinc-300"}>
-                  Sub Category
-                </label>
-                <Select
-                  disabled={subCategoryLoading}
-                  value={subCategoryOfPro}
-                  required
-                  placeholder={"Select Sub-Category"}
-                  onChange={(_, val) => setSubCategoryOfPro(val)}
-                >
-                  {subCategories !== null ? (
-                    subCategories.map((sub) => (
-                      <Option
-                        key={sub.id}
-                        value={sub.id}
-                        label={sub.subcategory_name}
-                      >
+                    ))}
+                  </Select>
+                </FormControl>
+                <FormControl className="space-y-1.5">
+                  <label className={`text-sm font-medium ${theme ? "text-gray-700" : "text-gray-300"}`}>
+                    Sub Category
+                  </label>
+                  <Select
+                    disabled={subCategoryLoading || !formData.selectedCategory}
+                    value={formData.selectedSubCategory}
+                    placeholder={
+                      subCategoryLoading
+                        ? "Loading..."
+                        : !formData.selectedCategory
+                        ? "Select a category first"
+                        : "Select Sub-Category"
+                    }
+                    required
+                    onChange={(_, val) => handleSelectChange("selectedSubCategory", val)}
+                    sx={{...commonInputStyles, minHeight: '41px', color: formData.selectedSubCategory ? (theme ? '#111827' : '#ffffff') : '#9ca3af'}}
+                  >
+                    {subCategories.map((sub) => (
+                      <Option key={sub.id} value={sub.id}>
                         {sub.subcategory_name}
                       </Option>
-                    ))
-                  ) : (
-                    <Option>No SubCategory Available</Option>
-                  )}
-                </Select>
-              </FormControl>
-              <FormControl size="lg" className={`space-y-1 cursor-pointer}`}>
-                <label className={theme ? "text-zinc-800" : "text-zinc-300"}>
-                  Warehouse
-                </label>
-                <Select
-                  value={warehouse}
-                  required
-                  placeholder={"Select warehouse"}
-                  onChange={(e) => setWarehouse(e.target.value)}
+                    ))}
+                  </Select>
+                </FormControl>
+                <FormControl className="space-y-1.5">
+                  <label className={`text-sm font-medium ${theme ? "text-gray-700" : "text-gray-300"}`}>
+                    Warehouse
+                  </label>
+                  <Select
+                    value={formData.selectedWarehouse}
+                    required
+                    placeholder="Select warehouse"
+                    onChange={(_, val) => handleSelectChange("selectedWarehouse", val)}
+                    sx={{...commonInputStyles, minHeight: '41px', color: formData.selectedWarehouse ? (theme ? '#111827' : '#ffffff') : '#9ca3af'}}
+                  >
+                    {warehouseOptions.map((opt) => (
+                      <Option key={opt} value={opt}>
+                        {opt}
+                      </Option>
+                    ))}
+                  </Select>
+                </FormControl>
+                <FormControl className="space-y-1.5">
+                  <label className={`text-sm font-medium ${theme ? "text-gray-700" : "text-gray-300"}`}>
+                    Segment
+                  </label>
+                  <Input
+                    type="number"
+                    min={0}
+                    name="segment"
+                    value={formData.segment}
+                    onChange={handleInputChange}
+                    onBlur={handleInputBlur}
+                    required
+                    placeholder="Enter segment"
+                    sx={commonInputStyles}
+                  />
+                </FormControl>
+                <FormControl className="space-y-1.5">
+                  <label className={`text-sm font-medium ${theme ? "text-gray-700" : "text-gray-300"}`}>
+                    Volume
+                  </label>
+                  <Input
+                    type="number"
+                    min={0.0}
+                    name="volume"
+                    value={formData.volume}
+                    onChange={handleInputChange}
+                    onBlur={handleInputBlur}
+                    required
+                    placeholder="Enter Volume"
+                    sx={commonInputStyles}
+                  />
+                </FormControl>
+              </div>
+              <div className="flex justify-center mt-8">
+                <button
+                  type="submit"
+                  className={`w-full p-2.5 text-white font-semibold rounded-md transition-all duration-200 ${theme ? "bg-purple-600 hover:bg-purple-700" : "bg-purple-700 hover:bg-purple-800"}`}
                 >
-                  <option value="" disabled>
-                    Select Warehouse
-                  </option>
-                  {warehouseOptions.map((opt) => (
-                    <option key={opt} value={opt}>
-                      {opt}
-                    </option>
-                  ))}
-                </Select>
-              </FormControl>
-              <FormControl size="lg" className="space-y-1">
-                <label className={theme ? "text-zinc-800" : "text-zinc-300"}>
-                  Segment
-                </label>
-                <Input
-                  sx={
-                    theme
-                      ? {
-                          backgroundColor: "#f4f4f5",
-                          color: "#27272a",
-                          border: "none",
-                        }
-                      : {
-                          backgroundColor: "#27272a",
-                          color: "#ffffff",
-                          border: "none",
-                        }
-                  }
-                  name="segment"
-                  type="number"
-                  min={0}
-                  value={saveData.segment}
-                  onChange={handleChange}
-                  required
-                  size="lg"
-                  placeholder="Enter segment"
-                />
-              </FormControl>
-              <FormControl size="lg" className="space-y-1">
-                <label className={theme ? "text-zinc-800" : "text-zinc-300"}>
-                  Volume
-                </label>
-                <Input
-                  sx={
-                    theme
-                      ? {
-                          backgroundColor: "#f4f4f5",
-                          color: "#27272a",
-                          border: "none",
-                        }
-                      : {
-                          backgroundColor: "#27272a",
-                          color: "#ffffff",
-                          border: "none",
-                        }
-                  }
-                  name="volume"
-                  type="number"
-                  min={0.0}
-                  value={saveData.volume}
-                  onChange={handleChange}
-                  required
-                  size="lg"
-                  placeholder="Enter Volume"
-                />
-              </FormControl>
-            </div>
-            <div className="flex justify-end">
-              <button
-                className={`p-2 font-medium rounded-lg w-20 mt-8 flex justify-center items-center
-                            ${
-                              theme
-                                ? "border border-green-600 text-green-600 hover:bg-green-600 hover:text-white"
-                                : "border border-green-500 hover:bg-green-600 hover:text-white text-green-500"
-                            }`}
-              >
-                {loading ? (
-                  <LoaderCircle className="animate-spin h-7" />
-                ) : (
-                  <>Add</>
-                )}
-              </button>
-            </div>
-          </form>
+                  Add Rack
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
-    </div>
+
+    </>
   );
 };
 
