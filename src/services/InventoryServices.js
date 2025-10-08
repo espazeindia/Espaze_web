@@ -10,6 +10,12 @@ const InventoryServices = {
       params: { limit: limit, offset: offset, sort: sort, search: search },
     });
   },
+  
+  GetAllInventoryRequests: (limit, offset, search) => {
+    return requests.get("/inventory/getAllInventoryRequests", {
+      params: { limit: limit, offset: offset, search: search },
+    });
+  },
 
   UpdateInventory: (body) => {
     return requests.put("/inventory/updateInventory", body);
@@ -18,6 +24,12 @@ const InventoryServices = {
   FetchInventoryById: (id) => {
     return requests.get("/inventory/getInventoryById", {
       params: { id: id },
+    });
+  },
+
+  AcceptProduct: (id) => {
+    return requests.get("/inventory/acceptProduct", {
+      params: { productId: id },
     });
   },
 

@@ -39,9 +39,9 @@ function UpdateInventory({ isOpen, onClose, data, setReload }) {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-
+    console.log(value);
     // Ensure price cannot be negative
-    const updatedValue = name === "price" || "quantity" ? Math.max(0, value) : value;
+    const updatedValue = name === "price" || name === "quantity" ? Math.max(0, value) : value;
 
     setFormData((prevData) => ({
       ...prevData,
@@ -114,12 +114,15 @@ function UpdateInventory({ isOpen, onClose, data, setReload }) {
                 />
               </FormControl>
 
-              <FormControl size="lg" className={`space-y-1 ${visible ? "opacity-80 hover:cursor-not-allowed" : ""}`}>
+              <FormControl
+                size="lg"
+                className={`space-y-1 ${visible ? "opacity-80 hover:cursor-not-allowed" : ""}`}
+              >
                 <label className={theme ? "text-zinc-800" : "text-zinc-300"}>Quantity</label>
                 <Input
                   sx={
                     theme
-                      ? { backgroundColor: "#f4f4f5", color: "#27272a", border: "none"  }
+                      ? { backgroundColor: "#f4f4f5", color: "#27272a", border: "none" }
                       : {
                           backgroundColor: "#27272a",
                           color: "#ffffff",
@@ -138,7 +141,10 @@ function UpdateInventory({ isOpen, onClose, data, setReload }) {
               </FormControl>
 
               {/* Manufacturing Date */}
-              <FormControl size="lg" className={`space-y-1 ${visible ? "opacity-80 hover:cursor-not-allowed" : ""}`}>
+              <FormControl
+                size="lg"
+                className={`space-y-1 ${visible ? "opacity-80 hover:cursor-not-allowed" : ""}`}
+              >
                 <label className={theme ? "text-zinc-800" : "text-zinc-300"}>
                   Manufacturing Date
                 </label>
@@ -163,7 +169,10 @@ function UpdateInventory({ isOpen, onClose, data, setReload }) {
               </FormControl>
 
               {/* Expiry Date (Cannot be earlier than Manufacturing Date) */}
-              <FormControl size="lg" className={`space-y-1 ${visible ? "opacity-80 hover:cursor-not-allowed" : ""}`}>
+              <FormControl
+                size="lg"
+                className={`space-y-1 ${visible ? "opacity-80 hover:cursor-not-allowed" : ""}`}
+              >
                 <label className={theme ? "text-zinc-800" : "text-zinc-300"}>Expiry Date</label>
                 <Input
                   sx={

@@ -83,7 +83,7 @@ function Sidebar() {
               className={`flex items-center text-base rounded-md px-2 
                 ${sidebarOpen ? "" : "justify-center"}
                py-2   ${
-                 location.pathname.includes(route.path)
+                 location.pathname.endsWith(route.path)
                    ? theme
                      ? "bg-violet-200 text-violet-800 font-medium"
                      : "bg-zinc-800 text-[#b490fc] font-medium"

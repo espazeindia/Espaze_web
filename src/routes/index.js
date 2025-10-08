@@ -25,6 +25,7 @@ const WarehouseOnboarding = lazy(() => import("../pages/AddWarehouse"));
 const OperationsOnboardingForm = lazy(() => import("../pages/RegisterOperations"));
 const CategoriesAndSubcategories = lazy(() => import("../pages/CategorySubcategoryAssortment"));
 const ChangePassword = lazy(() => import("../pages/ChangePassword"));
+const InventoryRequest = lazy(() => import("../pages/InventoryRequests"));
 
 const routes = [
   {
@@ -37,6 +38,11 @@ const routes = [
     path: "/inventory",
     component: Inventory,
     access: ["seller"],
+  },
+  {
+    path: "/inventory-request",
+    component: InventoryRequest,
+    access: [ "operations"],
   },
   {
     path: "/products",
@@ -114,6 +120,12 @@ const sidebarRoutes = [
     icon: Storefront,
     name: "Inventory",
     access: ["seller"],
+  },
+  {
+    path: "/inventory-request",
+    icon: Storefront,
+    name: "Inventory Request",
+    access: ["operations"],
   },
   {
     path: "/customers",
