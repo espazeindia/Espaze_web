@@ -20,6 +20,10 @@ const InventoryServices = {
       params: { id: id },
     });
   },
+
+  AddInventoryByExcel: (body) => {
+    return requests.post("/inventory/addInventoryByExcel", { metadataProducts: body });
+  },
 };
 
 export default InventoryServices;

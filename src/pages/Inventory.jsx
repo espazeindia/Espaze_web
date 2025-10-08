@@ -1,11 +1,13 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Tune, Add } from "@mui/icons-material";
 import InventoryTable from "../components/table/InventoryTable";
 import { useMode } from "../contexts/themeModeContext";
 import { useNavigate } from "react-router-dom";
 import { handleChangeDebounce } from "../utils/useDebounce";
 import InventoryServices from "../services/InventoryServices";
-import { notifyError } from "../utils/toast";
+import { notifyError, notifySuccess } from "../utils/toast";
+import { LoaderCircle } from "lucide-react";
+import * as XLSX from "xlsx";
 
 function Inventory() {
   const { theme } = useMode();
@@ -18,6 +20,8 @@ function Inventory() {
   const [totalDetails, setTotalDetails] = useState({});
   const [reload, setReload] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [excelLoading, setExcelLoading] = useState(false);
+  const fileInputRef = useRef(null);
 
   const debounce = handleChangeDebounce(searchText);
 
@@ -32,8 +36,8 @@ function Inventory() {
           if (inventory_products && inventory_products.length > 0) {
             transformedInventory = inventory_products.map((data) => {
               return {
-                inventory_id:data.inventory_id,
-                id:data.inventory_product_id,
+                inventory_id: data.inventory_id,
+                id: data.inventory_product_id,
                 productName: data.metadata_name,
                 productDescription: data.metadata_description,
                 category: data.metadata_category_id,
@@ -44,11 +48,11 @@ function Inventory() {
                 metadata_id: data.metadata_product_id,
                 category_name: data.metadata_category_name,
                 subcategory_name: data.metadata_subcategory_name,
-                m_date:data.product_manufacturing_date,
-                e_date:data.product_expiry_date,
-                price:data.product_price,
-                quantity:data.product_quantity,
-                visible:data.product_visibility,
+                m_date: data.product_manufacturing_date,
+                e_date: data.product_expiry_date,
+                price: data.product_price,
+                quantity: data.product_quantity,
+                visible: data.product_visibility,
               };
             });
           }
@@ -59,14 +63,128 @@ function Inventory() {
 
         setLoading(false);
       } catch (err) {
-        
-          notifyError(err?.response?.data?.message || err.message);
-        
+        notifyError(err?.response?.data?.message || err.message);
+
         setLoading(false);
       }
     };
     getMetadata();
   }, [debounce, page, limit, reload, sortOrder]);
+
+  const handleExcelImport = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+      fileInputRef.current.click();
+    }
+  };
+
+  const formatDate = (dateValue) => {
+    const dateObj = new Date(dateValue);
+    const day = String(dateObj.getDate()).padStart(2, "0");
+    const month = String(dateObj.getMonth() + 1).padStart(2, "0");
+    const year = dateObj.getFullYear();
+    return `${day}-${month}-${year}`;
+  };
+
+  const AddInventoryFunction = async (transformData) => {
+    try {
+      const result = await InventoryServices.AddInventoryByExcel(transformData);
+      if (result.success) {
+        setReload((prevData) => !prevData);
+      }
+    } catch (err) {
+      notifyError(err || err?.message);
+    }
+  };
+
+  const handleFileChange = async (event) => {
+    try {
+      const file = event.target.files?.[0];
+      if (!file) return;
+      setExcelLoading(true);
+      const arrayBuffer = await file.arrayBuffer();
+      const workbook = XLSX.read(arrayBuffer, { type: "array", cellDates: true, raw: false });
+
+      const firstSheetName = workbook.SheetNames[0];
+      const firstSheet = workbook.Sheets[firstSheetName];
+      const jsonRows = XLSX.utils.sheet_to_json(firstSheet, { defval: "" });
+
+      const { Serial_Number, id, name, description, category_name, subcategory_name, mrp } =
+        jsonRows[0];
+
+      if (
+        !Serial_Number ||
+        !id ||
+        !name ||
+        !description ||
+        !category_name ||
+        !subcategory_name ||
+        !mrp
+      ) {
+        notifyError("Invalid File Content!. Make sure you are uploading correct file");
+        excelLoading(false);
+        return;
+      }
+
+      const now = new Date();
+
+      let expiredProduct = 0;
+
+      console.log(jsonRows);
+
+      const transformedData = jsonRows
+        .map((data) => {
+          const { id, Quantity, Price, Manufacturing_Date, Expiry_Date } = data;
+          if (!id || !Price || !Quantity || !Manufacturing_Date || !Expiry_Date) {
+            return null;
+          }
+          return {
+            metadata_product_id: id,
+            product_quantity: parseInt(Quantity) ? parseInt(Quantity) : 0,
+            product_price: parseFloat(Price) ? parseFloat(Price) : 0.0,
+            product_manufacturing_date: formatDate(Manufacturing_Date),
+            product_expiry_date: formatDate(Expiry_Date),
+          };
+        })
+        .filter((filterData) => {
+          if (filterData == null) {
+            return false;
+          }
+          if (filterData.product_price === 0 || filterData.product_quantity === 0) {
+            return false;
+          }
+          const expiryDate = new Date(filterData.product_expiry_date);
+          if (expiryDate < now) {
+            expiredProduct++;
+            return false;
+          }
+          return true;
+        });
+      console.log(transformedData);
+      if (transformedData.length > 0) {
+        notifySuccess(
+          `Imported ${transformedData.length} valid rows from total ${jsonRows.length}  ${
+            jsonRows.length > 1 ? "rows" : "row"
+          }  from Excel. Please wait till we process it `
+        );
+      } else {
+        notifyError(`Not even one row has correct or complete data`);
+        setExcelLoading(false);
+        return;
+      }
+      if (expiredProduct > 0)
+        notifyError(
+          `${expiredProduct} ${
+            expiredProduct > 1 ? "products are" : "product is "
+          } already expired, can't add it `
+        );
+
+      await AddInventoryFunction(transformedData);
+    } catch (err) {
+      notifyError(`Invalid File :-  ${err}`);
+    }
+    setExcelLoading(false);
+  };
 
   return (
     <div
@@ -76,6 +194,40 @@ function Inventory() {
     >
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold">Inventory</h1>
+        <div className="flex justify-end gap-4 ">
+          <button
+            onClick={() => {
+              navigate("/products");
+            }}
+            className={` ${
+              theme
+                ? "border-green-600 text-green-600 shadow-green-600"
+                : " border-green-500 text-green-500 shadow-green-500"
+            } border w-26  
+              transition-all duration-700 flex  justify-center items-center py-1 font-semibold rounded-lg 
+              hover:cursor-pointer hover:shadow-sm`}
+          >
+            <Add fontSize="sm" />
+            Add
+          </button>
+          <button
+            className=" border px-4 py-1 rounded-lg cursor-pointer shadow-neutral-800 hover:shadow-sm"
+            onClick={handleExcelImport}
+          >
+            {excelLoading ? (
+              <LoaderCircle className=" animate-spin mx-7" />
+            ) : (
+              <span>Import Excel</span>
+            )}
+          </button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".xlsx,.xls"
+            onChange={handleFileChange}
+            className="hidden"
+          />
+        </div>
       </div>
 
       <div className="flex flex-col justify-center gap-5 mt-5">
@@ -133,50 +285,6 @@ function Inventory() {
               </button>
             </div>
           </div>
-        </div>
-        <div className="flex justify-end ">
-          {/* <button
-            className={` border-1 group relative flex items-center justify-center w-26 py-1 
-            transition-all duration-500  shadow-red-500 font-semibold rounded-s-lg  ${
-              checkedIds.length < 1
-                ? theme
-                  ? "text-zinc-700 border-zinc-700 hover:cursor-not-allowed"
-                  : "text-zinc-400 border-zinc-400 hover:cursor-not-allowed"
-                : theme
-                ? " hover:cursor-pointer text-red-600 border-red-600 hover:shadow-sm"
-                : " hover:cursor-pointer text-red-500 border-red-500 hover:shadow-sm"
-            }`}
-            disabled={checkedIds.length < 1}
-            onClick={handleMultipleDelete}
-          >
-            <DeleteOutline />
-            Delete
-            <div
-              className={`absolute hidden ${
-                checkedIds.length < 1 ? "group-hover:block" : ""
-              } top-[100%] text-[10px] ${
-                theme ? "text-zinc-600 bg-white " : "bg-zinc-600 text-white"
-              } p-2 rounded-md `}
-            >
-              {" "}
-              Only works on selecting atleast one product
-            </div>
-          </button> */}
-          <button
-            onClick={() => {
-              navigate("/products");
-            }}
-            className={` ${
-              theme
-                ? "border-green-600 text-green-600 shadow-green-600"
-                : " border-green-500 text-green-500 shadow-green-500"
-            } border w-26  
-              transition-all duration-700 flex  justify-center items-center py-1 font-semibold rounded-lg 
-              hover:cursor-pointer hover:shadow-sm`}
-          >
-            <Add fontSize="sm" />
-            Add
-          </button>
         </div>
       </div>
       <div className={`${theme ? " bg-white" : " bg-zinc-800"} shadow-md  p-4 rounded-lg mt-5 `}>

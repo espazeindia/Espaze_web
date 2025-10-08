@@ -25,31 +25,6 @@ function InventoryTable({
   const [openUpdateProduct, setOpenUpdateProduct] = useState(false);
   const [editProductDetails, setEditProductDetails] = useState({});
 
-  const handleUpdateInventory = async (data) => {
-    try {
-      const body = {
-        inventory_product_id: data.id,
-        product_visibility: data.visible ? false : true,
-        product_price: data.price,
-        product_manufacturing_date: data.m_date,
-        product_expiry_date: data.e_date,
-      };
-      const res = await InventoryServices.UpdateInventory(body);
-      if (res.success === true) {
-        setProducts((prevProducts) =>
-          prevProducts.map((product) =>
-            product.id === data.id
-              ? { ...product, visible: product.visible ? false : true }
-              : product
-          )
-        );
-        notifySuccess(res.message);
-      }
-    } catch (err) {
-      notifyError(err?.response?.data?.message || err.message);
-    }
-  };
-
   const handleProductView = (id) => {
     navigate(`/product-details/inventory_${id}`);
   };
@@ -75,7 +50,7 @@ function InventoryTable({
 
     const [year, month, day] = dateString.split("-");
     const monthName = months[parseInt(month, 10) - 1];
-    const shortYear = year.slice(-2);
+    const shortYear = year;
 
     return `${day} ${monthName} ${shortYear}`;
   };
@@ -263,10 +238,7 @@ function InventoryTable({
                   >
                     <Switch
                       checked={data.visible}
-                      onChange={(e) => {
-                        e.stopPropagation();
-                        handleUpdateInventory(data);
-                      }}
+                      readOnly={true}
                       sx={
                         theme
                           ? {
@@ -288,9 +260,6 @@ function InventoryTable({
                               "--Switch-thumbSize": "10px",
                               "&.Mui-checked": {
                                 "--Switch-trackBackground": "#4ade80",
-                              },
-                              "&.Mui-checked:hover": {
-                                "--Switch-trackBackground": "#388E3C", // Hover effect when checked
                               },
                             }
                       }

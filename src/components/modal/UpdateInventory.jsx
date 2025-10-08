@@ -114,12 +114,12 @@ function UpdateInventory({ isOpen, onClose, data, setReload }) {
                 />
               </FormControl>
 
-              <FormControl size="lg" className="space-y-1">
+              <FormControl size="lg" className={`space-y-1 ${visible ? "opacity-80 hover:cursor-not-allowed" : ""}`}>
                 <label className={theme ? "text-zinc-800" : "text-zinc-300"}>Quantity</label>
                 <Input
                   sx={
                     theme
-                      ? { backgroundColor: "#f4f4f5", color: "#27272a", border: "none" }
+                      ? { backgroundColor: "#f4f4f5", color: "#27272a", border: "none"  }
                       : {
                           backgroundColor: "#27272a",
                           color: "#ffffff",
@@ -132,12 +132,13 @@ function UpdateInventory({ isOpen, onClose, data, setReload }) {
                   onChange={handleChange}
                   required
                   size="lg"
+                  disabled={visible}
                   placeholder="Enter Product Quantity"
                 />
               </FormControl>
 
               {/* Manufacturing Date */}
-              <FormControl size="lg" className="space-y-1">
+              <FormControl size="lg" className={`space-y-1 ${visible ? "opacity-80 hover:cursor-not-allowed" : ""}`}>
                 <label className={theme ? "text-zinc-800" : "text-zinc-300"}>
                   Manufacturing Date
                 </label>
@@ -156,12 +157,13 @@ function UpdateInventory({ isOpen, onClose, data, setReload }) {
                   onChange={handleChange}
                   type="date"
                   required
+                  disabled={visible}
                   size="lg"
                 />
               </FormControl>
 
               {/* Expiry Date (Cannot be earlier than Manufacturing Date) */}
-              <FormControl size="lg" className="space-y-1">
+              <FormControl size="lg" className={`space-y-1 ${visible ? "opacity-80 hover:cursor-not-allowed" : ""}`}>
                 <label className={theme ? "text-zinc-800" : "text-zinc-300"}>Expiry Date</label>
                 <Input
                   sx={
@@ -178,46 +180,11 @@ function UpdateInventory({ isOpen, onClose, data, setReload }) {
                   onChange={handleChange}
                   type="date"
                   required
+                  disabled={visible}
                   size="lg"
                   min={formData.manufacturingDate}
                 />
               </FormControl>
-              <div size="lg" className="flex gap-10 mt-2">
-                <label className={theme ? "text-zinc-800" : "text-zinc-300"}>Visibility</label>
-                <Switch
-                  checked={visible}
-                  onChange={(e) => {
-                    setVisible(e.target.checked);
-                  }}
-                  sx={
-                    theme
-                      ? {
-                          "--Switch-trackRadius": "13px",
-                          "--Switch-trackWidth": "40px",
-                          "--Switch-trackHeight": "19px",
-                          "--Switch-thumbSize": "10px",
-                          "&.Mui-checked": {
-                            "--Switch-trackBackground": "#16a34a",
-                          },
-                          "&.Mui-checked:hover": {
-                            "--Switch-trackBackground": "#166534", // Hover effect when checked
-                          },
-                        }
-                      : {
-                          "--Switch-trackRadius": "13px",
-                          "--Switch-trackWidth": "40px",
-                          "--Switch-trackHeight": "19px",
-                          "--Switch-thumbSize": "10px",
-                          "&.Mui-checked": {
-                            "--Switch-trackBackground": "#4ade80",
-                          },
-                          "&.Mui-checked:hover": {
-                            "--Switch-trackBackground": "#388E3C", // Hover effect when checked
-                          },
-                        }
-                  }
-                />
-              </div>
             </div>
 
             {/* Submit Button */}
